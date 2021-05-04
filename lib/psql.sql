@@ -1,0 +1,31 @@
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TODO SET NOT FULL AFTER TESTING
+CREATE TABLE products(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  image VARCHAR(50),
+  brand VARCHAR(50),
+  category VARCHAR(50),
+  description VARCHAR(50),
+  rating INTEGER DEFAULT 0,
+  num_reviews INTEGER DEFAULT 0,
+  price INTEGER DEFAULT 0,
+  count_in_stock INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON products
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+-- TODO ADD OTHER TABLES, FOREIGN KEYS, INDEXES
+-- TODO POPULATE DB WITH RAW DATA IN rawdata.sql
