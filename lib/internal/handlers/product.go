@@ -8,6 +8,7 @@ import (
 
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
+	"github.com/go-chi/chi"
 )
 
 type productsJson struct {
@@ -130,24 +131,121 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 }
 
+// UpdateProduct updates a product
+func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Println("Error converting parameter to int")
+		return
+	}
+
+	var resp jsonMsg = jsonMsg{
+		Ok:      true,
+		Message: "Success!",
+	}
+
+	prod, err := repo.DB.GetProductById(id)
+	if err != nil {
+		fmt.Printf("ERR: %s", err)
+
+		resp.Ok = false
+		resp.Message = fmt.Sprintf("ERR: %s", err)
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("error marshalling", err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+
+		return
+	}
+
+	prod.Name = r.Form.Get("name")
+	prod.Image = r.Form.Get("image")
+	prod.Brand = r.Form.Get("brand")
+	prod.Category = r.Form.Get("category")
+	prod.Description = r.Form.Get("description")
+	if r.Form.Get("price") != "" {
+		tmp, err := strconv.Atoi(r.Form.Get("price"))
+		if err != nil {
+			fmt.Println("Error converting price to int")
+			return
+		}
+
+		prod.Price = tmp
+	}
+	if r.Form.Get("count_in_stock") != "" {
+		tmp, err := strconv.Atoi(r.Form.Get("count_in_stock"))
+		if err != nil {
+			fmt.Println("Error converting count_in_stock to int")
+			return
+		}
+		prod.CountInStock = tmp
+	}
+
+	err = repo.DB.UpdateProductById(prod)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	out, err := json.Marshal(resp)
+	if err != nil {
+		fmt.Println("error marshalling", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
+
 // DeleteProduct deletes a product
 func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
-	// body, _ := ioutil.ReadAll(r.Body) // check for errors
-	// keyVal := make(map[string]interface{})
-	// json.Unmarshal(body, &keyVal) // check for errors
-	// fmt.Println(keyVal)           // has populated data
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Println("Error converting parameter to int")
+		return
+	}
 
-	// id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	// if err != nil {
-	// 	fmt.Println(fmt.Errorf("error converting id to int, %s", err))
-	// 	return
-	// }
+	var resp jsonMsg = jsonMsg{
+		Ok:      true,
+		Message: "Success!",
+	}
 
-	// tempDb, err = removeElement(tempDb, id)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	err = repo.DB.DeleteProductById(id)
+	if err != nil {
+		fmt.Printf("ERR: %s", err)
+
+		resp.Ok = false
+		resp.Message = fmt.Sprintf("ERR: %s", err)
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("error marshalling", err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+
+		return
+	}
+
+	out, err := json.Marshal(resp)
+	if err != nil {
+		fmt.Println("error marshalling", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
 }
 
 // func removeElement(prods []models.Product, id int) ([]models.Product, error) {

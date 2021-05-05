@@ -29,11 +29,12 @@ func routes() http.Handler {
 	})
 
 	mux.Route("/products", func(mux chi.Router) {
+		mux.Get("/", handlers.Repo.GetProducts)
+
 		// mux.Use(Auth)
 		// mux.Get("/xyz/{src}/{id}", handlers.Repo.Xyz)
-
-		mux.Get("/", handlers.Repo.GetProducts)
 		mux.Post("/", handlers.Repo.CreateProduct)
+		mux.Patch("/{id}", handlers.Repo.UpdateProduct)
 		mux.Delete("/{id}", handlers.Repo.DeleteProduct)
 	})
 
