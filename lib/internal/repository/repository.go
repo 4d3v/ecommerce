@@ -8,4 +8,7 @@ type DatabaseRepo interface {
 	GetProductById(id int) (models.Product, error)
 	UpdateProductById(prod models.Product) error
 	DeleteProductById(id int) error
+
+	InsertUser(usr models.User) error
+	GetUsers() ([]models.User, error)
 }

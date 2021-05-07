@@ -28,6 +28,11 @@ func routes() http.Handler {
 		w.Write([]byte(fmt.Sprintf("test page %s", param)))
 	})
 
+	mux.Route("/users", func(mux chi.Router) {
+		mux.Get("/", handlers.Repo.GetUsers)
+		mux.Post("/", handlers.Repo.CreateUser)
+	})
+
 	mux.Route("/products", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetProducts)
 

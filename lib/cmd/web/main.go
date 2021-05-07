@@ -11,6 +11,8 @@ import (
 	"github.com/4d3v/ecommerce/internal/helpers"
 )
 
+// TODO implement form validation
+
 // Temporary Postgres container for development
 // docker run --name ecommerce-dev -e POSTGRES_USER=tmpusr
 // -e POSTGRES_PASSWORD=secret -d -p 5432:5432 postgres

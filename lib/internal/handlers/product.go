@@ -11,24 +11,6 @@ import (
 	"github.com/go-chi/chi"
 )
 
-type productsJson struct {
-	Id           int    `json:"id"`
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	Brand        string `json:"brand"`
-	Category     string `json:"category"`
-	Description  string `json:"description"`
-	Rating       int    `json:"rating"`
-	NumReviews   int    `json:"num_reviews"`
-	Price        int    `json:"price"`
-	CountInStock int    `json:"count_in_stock"`
-}
-
-type jsonMsg struct {
-	Ok      bool   `json:"ok"`
-	Message string `json:"message"`
-}
-
 // GetProducts get all products and return as json
 func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := repo.DB.GetProducts()
@@ -37,9 +19,9 @@ func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp []productsJson
+	var resp []productJson
 	for _, prod := range products {
-		p := productsJson{
+		p := productJson{
 			Id:           prod.Id,
 			Name:         prod.Name,
 			Image:        prod.Image,
@@ -81,12 +63,10 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, _ := strconv.Atoi(r.Form.Get("id"))                       // TODO handle error
 	price, _ := strconv.Atoi(r.Form.Get("price"))                 // TODO handle error
 	countInStock, _ := strconv.Atoi(r.Form.Get("count_in_stock")) // TODO handle error
 
 	product := models.Product{
-		Id:           id,
 		Name:         r.Form.Get("name"),
 		Image:        r.Form.Get("image"),
 		Brand:        r.Form.Get("brand"),
@@ -169,18 +149,27 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prod.Name = r.Form.Get("name")
-	prod.Image = r.Form.Get("image")
-	prod.Brand = r.Form.Get("brand")
-	prod.Category = r.Form.Get("category")
-	prod.Description = r.Form.Get("description")
+	if len(r.Form.Get("name")) > 0 {
+		prod.Name = r.Form.Get("name")
+	}
+	if len(r.Form.Get("image")) > 0 {
+		prod.Image = r.Form.Get("image")
+	}
+	if len(r.Form.Get("brand")) > 0 {
+		prod.Brand = r.Form.Get("brand")
+	}
+	if len(r.Form.Get("category")) > 0 {
+		prod.Category = r.Form.Get("category")
+	}
+	if len(r.Form.Get("descrition")) > 0 {
+		prod.Description = r.Form.Get("description")
+	}
 	if r.Form.Get("price") != "" {
 		tmp, err := strconv.Atoi(r.Form.Get("price"))
 		if err != nil {
 			fmt.Println("Error converting price to int")
 			return
 		}
-
 		prod.Price = tmp
 	}
 	if r.Form.Get("count_in_stock") != "" {
