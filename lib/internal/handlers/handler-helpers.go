@@ -1,11 +1,13 @@
 package handlers
 
-import "time"
+import (
+	"time"
+)
 
 const (
-	owner = iota + 1 // 1
-	admin            // 2
-	user             // 3
+	owner  = iota + 1 // 1
+	admin             // 2
+	normal            // 3
 )
 
 type userJson struct {

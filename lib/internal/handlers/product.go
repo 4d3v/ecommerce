@@ -131,6 +131,8 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		Message: "Success!",
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
 		fmt.Printf("ERR: %s", err)
@@ -141,11 +143,10 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		out, err := json.Marshal(resp)
 		if err != nil {
 			fmt.Println("error marshalling", err)
+			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		w.Write(out)
-
 		return
 	}
 
@@ -192,7 +193,6 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("error marshalling", err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
 }
 

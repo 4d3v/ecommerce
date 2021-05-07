@@ -120,7 +120,8 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 
 	query := `
 		UPDATE products SET name = $1, image = $2, brand = $3, category = $4,
-		description = $5, price = $6, count_in_stock = $7 WHERE id = $8
+		description = $5, price = $6, count_in_stock = $7 updated_at $8
+		WHERE id = $9
 	`
 
 	_, err := dbrepo.DB.ExecContext(
@@ -133,6 +134,7 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 		&prod.Description,
 		&prod.Price,
 		&prod.CountInStock,
+		time.Now(),
 		&prod.Id,
 	)
 

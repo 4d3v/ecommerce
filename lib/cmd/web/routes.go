@@ -31,6 +31,7 @@ func routes() http.Handler {
 	mux.Route("/users", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetUsers)
 		mux.Post("/", handlers.Repo.CreateUser)
+		mux.Patch("/{id}", handlers.Repo.AdminUpdateUser)
 	})
 
 	mux.Route("/products", func(mux chi.Router) {
