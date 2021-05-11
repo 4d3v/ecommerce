@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 )
 
-func (repo *Repository) GetUsers(w http.ResponseWriter, r *http.Request) {
+func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
 	users, err := repo.DB.AdminGetUsers()
 	if err != nil {
@@ -19,53 +22,34 @@ func (repo *Repository) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp []userJson
-
-	for _, prop := range users {
-		p := userJson{
-			Id:     prop.Id,
-			Name:   prop.Name,
-			Email:  prop.Email,
-			Role:   prop.Role,
-			Active: prop.Active,
-		}
-
-		resp = append(resp, p)
+	opts := &options{
+		users: users,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	newJson, err := json.MarshalIndent(resp, "", "    ")
-	if err != nil {
-		fmt.Println("Error marshaling json")
-
-		resp := jsonMsg{
-			Ok:      false,
-			Message: "Internal server error",
-		}
-
-		out, _ := json.Marshal(resp)
-		w.Write(out)
-		return
-	}
-
-	w.Write(newJson)
+	sendJson("usersjson", w, opts)
 }
 
-func (repo *Repository) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
-	role, err := strconv.Atoi(r.Form.Get("role")) // TODO handle error
-	if err != nil {
-		fmt.Println("Error parsing user role property into int")
-		return
+	var role int
+
+	switch r.Form.Get("role") {
+	case "owner":
+		role = owner
+	case "admin":
+		role = admin
+	case "normal":
+		role = normal
+	default:
+		role = normal
 	}
 
-	usr := models.User{
+	user := models.User{
 		Name:            r.Form.Get("name"),
 		Email:           r.Form.Get("email"),
 		Role:            role,
@@ -73,38 +57,26 @@ func (repo *Repository) CreateUser(w http.ResponseWriter, r *http.Request) {
 		PasswordConfirm: r.Form.Get("password_confirm"),
 	}
 
-	resp := jsonMsg{
-		Ok:      true,
-		Message: "Success!",
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+		err: "",
 	}
-
-	err = repo.DB.AdminInsertUser(usr) // TODO handle error #Err0
 
 	w.Header().Set("Content-Type", "application/json")
 
+	err = repo.DB.AdminInsertUser(user)
 	if err != nil {
-		helpers.ServerError(w, err) // #Err0
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
 
-		resp.Ok = false
-		resp.Message = "Fail!"
-
-		out, err := json.MarshalIndent(resp, "", "    ")
-		if err != nil {
-			fmt.Println("Error marshalling json")
-			return
-		}
-
-		w.Write(out)
+		sendJson("msgjson", w, opts)
 		return
 	}
 
-	out, err := json.Marshal(resp)
-	if err != nil {
-		fmt.Println("error marshalling", err)
-		return
-	}
-
-	w.Write(out)
+	sendJson("msgjson", w, opts)
 }
 
 func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -117,31 +89,25 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		fmt.Println("Error converting parameter to int")
+		helpers.ServerError(w, err)
 		return
 	}
 
-	resp := jsonMsg{
-		Ok:      true,
-		Message: "Success!",
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+		err: "",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	user, err := repo.DB.AdminGetUserById(id)
+	user, err := repo.DB.GetUserById(id)
 	if err != nil {
-		fmt.Printf("ERROR: %s", err)
-
-		resp.Ok = false
-		resp.Message = "Fail!"
-
-		out, err := json.Marshal(resp)
-		if err != nil {
-			fmt.Println("Error marshaling json")
-			return
-		}
-
-		w.Write(out)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
 		return
 	}
 
@@ -166,7 +132,7 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 	if len(r.Form.Get("active")) > 0 {
 		tmp, err := strconv.ParseBool(r.Form.Get("active"))
 		if err != nil {
-			fmt.Println("Error converting active to boolean")
+			helpers.ServerError(w, err)
 			return
 		}
 		user.Active = tmp
@@ -178,11 +144,98 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	out, err := json.Marshal(resp)
+	sendJson("msgjson", w, opts)
+}
+
+func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
 	if err != nil {
-		fmt.Println("Error marshaling json")
+		helpers.ServerError(w, err)
 		return
 	}
 
-	w.Write(out)
+	w.Header().Set("Content-Type", "application/json")
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	token, err := repo.DB.Login(email, password)
+	if err != nil {
+		resp := jsonMsg{
+			Ok:      false,
+			Message: fmt.Sprintf("Err: %s", err),
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			return
+		}
+
+		w.Write(out)
+		return
+	}
+
+	jwtCookie := http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		HttpOnly: true,
+		Expires:  time.Now().Add(time.Hour * 24), // 1 day
+	}
+
+	fmt.Println(jwtCookie)
+	http.SetCookie(w, &jwtCookie)
+
+	w.Write([]byte(token))
+}
+
+func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
+	jwtCookie, err := r.Cookie("jwt")
+	if err != nil {
+		fmt.Println("Unauthenticated!", err)
+		return
+	}
+
+	const secretKey = "secret"
+	token, _ := jwt.ParseWithClaims(jwtCookie.Value, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	// if err != nil {
+	// 	fmt.Println("Unauthenticated!")
+	// 	return
+	// }
+
+	claims := token.Claims.(*jwt.StandardClaims)
+	userId, err := strconv.Atoi(claims.Issuer)
+	if err != nil {
+		fmt.Println("Error converting claims issuer (userId) to int")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	user, err := repo.DB.GetUserById(userId)
+	if err != nil {
+		fmt.Printf("ERROR: %s", err)
+
+		resp := jsonMsg{
+			Ok:      false,
+			Message: fmt.Sprintf("Err: %s", err),
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			return
+		}
+
+		w.Write(out)
+		return
+	}
+
+	opts := &options{
+		user: user,
+	}
+
+	sendJson("userjson", w, opts)
 }

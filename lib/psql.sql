@@ -8,8 +8,8 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE users(
   id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
-  email VARCHAR(50),
+  name VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(50) NOT NULL UNIQUE,
   role INTEGER,
   password VARCHAR(100),
   password_confirm VARCHAR(100),

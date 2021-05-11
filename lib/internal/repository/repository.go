@@ -11,8 +11,10 @@ type DatabaseRepo interface {
 
 	AdminInsertUser(usr models.User) error
 	AdminGetUsers() ([]models.User, error)
-	AdminGetUserById(id int) (models.User, error)
 	AdminUpdateUser(user models.User) error
 
+	GetUserById(id int) (models.User, error)
+
+	Login(email, password string) (string, error)
 	UpdateMe(user models.User) error
 }

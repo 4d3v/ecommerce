@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/4d3v/ecommerce/internal/models"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -85,31 +87,6 @@ func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// AdminGetUserById retrieves user's info
-func (dbrepo *postgresDbRepo) AdminGetUserById(id int) (models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := `SELECT id, name, email, role, active FROM users WHERE id = $1`
-
-	var user models.User
-
-	row := dbrepo.DB.QueryRowContext(ctx, query, id)
-	err := row.Scan(
-		&user.Id,
-		&user.Name,
-		&user.Email,
-		&user.Role,
-		&user.Active,
-	)
-
-	if err != nil {
-		return user, err
-	}
-
-	return user, nil
-}
-
 // AdminUpdateUser updates user's data, should be used only by admins
 // Can mutate critical properties such as user's role
 func (dbrepo *postgresDbRepo) AdminUpdateUser(user models.User) error {
@@ -139,6 +116,31 @@ func (dbrepo *postgresDbRepo) AdminUpdateUser(user models.User) error {
 	return nil
 }
 
+// GetUserById retrieves user's info
+func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, name, email, role, active FROM users WHERE id = $1`
+
+	var user models.User
+
+	row := dbrepo.DB.QueryRowContext(ctx, query, id)
+	err := row.Scan(
+		&user.Id,
+		&user.Name,
+		&user.Email,
+		&user.Role,
+		&user.Active,
+	)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
 // TODO see how to implement JWT
 // TODO func (dbrepo *postgresDbRepo) SignUp(){}
 // TODO func (dbrepo *postgresDbRepo) ForgotPassword(){}
@@ -146,7 +148,7 @@ func (dbrepo *postgresDbRepo) AdminUpdateUser(user models.User) error {
 // TODO func (dbrepo *postgresDbRepo) GetMyProfile(){}
 
 // Login
-func (dbrepo *postgresDbRepo) Login(email, password string) (int, error) {
+func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -163,17 +165,29 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (int, error) {
 
 	err := row.Scan(&id, &hashedPassword)
 	if err != nil {
-		return id, err
+		return "", errors.New("incorrect email or password")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return 0, errors.New("incorrect password")
+		return "", errors.New("incorrect email or password")
 	} else if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return id, nil
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    strconv.Itoa(id),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 1 day
+	})
+
+	const secretKey = "secret"
+
+	token, err := claims.SignedString([]byte(secretKey))
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 // UpdateMe updates some user's data
