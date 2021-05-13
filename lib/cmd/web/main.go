@@ -9,6 +9,7 @@ import (
 	"github.com/4d3v/ecommerce/internal/driver"
 	"github.com/4d3v/ecommerce/internal/handlers"
 	"github.com/4d3v/ecommerce/internal/helpers"
+	"github.com/joho/godotenv"
 )
 
 // TODO implement form validation
@@ -37,6 +38,14 @@ func run() (*driver.DB, error) {
 	app.InProduction = false
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime)
+
+	var envMap map[string]string
+	envMap, err := godotenv.Read()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	app.Env = envMap
 
 	// connect to database
 	log.Println("Connecting to database...")

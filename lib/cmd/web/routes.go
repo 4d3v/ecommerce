@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/4d3v/ecommerce/internal/handlers"
@@ -26,19 +25,7 @@ func routes() http.Handler {
 
 	mux.Use(middleware.Recoverer)
 	// mux.Use(NoSurf) // Disable when working with postman
-
-	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("This is the about page"))
-	})
-
-	mux.Get("/about", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("This is the about page"))
-	})
-
-	mux.Get("/test/{id}", func(w http.ResponseWriter, r *http.Request) {
-		param := chi.URLParam(r, "id")
-		w.Write([]byte(fmt.Sprintf("test page %s", param)))
-	})
+	mux.Use(setContentType)
 
 	mux.Route("/users", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.AdminGetUsers)

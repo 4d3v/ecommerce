@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/4d3v/ecommerce/internal/forms"
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
 	"github.com/dgrijalva/jwt-go"
@@ -14,8 +15,6 @@ import (
 )
 
 func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	users, err := repo.DB.AdminGetUsers()
 	if err != nil {
 		helpers.ServerError(w, err)
@@ -36,8 +35,31 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var role int
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+	}
 
+	form := forms.New(r.PostForm)
+	form.Required("name", "email", "password", "password_confirm")
+	form.MinLength("name", 3)
+	form.MinLength("password", 6)
+	form.CheckPassword("password", "password_confirm")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	var role int
 	switch r.Form.Get("role") {
 	case "owner":
 		role = owner
@@ -56,14 +78,6 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		Password:        r.Form.Get("password"),
 		PasswordConfirm: r.Form.Get("password_confirm"),
 	}
-
-	opts := &options{
-		ok:  true,
-		msg: "Success",
-		err: "",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	err = repo.DB.AdminInsertUser(user)
 	if err != nil {
@@ -98,8 +112,6 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		msg: "Success",
 		err: "",
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	user, err := repo.DB.GetUserById(id)
 	if err != nil {
@@ -154,7 +166,6 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
 
@@ -182,28 +193,36 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(time.Hour * 24), // 1 day
 	}
 
-	fmt.Println(jwtCookie)
 	http.SetCookie(w, &jwtCookie)
 
-	w.Write([]byte(token))
+	sendJson("msgjson", w, &options{ok: true, msg: "Logged in succesfully"})
 }
 
 func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	jwtCookie, err := r.Cookie("jwt")
 	if err != nil {
-		fmt.Println("Unauthenticated!", err)
+		sendJson("msgjson", w, &options{
+			ok:  false,
+			err: "Unauthenticated",
+		})
 		return
 	}
 
-	const secretKey = "secret"
-	token, _ := jwt.ParseWithClaims(jwtCookie.Value, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secretKey), nil
-	})
-
-	// if err != nil {
-	// 	fmt.Println("Unauthenticated!")
-	// 	return
-	// }
+	token, err := jwt.ParseWithClaims(
+		jwtCookie.Value,
+		&jwt.StandardClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(repo.App.Env["JWT_SECRET"]), nil
+		},
+	)
+	if err != nil {
+		fmt.Println("Unauthenticated, ParseWithClaims...")
+		sendJson("msgjson", w, &options{
+			ok:  false,
+			err: "Unauthenticated",
+		})
+		return
+	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
 	userId, err := strconv.Atoi(claims.Issuer)
@@ -211,8 +230,6 @@ func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error converting claims issuer (userId) to int")
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	user, err := repo.DB.GetUserById(userId)
 	if err != nil {

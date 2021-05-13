@@ -47,9 +47,10 @@ type jsonMsg struct {
 }
 
 type msgJson struct {
-	Ok      bool   `json:"ok"`
-	Message string `json:"message"`
-	Error   string `json:"error"`
+	Ok      bool                `json:"ok"`
+	Message string              `json:"message"`
+	Error   string              `json:"error"`
+	Errors  map[string][]string `json:"errors"`
 }
 
 type options struct {
@@ -59,6 +60,7 @@ type options struct {
 	ok    bool
 	msg   string
 	err   string
+	errs  map[string][]string
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -111,6 +113,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			Ok:      opts.ok,
 			Message: opts.msg,
 			Error:   opts.err,
+			Errors:  opts.errs,
 		}
 
 		out, err := json.Marshal(resp)

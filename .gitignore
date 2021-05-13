@@ -19,4 +19,7 @@
 /vendor/
 /Godeps/
 
+### Dotenv Files ###
+*.env
+
 ### End Go ###

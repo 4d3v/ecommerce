@@ -6,6 +6,7 @@ import (
 
 // AppConfig holds the application config
 type AppConfig struct {
+	Env          map[string]string
 	InProduction bool
 	UseCache     bool
 	InfoLog      *log.Logger
