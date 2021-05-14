@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -19,40 +18,7 @@ func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp []productJson
-	for _, prod := range products {
-		p := productJson{
-			Id:           prod.Id,
-			Name:         prod.Name,
-			Image:        prod.Image,
-			Brand:        prod.Brand,
-			Category:     prod.Category,
-			Description:  prod.Description,
-			Rating:       prod.Rating,
-			NumReviews:   prod.NumReviews,
-			Price:        prod.Price,
-			CountInStock: prod.CountInStock,
-		}
-		resp = append(resp, p)
-	}
-
-	newJson, err := json.MarshalIndent(resp, "", "    ")
-	if err != nil {
-		fmt.Println("error marshalling", err)
-
-		resp := jsonMsg{
-			Ok:      false,
-			Message: "Internal server error",
-		}
-
-		out, _ := json.MarshalIndent(resp, "", "     ")
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(newJson)
+	sendJson("prodsjson", w, &options{prods: products})
 }
 
 // CreateProduct creates a new product
@@ -61,6 +27,11 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
+	}
+
+	opts := &options{
+		ok:  true,
+		msg: "Success",
 	}
 
 	price, _ := strconv.Atoi(r.Form.Get("price"))                 // TODO handle error
@@ -76,39 +47,42 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		CountInStock: countInStock,
 	}
 
-	err = repo.DB.InsertProduct(product) // TODO handle error #Err0
+	err = repo.DB.InsertProduct(product)
 	if err != nil {
-		helpers.ServerError(w, err) // #Err0
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
 
-		resp := jsonMsg{
-			Ok:      false,
-			Message: "Fail!",
-		}
-
-		out, err := json.MarshalIndent(resp, "", "    ")
-		if err != nil {
-			fmt.Println("error marshalling", err)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		sendJson("msgjson", w, opts)
 		return
 	}
 
-	resp := jsonMsg{
-		Ok:      true,
-		Message: "Success!",
-	}
+	sendJson("msgjson", w, opts)
+}
 
-	out, err := json.Marshal(resp)
+// GetProductById retrieves the product with specified id
+func (repo *Repository) GetProductById(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		fmt.Println("error marshalling", err)
+		helpers.ServerError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	prod, err := repo.DB.GetProductById(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		sendJson("msgjson", w, &options{
+			ok:  false,
+			msg: "Fail",
+			err: fmt.Sprintf("%s", err),
+		})
+		return
+	}
+
+	sendJson("prodjson", w, &options{prod: prod})
 }
 
 // UpdateProduct updates a product
@@ -122,31 +96,24 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		fmt.Println("Error converting parameter to int")
+		helpers.ServerError(w, err)
 		return
 	}
 
-	var resp jsonMsg = jsonMsg{
-		Ok:      true,
-		Message: "Success!",
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+		err: "",
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
-		fmt.Printf("ERR: %s", err)
-
-		resp.Ok = false
-		resp.Message = fmt.Sprintf("ERR: %s", err)
-
-		out, err := json.Marshal(resp)
-		if err != nil {
-			fmt.Println("error marshalling", err)
-			return
-		}
-
-		w.Write(out)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
 		return
 	}
 
@@ -188,12 +155,7 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, err := json.Marshal(resp)
-	if err != nil {
-		fmt.Println("error marshalling", err)
-	}
-
-	w.Write(out)
+	sendJson("msgjson", w, opts)
 }
 
 // DeleteProduct deletes a product
@@ -205,36 +167,24 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp jsonMsg = jsonMsg{
-		Ok:      true,
-		Message: "Success!",
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+		err: "",
 	}
 
 	err = repo.DB.DeleteProductById(id)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Printf("ERR: %s", err)
-
-		resp.Ok = false
-		resp.Message = fmt.Sprintf("ERR: %s", err)
-
-		out, err := json.Marshal(resp)
-		if err != nil {
-			fmt.Println("error marshalling", err)
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
-
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
 		return
 	}
 
-	out, err := json.Marshal(resp)
-	if err != nil {
-		fmt.Println("error marshalling", err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	sendJson("msgjson", w, opts)
 }
 
 // func removeElement(prods []models.Product, id int) ([]models.Product, error) {

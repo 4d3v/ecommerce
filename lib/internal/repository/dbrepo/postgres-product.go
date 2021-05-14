@@ -120,7 +120,7 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 
 	query := `
 		UPDATE products SET name = $1, image = $2, brand = $3, category = $4,
-		description = $5, price = $6, count_in_stock = $7 updated_at $8
+		description = $5, price = $6, count_in_stock = $7, updated_at = $8
 		WHERE id = $9
 	`
 

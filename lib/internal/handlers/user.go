@@ -49,12 +49,11 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 
 	if !form.Valid() {
 		w.WriteHeader(http.StatusBadRequest)
-
+		fmt.Println(err)
 		opts.ok = false
 		opts.msg = "Fail"
 		opts.err = "Invalid form"
 		opts.errs = form.Errors
-
 		sendJson("msgjson", w, opts)
 		return
 	}
@@ -115,6 +114,7 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 
 	user, err := repo.DB.GetUserById(id)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		opts.ok = false
 		opts.msg = "Fail"

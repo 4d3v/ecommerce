@@ -41,6 +41,7 @@ func routes() http.Handler {
 		// mux.Use(Auth)
 		// mux.Get("/xyz/{src}/{id}", handlers.Repo.Xyz)
 		mux.Post("/", handlers.Repo.CreateProduct)
+		mux.Get("/{id}", handlers.Repo.GetProductById)
 		mux.Patch("/{id}", handlers.Repo.UpdateProduct)
 		mux.Delete("/{id}", handlers.Repo.DeleteProduct)
 	})

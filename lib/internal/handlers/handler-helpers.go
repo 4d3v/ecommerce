@@ -56,6 +56,7 @@ type msgJson struct {
 type options struct {
 	users []models.User
 	user  models.User
+	prods []models.Product
 	prod  models.Product
 	ok    bool
 	msg   string
@@ -106,7 +107,52 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(out)
 
 	case "prodjson":
-		return nil
+		resp := productJson{
+			Id:           opts.prod.Id,
+			Name:         opts.prod.Name,
+			Image:        opts.prod.Image,
+			Brand:        opts.prod.Brand,
+			Category:     opts.prod.Category,
+			Description:  opts.prod.Description,
+			Rating:       opts.prod.Rating,
+			NumReviews:   opts.prod.NumReviews,
+			Price:        opts.prod.Price,
+			CountInStock: opts.prod.CountInStock,
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(out)
+
+	case "prodsjson":
+		var resp []productJson
+		for _, prod := range opts.prods {
+			p := productJson{
+				Id:           prod.Id,
+				Name:         prod.Name,
+				Image:        prod.Image,
+				Brand:        prod.Brand,
+				Category:     prod.Category,
+				Description:  prod.Description,
+				Rating:       prod.Rating,
+				NumReviews:   prod.NumReviews,
+				Price:        prod.Price,
+				CountInStock: prod.CountInStock,
+			}
+			resp = append(resp, p)
+		}
+
+		newJson, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(newJson)
 
 	case "msgjson":
 		resp := msgJson{
