@@ -9,6 +9,7 @@ import (
 	"github.com/4d3v/ecommerce/internal/driver"
 	"github.com/4d3v/ecommerce/internal/handlers"
 	"github.com/4d3v/ecommerce/internal/helpers"
+	"github.com/4d3v/ecommerce/internal/models"
 	"github.com/joho/godotenv"
 )
 
@@ -32,9 +33,27 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.SQL.Close()
+
+	defer close(app.MailChan)
+	app.InfoLog.Printf("starting mail listener...")
+	listenForMail()
+
+	app.InfoLog.Printf("Starting application on port %s", port)
+
+	srv := &http.Server{
+		Addr:    port,
+		Handler: routes(),
+	}
+
+	err = srv.ListenAndServe()
+	app.ErrorLog.Println(err)
+	os.Exit(1)
 }
 
 func run() (*driver.DB, error) {
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+
 	app.InProduction = false
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime)
@@ -60,17 +79,6 @@ func run() (*driver.DB, error) {
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	helpers.NewLoggers(&app)
-
-	app.InfoLog.Printf("Starting application on port %s", port)
-
-	srv := &http.Server{
-		Addr:    port,
-		Handler: routes(),
-	}
-
-	err = srv.ListenAndServe()
-	app.ErrorLog.Println(err)
-	os.Exit(1)
 
 	return db, nil
 }

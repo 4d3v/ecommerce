@@ -3,6 +3,7 @@ package forms
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -64,5 +65,28 @@ func (f *Form) CheckPassword(pass, passConfirm string) bool {
 func (f *Form) IsEmail(field string) {
 	if !govalidator.IsEmail(f.Get(field)) {
 		f.Errors.Add(field, "Invalid email address")
+	}
+}
+
+func (f *Form) IsInt(field string) {
+	if !govalidator.IsInt(f.Get(field)) {
+		f.Errors.Add(field, "Field %s should be an integer")
+	}
+}
+
+func (f *Form) IsUint(field string) {
+	num, err := strconv.Atoi(f.Get(field))
+	if err != nil {
+		fmt.Println("[isUint]:", err)
+		f.Errors.Add(
+			field,
+			fmt.Sprintf("Field %s should be an integer and greater or equal than 0", field),
+		)
+	}
+	if num < 0 {
+		f.Errors.Add(
+			field,
+			fmt.Sprintf("Field %s should be an integer and greater or equal than 0", field),
+		)
 	}
 }

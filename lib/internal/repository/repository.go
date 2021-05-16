@@ -15,6 +15,8 @@ type DatabaseRepo interface {
 
 	GetUserById(id int) (models.User, error)
 
+	SignUp(user models.User) error
 	Login(email, password string) (string, error)
 	UpdateMe(user models.User) error
+	ForgotPassword(email string) (models.User, error)
 }

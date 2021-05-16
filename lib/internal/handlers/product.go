@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/4d3v/ecommerce/internal/forms"
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
 	"github.com/go-chi/chi"
@@ -34,8 +35,32 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		msg: "Success",
 	}
 
-	price, _ := strconv.Atoi(r.Form.Get("price"))                 // TODO handle error
-	countInStock, _ := strconv.Atoi(r.Form.Get("count_in_stock")) // TODO handle error
+	form := forms.New(r.PostForm)
+	form.Required("name", "brand", "category", "description")
+	form.MinLength("name", 3)
+	form.MinLength("brand", 1)
+	form.MinLength("category", 3)
+	form.MinLength("description", 10)
+	form.IsUint("price")
+	form.IsUint("count_in_stock")
+
+	if len(r.Form.Get("image")) > 0 {
+		form.MinLength("image", 5)
+	}
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	price, _ := strconv.Atoi(r.Form.Get("price"))                 // Validated above
+	countInStock, _ := strconv.Atoi(r.Form.Get("count_in_stock")) // Validated above
 
 	product := models.Product{
 		Name:         r.Form.Get("name"),
@@ -110,43 +135,56 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		sendJson("msgjson", w, opts)
+		sendJson("msgjson", w, &options{
+			ok:  false,
+			msg: "Fail",
+			err: fmt.Sprintf("%s", err),
+		})
 		return
 	}
 
+	form := forms.New(r.PostForm)
+
 	if len(r.Form.Get("name")) > 0 {
+		form.MinLength("name", 3)
 		prod.Name = r.Form.Get("name")
 	}
 	if len(r.Form.Get("image")) > 0 {
+		form.MinLength("image", 5)
 		prod.Image = r.Form.Get("image")
 	}
 	if len(r.Form.Get("brand")) > 0 {
+		form.MinLength("brand", 1)
 		prod.Brand = r.Form.Get("brand")
 	}
 	if len(r.Form.Get("category")) > 0 {
+		form.MinLength("category", 3)
 		prod.Category = r.Form.Get("category")
 	}
 	if len(r.Form.Get("descrition")) > 0 {
+		form.MinLength("description", 10)
 		prod.Description = r.Form.Get("description")
 	}
 	if r.Form.Get("price") != "" {
-		tmp, err := strconv.Atoi(r.Form.Get("price"))
-		if err != nil {
-			fmt.Println("Error converting price to int")
-			return
-		}
+		form.IsUint("price")
+		tmp, _ := strconv.Atoi(r.Form.Get("price"))
 		prod.Price = tmp
 	}
 	if r.Form.Get("count_in_stock") != "" {
-		tmp, err := strconv.Atoi(r.Form.Get("count_in_stock"))
-		if err != nil {
-			fmt.Println("Error converting count_in_stock to int")
-			return
-		}
+		form.IsUint("count_in_stock")
+		tmp, _ := strconv.Atoi(r.Form.Get("count_in_stock"))
 		prod.CountInStock = tmp
+	}
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		sendJson("msgjson", w, opts)
+		return
 	}
 
 	err = repo.DB.UpdateProductById(prod)
@@ -163,7 +201,7 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		fmt.Println("Error converting parameter to int")
+		helpers.ServerError(w, err)
 		return
 	}
 

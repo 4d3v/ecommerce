@@ -20,7 +20,7 @@ func (dbrepo *postgresDbRepo) AdminInsertUser(usr models.User) error {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 12)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[bcrypt]:", err)
 		return err
 	}
 	usr.Password = string(hashedPassword)
@@ -141,11 +141,38 @@ func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 	return user, nil
 }
 
-// TODO see how to implement JWT
-// TODO func (dbrepo *postgresDbRepo) SignUp(){}
-// TODO func (dbrepo *postgresDbRepo) ForgotPassword(){}
-// TODO func (dbrepo *postgresDbRepo) ResetPassword(){}
-// TODO func (dbrepo *postgresDbRepo) GetMyProfile(){}
+func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		fmt.Println("[bcrypt]:", err)
+		return err
+	}
+	user.Password = string(hashedPassword)
+	user.PasswordConfirm = string(hashedPassword)
+
+	query := `
+		INSERT INTO users(name, email, password, password_confirm)
+		VALUES($1, $2, $3, $4)
+	`
+
+	_, err = dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.PasswordConfirm,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // Login
 func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
@@ -211,3 +238,23 @@ func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 
 	return nil
 }
+
+func (dbrepo *postgresDbRepo) ForgotPassword(email string) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT name, email FROM users WHERE email = $1`
+
+	var user models.User
+
+	row := dbrepo.DB.QueryRowContext(ctx, query, email)
+	err := row.Scan(&user.Name, &user.Email)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+// TODO func (dbrepo *postgresDbRepo) ResetPassword(){}

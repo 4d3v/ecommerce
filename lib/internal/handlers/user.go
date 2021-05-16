@@ -159,6 +159,57 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 	sendJson("msgjson", w, opts)
 }
 
+func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	opts := &options{
+		ok:  true,
+		msg: "Success",
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("name", "email", "password", "password_confirm")
+	form.MinLength("name", 3)
+	form.MinLength("password", 6)
+	form.CheckPassword("password", "password_confirm")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	user := models.User{
+		Name:            r.Form.Get("name"),
+		Email:           r.Form.Get("email"),
+		Password:        r.Form.Get("password"),
+		PasswordConfirm: r.Form.Get("password_confirm"),
+	}
+
+	err = repo.DB.SignUp(user)
+	if err != nil {
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	sendJson("msgjson", w, opts)
+}
+
 func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -255,4 +306,54 @@ func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendJson("userjson", w, opts)
+}
+
+func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	opts := &options{
+		ok:  true,
+		msg: "Mail sent",
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("email")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	user, err := repo.DB.ForgotPassword(r.Form.Get("email"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	msg := models.MailData{
+		To:      user.Email,
+		From:    "admin@test.com",
+		Subject: "Reset Your Password",
+		Content: fmt.Sprintf("<h1>Testing...</h1><p>%s</p>", user.Name),
+	}
+
+	repo.App.MailChan <- msg
+
+	sendJson("msgjson", w, opts)
 }

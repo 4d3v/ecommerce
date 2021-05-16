@@ -2,6 +2,8 @@ package config
 
 import (
 	"log"
+
+	"github.com/4d3v/ecommerce/internal/models"
 )
 
 // AppConfig holds the application config
@@ -11,5 +13,5 @@ type AppConfig struct {
 	UseCache     bool
 	InfoLog      *log.Logger
 	ErrorLog     *log.Logger
-	// MailChan     chan models.MailData
+	MailChan     chan models.MailData
 }
