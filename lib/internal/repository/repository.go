@@ -14,9 +14,11 @@ type DatabaseRepo interface {
 	AdminUpdateUser(user models.User) error
 
 	GetUserById(id int) (models.User, error)
+	GetUserByToken(token string) (models.User, error)
 
 	SignUp(user models.User) error
 	Login(email, password string) (string, error)
 	UpdateMe(user models.User) error
-	ForgotPassword(email string) (models.User, error)
+	ForgotPassword(email string) (string, string, error)
+	ResetPassword(id int, password string) error
 }

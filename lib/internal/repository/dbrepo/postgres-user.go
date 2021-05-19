@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/4d3v/ecommerce/internal/models"
+	"github.com/dchest/uniuri"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -239,22 +240,101 @@ func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 	return nil
 }
 
-func (dbrepo *postgresDbRepo) ForgotPassword(email string) (models.User, error) {
+func (dbrepo *postgresDbRepo) ForgotPassword(email string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT name, email FROM users WHERE email = $1`
+	query := `
+		UPDATE users SET password_reset_token = $1, password_reset_expires = $2
+		WHERE email = $3
+		RETURNING email
+	`
+
+	var userEmail string
+	hash := uniuri.New()
+
+	err := dbrepo.DB.QueryRowContext(
+		ctx,
+		query,
+		hash,
+		time.Now().Add(time.Minute*10),
+		email,
+	).Scan(&userEmail)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	return userEmail, hash, nil
+}
+
+// TODO
+func (dbrepo *postgresDbRepo) GetUserByToken(token string) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT id, name, email, role, active, password_reset_token, password_reset_expires
+		FROM users WHERE password_reset_token = $1
+	`
 
 	var user models.User
 
-	row := dbrepo.DB.QueryRowContext(ctx, query, email)
-	err := row.Scan(&user.Name, &user.Email)
+	row := dbrepo.DB.QueryRowContext(ctx, query, token)
+	err := row.Scan(
+		&user.Id,
+		&user.Name,
+		&user.Email,
+		&user.Role,
+		&user.Active,
+		&user.PasswordResetToken,
+		&user.PasswordResetExpires,
+	)
 
 	if err != nil {
+		return user, err
+	}
+
+	// if user.PasswordResetToken != token && user.PasswordResetExpires has expired {
+	// return user, err
+	// }
+	if user.PasswordResetToken != token {
 		return user, err
 	}
 
 	return user, nil
 }
 
-// TODO func (dbrepo *postgresDbRepo) ResetPassword(){}
+func (dbrepo *postgresDbRepo) ResetPassword(id int, password string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		fmt.Println("[bcrypt]:", err)
+		return err
+	}
+	password = string(hashedPassword)
+
+	query := `
+		UPDATE users SET password_reset_token = $1, password_reset_expires = $2,
+		password = $3, password_confirm = $4
+		WHERE id = $5
+	`
+
+	_, err = dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		"",
+		time.Now(),
+		password,
+		password, // passwordConfirm should be equal to password cos of previous check
+		id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

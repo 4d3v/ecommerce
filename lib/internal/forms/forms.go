@@ -53,12 +53,10 @@ func (f *Form) MinLength(field string, length int) bool {
 	return true
 }
 
-func (f *Form) CheckPassword(pass, passConfirm string) bool {
+func (f *Form) CheckPassword(pass, passConfirm string) {
 	if f.Get(pass) != f.Get(passConfirm) {
 		f.Errors.Add(passConfirm, "Passwords does not match")
-		return false
 	}
-	return true
 }
 
 // IsEmail checks for valid email address

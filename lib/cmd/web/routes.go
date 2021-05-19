@@ -36,6 +36,7 @@ func routes() http.Handler {
 		mux.Post("/login", handlers.Repo.Login)
 		mux.Get("/user", handlers.Repo.User)
 		mux.Post("/forgotpassword", handlers.Repo.ForgotPassword)
+		mux.Post("/resetpassword/{token}", handlers.Repo.ResetPassword)
 	})
 
 	mux.Route("/products", func(mux chi.Router) {

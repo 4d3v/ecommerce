@@ -317,7 +317,7 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	opts := &options{
 		ok:  true,
-		msg: "Mail sent",
+		msg: "Token sent to email",
 	}
 
 	form := forms.New(r.PostForm)
@@ -335,7 +335,7 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := repo.DB.ForgotPassword(r.Form.Get("email"))
+	email, hash, err := repo.DB.ForgotPassword(r.Form.Get("email"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
@@ -347,13 +347,72 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := models.MailData{
-		To:      user.Email,
+		To:      email,
 		From:    "admin@test.com",
 		Subject: "Reset Your Password",
-		Content: fmt.Sprintf("<h1>Testing...</h1><p>%s</p>", user.Name),
+		Content: fmt.Sprintf( // (TEMPORARY) TODO setup url properly
+			`<a>http://localhost:8080/users/resetpassword/%s</a>`,
+			hash,
+		),
 	}
 
 	repo.App.MailChan <- msg
+
+	fmt.Println(hash)
+
+	sendJson("msgjson", w, opts)
+}
+
+func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	opts := &options{
+		ok:  true,
+		msg: "Password set successfully",
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("password", "password_confirm")
+	form.MinLength("password", 6)
+	form.MinLength("password_confirm", 6)
+	form.CheckPassword("password", "password_confirm")
+
+	if !form.Valid() {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	user, err := repo.DB.GetUserByToken(chi.URLParam(r, "token"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	err = repo.DB.ResetPassword(user.Id, r.Form.Get("password"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		sendJson("msgjson", w, opts)
+		return
+	}
 
 	sendJson("msgjson", w, opts)
 }

@@ -14,6 +14,8 @@ CREATE TABLE users(
   password VARCHAR(100),
   password_confirm VARCHAR(100),
   active BOOLEAN DEFAULT TRUE,
+  password_reset_token VARCHAR(50),
+  password_reset_expires TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -4,15 +4,17 @@ import "time"
 
 // User is the User model
 type User struct {
-	Id              int
-	Name            string
-	Email           string
-	Role            int // ENUM
-	Password        string
-	PasswordConfirm string
-	Active          bool
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	Id                   int
+	Name                 string
+	Email                string
+	Role                 int // ENUM
+	Password             string
+	PasswordConfirm      string
+	Active               bool
+	PasswordResetToken   string
+	PasswordResetExpires time.Time
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 // Product is the Product model
