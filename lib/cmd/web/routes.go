@@ -27,25 +27,26 @@ func routes() http.Handler {
 	// mux.Use(NoSurf) // Disable when working with postman
 	mux.Use(setContentType)
 
+	mux.Post("/signup", handlers.Repo.SignUp)
+	mux.Post("/forgotpassword", handlers.Repo.ForgotPassword)
+	mux.Post("/resetpassword/{token}", handlers.Repo.ResetPassword)
+	mux.Post("/login", handlers.Repo.Login)
+	mux.Get("/user", handlers.Repo.User)
+
 	mux.Route("/users", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.AdminGetUsers)
 		mux.Post("/", handlers.Repo.AdminCreateUser)
 		mux.Patch("/{id}", handlers.Repo.AdminUpdateUser)
-
-		mux.Post("/signup", handlers.Repo.SignUp)
-		mux.Post("/login", handlers.Repo.Login)
-		mux.Get("/user", handlers.Repo.User)
-		mux.Post("/forgotpassword", handlers.Repo.ForgotPassword)
-		mux.Post("/resetpassword/{token}", handlers.Repo.ResetPassword)
 	})
 
 	mux.Route("/products", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetProducts)
-
-		// mux.Use(Auth)
-		// mux.Get("/xyz/{src}/{id}", handlers.Repo.Xyz)
-		mux.Post("/", handlers.Repo.CreateProduct)
 		mux.Get("/{id}", handlers.Repo.GetProductById)
+	})
+
+	mux.Route("/admproducts", func(mux chi.Router) {
+		mux.Use(Auth)
+		mux.Post("/", handlers.Repo.CreateProduct)
 		mux.Patch("/{id}", handlers.Repo.UpdateProduct)
 		mux.Delete("/{id}", handlers.Repo.DeleteProduct)
 	})

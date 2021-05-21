@@ -36,6 +36,7 @@ CREATE TABLE products(
   num_reviews INTEGER DEFAULT 0,
   price INTEGER DEFAULT 0,
   count_in_stock INTEGER DEFAULT 0,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

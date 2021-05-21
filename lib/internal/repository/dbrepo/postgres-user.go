@@ -142,6 +142,7 @@ func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 	return user, nil
 }
 
+// SignUp signs a user up
 func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -175,7 +176,7 @@ func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
 	return nil
 }
 
-// Login
+// Login logs in the user
 func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -218,7 +219,7 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 	return token, nil
 }
 
-// UpdateMe updates some user's data
+// UpdateMe updates user's data
 func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -240,6 +241,8 @@ func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 	return nil
 }
 
+// ForgotPassword sets a user's reset token and expiration time so the user can
+// reset the password if expiration is still valid
 func (dbrepo *postgresDbRepo) ForgotPassword(email string) (string, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -268,7 +271,42 @@ func (dbrepo *postgresDbRepo) ForgotPassword(email string) (string, string, erro
 	return userEmail, hash, nil
 }
 
-// TODO
+// ResetPassword resets the user's password with the new provided one
+func (dbrepo *postgresDbRepo) ResetPassword(id int, password string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		fmt.Println("[bcrypt]:", err)
+		return err
+	}
+	password = string(hashedPassword)
+
+	query := `
+		UPDATE users SET password_reset_token = $1, password_reset_expires = $2,
+		password = $3, password_confirm = $4
+		WHERE id = $5
+	`
+
+	_, err = dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		"",
+		time.Now(),
+		password,
+		password, // passwordConfirm should be equal to password cos of previous check
+		id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetUserByToken retrieves the user based on the token
 func (dbrepo *postgresDbRepo) GetUserByToken(token string) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -303,38 +341,4 @@ func (dbrepo *postgresDbRepo) GetUserByToken(token string) (models.User, error) 
 	}
 
 	return user, nil
-}
-
-func (dbrepo *postgresDbRepo) ResetPassword(id int, password string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		fmt.Println("[bcrypt]:", err)
-		return err
-	}
-	password = string(hashedPassword)
-
-	query := `
-		UPDATE users SET password_reset_token = $1, password_reset_expires = $2,
-		password = $3, password_confirm = $4
-		WHERE id = $5
-	`
-
-	_, err = dbrepo.DB.ExecContext(
-		ctx,
-		query,
-		"",
-		time.Now(),
-		password,
-		password, // passwordConfirm should be equal to password cos of previous check
-		id,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

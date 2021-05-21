@@ -358,8 +358,6 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	repo.App.MailChan <- msg
 
-	fmt.Println(hash)
-
 	sendJson("msgjson", w, opts)
 }
 

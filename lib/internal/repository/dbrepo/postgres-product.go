@@ -8,13 +8,14 @@ import (
 	"github.com/4d3v/ecommerce/internal/models"
 )
 
+// InsertProduct inserts a new Product into the db
 func (dbrepo *postgresDbRepo) InsertProduct(prod models.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	query := `
-		INSERT INTO products(name, image, brand, category, description, price, count_in_stock)
-		VALUES($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO products(name, image, brand, category, description, price, count_in_stock, user_id)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 	_, err := dbrepo.DB.ExecContext(
 		ctx,
@@ -26,6 +27,7 @@ func (dbrepo *postgresDbRepo) InsertProduct(prod models.Product) error {
 		prod.Description,
 		prod.Price,
 		prod.CountInStock,
+		prod.UserId,
 	)
 
 	if err != nil {
@@ -35,6 +37,7 @@ func (dbrepo *postgresDbRepo) InsertProduct(prod models.Product) error {
 	return nil
 }
 
+// GetProducts retrieves all the products from the db
 func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -43,7 +46,7 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 
 	query := `
 		SELECT id, name, image, brand, category, description,
-		rating, num_reviews, price, count_in_stock FROM products
+		rating, num_reviews, price, count_in_stock, user_id FROM products
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query)
@@ -65,6 +68,7 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 			&prod.NumReviews,
 			&prod.Price,
 			&prod.CountInStock,
+			&prod.UserId,
 		)
 
 		if err != nil {
@@ -81,6 +85,7 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 	return products, nil
 }
 
+// GetProductById retrieves a product based on the specified id
 func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -114,6 +119,7 @@ func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 	return prod, nil
 }
 
+// UpdateProductById updates product's data based on the provided id
 func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -145,6 +151,7 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 	return nil
 }
 
+// DeleteProductById deletes a product from the db based on the provided id
 func (dbrepo *postgresDbRepo) DeleteProductById(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

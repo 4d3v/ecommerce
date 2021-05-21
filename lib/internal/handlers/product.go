@@ -30,6 +30,13 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("GetUserByJwt", err)
+		return
+	}
+	fmt.Println("USERID", user.Id)
+
 	opts := &options{
 		ok:  true,
 		msg: "Success",
@@ -70,6 +77,7 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		Description:  r.Form.Get("description"),
 		Price:        price,
 		CountInStock: countInStock,
+		UserId:       user.Id, // Testing
 	}
 
 	err = repo.DB.InsertProduct(product)

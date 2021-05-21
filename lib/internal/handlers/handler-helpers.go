@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
+	"github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -39,6 +41,7 @@ type productJson struct {
 	NumReviews   int    `json:"num_reviews"`
 	Price        int    `json:"price"`
 	CountInStock int    `json:"count_in_stock"`
+	UserId       int    `json:"user_id"`
 }
 
 type jsonMsg struct {
@@ -118,6 +121,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			NumReviews:   opts.prod.NumReviews,
 			Price:        opts.prod.Price,
 			CountInStock: opts.prod.CountInStock,
+			UserId:       opts.prod.UserId,
 		}
 
 		out, err := json.Marshal(resp)
@@ -142,6 +146,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 				NumReviews:   prod.NumReviews,
 				Price:        prod.Price,
 				CountInStock: prod.CountInStock,
+				UserId:       opts.prod.UserId,
 			}
 			resp = append(resp, p)
 		}
@@ -175,4 +180,41 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 	}
 
 	return nil
+}
+
+func (repo *Repository) getUserByJwt(r *http.Request) (models.User, error) {
+	var user models.User
+
+	jwtCookie, err := r.Cookie("jwt")
+	if err != nil {
+		fmt.Println("Unauthenticated")
+		return user, err
+	}
+
+	token, err := jwt.ParseWithClaims(
+		jwtCookie.Value,
+		&jwt.StandardClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(repo.App.Env["JWT_SECRET"]), nil
+		},
+	)
+	if err != nil {
+		fmt.Println("Unauthenticated, ParseWithClaims...")
+		return user, err
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+	userId, err := strconv.Atoi(claims.Issuer)
+	if err != nil {
+		fmt.Println("Error converting claims issuer (userId) to int")
+		return user, err
+	}
+
+	user, err = repo.DB.GetUserById(userId)
+	if err != nil {
+		fmt.Printf("ERROR: %s", err)
+		return user, err
+	}
+
+	return user, nil
 }
