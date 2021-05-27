@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// GetProducts get all products and return as json
+// GetProducts get all products
 func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := repo.DB.GetProducts()
 	if err != nil {
@@ -19,7 +19,7 @@ func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendJson("prodsjson", w, &options{prods: products})
+	sendJson("prodsjson", w, &options{prods: products, stCode: http.StatusOK})
 }
 
 // CreateProduct creates a new product
@@ -32,14 +32,15 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	user, err := repo.getUserByJwt(r)
 	if err != nil { // Should already be handled on pre middleware
-		fmt.Println("GetUserByJwt", err)
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
 		return
 	}
-	fmt.Println("USERID", user.Id)
 
 	opts := &options{
-		ok:  true,
-		msg: "Success",
+		ok:     true,
+		msg:    "Success",
+		stCode: http.StatusOK,
 	}
 
 	form := forms.New(r.PostForm)
@@ -56,12 +57,12 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		opts.ok = false
 		opts.msg = "Fail"
 		opts.err = "Invalid form"
 		opts.errs = form.Errors
+		opts.stCode = http.StatusBadRequest
 		sendJson("msgjson", w, opts)
 		return
 	}
@@ -86,7 +87,7 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		opts.ok = false
 		opts.msg = "Fail"
 		opts.err = fmt.Sprintf("%s", err)
-
+		opts.stCode = http.StatusBadRequest
 		sendJson("msgjson", w, opts)
 		return
 	}
@@ -105,17 +106,20 @@ func (repo *Repository) GetProductById(w http.ResponseWriter, r *http.Request) {
 
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		sendJson("msgjson", w, &options{
-			ok:  false,
-			msg: "Fail",
-			err: fmt.Sprintf("%s", err),
+			ok:     false,
+			msg:    "Fail",
+			err:    fmt.Sprintf("%s", err),
+			stCode: http.StatusNotFound,
 		})
 		return
 	}
 
-	sendJson("prodjson", w, &options{prod: prod})
+	sendJson("prodjson", w, &options{
+		prod:   prod,
+		stCode: http.StatusOK,
+	})
 }
 
 // UpdateProduct updates a product
@@ -129,24 +133,26 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
+		fmt.Println("Error converting idParam to int")
 		helpers.ServerError(w, err)
 		return
 	}
 
 	opts := &options{
-		ok:  true,
-		msg: "Success",
-		err: "",
+		ok:     true,
+		msg:    "Success",
+		err:    "",
+		stCode: http.StatusOK,
 	}
 
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		sendJson("msgjson", w, &options{
-			ok:  false,
-			msg: "Fail",
-			err: fmt.Sprintf("%s", err),
+			ok:     false,
+			msg:    "Fail",
+			err:    fmt.Sprintf("%s", err),
+			stCode: http.StatusNotFound,
 		})
 		return
 	}
@@ -185,19 +191,25 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println(err)
 		opts.ok = false
 		opts.msg = "Fail"
 		opts.err = "Invalid form"
 		opts.errs = form.Errors
+		opts.stCode = http.StatusBadRequest
 		sendJson("msgjson", w, opts)
 		return
 	}
 
 	err = repo.DB.UpdateProductById(prod)
 	if err != nil {
-		helpers.ServerError(w, err)
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = "Invalid form"
+		opts.errs = form.Errors
+		opts.stCode = http.StatusNotFound
+		sendJson("msgjson", w, opts)
 		return
 	}
 
@@ -214,18 +226,19 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opts := &options{
-		ok:  true,
-		msg: "Success",
-		err: "",
+		ok:     true,
+		msg:    "Success",
+		err:    "",
+		stCode: http.StatusOK,
 	}
 
 	err = repo.DB.DeleteProductById(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		fmt.Printf("ERR: %s", err)
 		opts.ok = false
 		opts.msg = "Fail"
 		opts.err = fmt.Sprintf("%s", err)
+		opts.stCode = http.StatusNotFound
 		sendJson("msgjson", w, opts)
 		return
 	}

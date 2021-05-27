@@ -44,11 +44,6 @@ type productJson struct {
 	UserId       int    `json:"user_id"`
 }
 
-type jsonMsg struct {
-	Ok      bool   `json:"ok"`
-	Message string `json:"message"`
-}
-
 type msgJson struct {
 	Ok      bool                `json:"ok"`
 	Message string              `json:"message"`
@@ -57,17 +52,20 @@ type msgJson struct {
 }
 
 type options struct {
-	users []models.User
-	user  models.User
-	prods []models.Product
-	prod  models.Product
-	ok    bool
-	msg   string
-	err   string
-	errs  map[string][]string
+	users  []models.User
+	user   models.User
+	prods  []models.Product
+	prod   models.Product
+	ok     bool
+	msg    string
+	err    string
+	errs   map[string][]string
+	stCode int
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
+	w.WriteHeader(opts.stCode)
+
 	switch jsonType {
 	case "usersjson":
 		var users []userJson

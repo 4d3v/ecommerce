@@ -13,14 +13,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO implement form validation
-
 // Temporary Postgres container for development
 // docker run --name ecommerce-dev -e POSTGRES_USER=tmpusr
 // -e POSTGRES_PASSWORD=secret -d -p 5432:5432 postgres
 const (
 	port = ":8080"
-	dsn  = "host=localhost port=5432 dbname=ecommerce user=tmpusr password=secret"
+	dsn  = "host=localhost port=5432 dbname=ecommerce user=postgres password=admin"
 )
 
 var (
