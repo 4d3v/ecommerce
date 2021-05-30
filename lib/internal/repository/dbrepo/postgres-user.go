@@ -117,6 +117,30 @@ func (dbrepo *postgresDbRepo) AdminUpdateUser(user models.User) error {
 	return nil
 }
 
+// AdminDeleteUser deletes all user's data, should be used only by admins
+func (dbrepo *postgresDbRepo) AdminDeleteUser(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `DELETE FROM users WHERE id = $1`
+
+	res, err := dbrepo.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	found, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if found < 1 {
+		return errors.New("there is no user with specified id")
+	}
+
+	return nil
+}
+
 // GetUserById retrieves user's info
 func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

@@ -15,6 +15,16 @@ import (
 
 // AdminGetUsers retrieves all the users on the database
 func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
 	users, err := repo.DB.AdminGetUsers()
 	if err != nil {
 		helpers.ServerError(w, err)
@@ -31,7 +41,17 @@ func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 
 // AdminCreateUser creates a new user (PS normal users should use Signup instead)
 func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
+	err = r.ParseForm()
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -73,7 +93,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		role = normal
 	}
 
-	user := models.User{
+	newUser := models.User{
 		Name:            r.Form.Get("name"),
 		Email:           r.Form.Get("email"),
 		Role:            role,
@@ -81,7 +101,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		PasswordConfirm: r.Form.Get("password_confirm"),
 	}
 
-	err = repo.DB.AdminInsertUser(user)
+	err = repo.DB.AdminInsertUser(newUser)
 	if err != nil {
 		fmt.Println(err)
 		opts.ok = false
@@ -97,7 +117,17 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 
 // AdminUpdateUser updates user's data, (PS normal users should instead use updateMe)
 func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
+	err = r.ParseForm()
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -117,7 +147,7 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		stCode: http.StatusOK,
 	}
 
-	user, err := repo.DB.GetUserById(id)
+	user, err = repo.DB.GetUserById(id)
 	if err != nil {
 		fmt.Println(err)
 		opts.ok = false
@@ -162,6 +192,45 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		opts.msg = "Fail"
 		opts.err = fmt.Sprintf("%s", err)
 		opts.stCode = http.StatusBadRequest
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	sendJson("msgjson", w, opts)
+}
+
+// AdminDeleteUser completely deletes the user and all it's data
+func (repo *Repository) AdminDeleteUser(w http.ResponseWriter, r *http.Request) {
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	opts := &options{
+		ok:     true,
+		msg:    "Success",
+		err:    "",
+		stCode: http.StatusOK,
+	}
+
+	err = repo.DB.AdminDeleteUser(id)
+	if err != nil {
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		opts.stCode = http.StatusNotFound
 		sendJson("msgjson", w, opts)
 		return
 	}

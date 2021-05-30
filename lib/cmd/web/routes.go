@@ -33,12 +33,6 @@ func routes() http.Handler {
 	mux.Post("/login", handlers.Repo.Login)
 	mux.Get("/user", handlers.Repo.User)
 
-	mux.Route("/users", func(mux chi.Router) {
-		mux.Get("/", handlers.Repo.AdminGetUsers)
-		mux.Post("/", handlers.Repo.AdminCreateUser)
-		mux.Patch("/{id}", handlers.Repo.AdminUpdateUser)
-	})
-
 	mux.Route("/products", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetProducts)
 		mux.Get("/{id}", handlers.Repo.GetProductById)
@@ -49,6 +43,14 @@ func routes() http.Handler {
 		mux.Post("/", handlers.Repo.CreateProduct)
 		mux.Patch("/{id}", handlers.Repo.UpdateProduct)
 		mux.Delete("/{id}", handlers.Repo.DeleteProduct)
+	})
+
+	mux.Route("/users", func(mux chi.Router) {
+		mux.Use(Auth)
+		mux.Get("/", handlers.Repo.AdminGetUsers)
+		mux.Post("/", handlers.Repo.AdminCreateUser)
+		mux.Patch("/{id}", handlers.Repo.AdminUpdateUser)
+		mux.Delete("/{id}", handlers.Repo.AdminDeleteUser)
 	})
 
 	return mux

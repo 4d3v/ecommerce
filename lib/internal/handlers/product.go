@@ -37,6 +37,10 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
 	opts := &options{
 		ok:     true,
 		msg:    "Success",
@@ -130,6 +134,17 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -218,6 +233,16 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 // DeleteProduct deletes a product
 func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+	if userOk := checkUserRestriction(w, user); !userOk {
+		return
+	}
+
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {

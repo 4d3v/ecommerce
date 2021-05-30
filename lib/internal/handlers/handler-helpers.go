@@ -216,3 +216,16 @@ func (repo *Repository) getUserByJwt(r *http.Request) (models.User, error) {
 
 	return user, nil
 }
+
+func checkUserRestriction(w http.ResponseWriter, user models.User) bool {
+	if user.Role != owner && user.Role != admin {
+		fmt.Println("ERR user doesn't have permission")
+		sendJson("msgjson", w, &options{
+			ok:     false,
+			msg:    "User does not have the permission for that operation",
+			stCode: http.StatusForbidden,
+		})
+		return false
+	}
+	return true
+}
