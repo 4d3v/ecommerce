@@ -75,7 +75,6 @@ func (f *Form) IsInt(field string) {
 func (f *Form) IsUint(field string) {
 	num, err := strconv.Atoi(f.Get(field))
 	if err != nil {
-		fmt.Println("[isUint]:", err)
 		f.Errors.Add(
 			field,
 			fmt.Sprintf("Field %s should be an integer and greater or equal than 0", field),

@@ -46,6 +46,26 @@ BEFORE UPDATE ON products
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
+CREATE TABLE orders(
+  id SERIAL PRIMARY KEY,
+  shipping_address VARCHAR(100),
+  payment_method INTEGER,
+  total_price INTEGER,
+  is_paid BOOLEAN,
+  paid_at TIMESTAMPTZ,
+  is_delivered BOOLEAN,
+  delivered_at TIMESTAMPTZ,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON orders
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
 -- TODO SET NOT NULL AFTER TESTING
 -- TODO ADD OTHER TABLES, FOREIGN KEYS, INDEXES
 -- TODO POPULATE DB WITH RAW DATA IN rawdata.sql

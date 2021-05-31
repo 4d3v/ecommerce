@@ -53,5 +53,11 @@ func routes() http.Handler {
 		mux.Delete("/{id}", handlers.Repo.AdminDeleteUser)
 	})
 
+	mux.Route("/orders", func(mux chi.Router) {
+		mux.Use(Auth)
+		mux.Get("/", handlers.Repo.GetOrders)
+		mux.Post("/{id}", handlers.Repo.CreateOrder)
+	})
+
 	return mux
 }

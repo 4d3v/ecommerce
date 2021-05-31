@@ -22,4 +22,7 @@ type DatabaseRepo interface {
 	UpdateMe(user models.User) error
 	ForgotPassword(email string) (string, string, error)
 	ResetPassword(id int, password string) error
+
+	GetOrders(userId int) ([]models.Order, error)
+	InsertOrder(order models.Order) error
 }

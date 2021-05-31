@@ -37,17 +37,22 @@ type Product struct {
 
 // Order is the Order model
 type Order struct {
-	UserId         User
-	OrderItems     []Product
-	ShippingAddres address
-	PaymentMethod  int // Enum
-	PaymentResult  paymentResult
+	Id             int
+	ShippingAddres string // TODO address
+	PaymentMethod  int    // Enum
+	PaymentResult  string
 	// ShippingPrice int
 	TotalPrice  int
 	IsPaid      bool
-	PaitAt      time.Time
+	PaidAt      time.Time
 	IsDelivered bool
 	DeliveredAt time.Time
+	UserId      int
+	User        User
+	ProductId   int
+	OrderItem   Product
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // address is the Order's address struct
