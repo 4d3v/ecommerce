@@ -14,8 +14,9 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 	var orders []models.Order
 
 	query := `
-		SELECT id, payment_method, total_price, is_paid,
-		is_delivered, product_id, user_id
+		SELECT id, postal_code, address, country, city, payment_method, 
+		payment_result_status, total_price, 
+		is_paid, is_delivered, product_id, user_id
 		FROM orders WHERE user_id = $1
 	` // ORDER BY id ASC
 
@@ -30,7 +31,12 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 
 		err := rows.Scan(
 			&order.Id,
+			&order.PostalCode,
+			&order.Address,
+			&order.Country,
+			&order.City,
 			&order.PaymentMethod,
+			&order.PaymentResultStatus,
 			&order.TotalPrice,
 			&order.IsPaid,
 			// &order.PaidAt,
@@ -60,20 +66,21 @@ func (dbrepo *postgresDbRepo) InsertOrder(order models.Order) error {
 
 	query := `
 		INSERT INTO orders(
-		shipping_address, payment_method, total_price, is_paid, 
-		is_delivered, user_id, product_id
+		postal_code, address, country, city, payment_method, 
+		total_price, user_id, product_id
 		)
-		VALUES($1, $2, $3, $4, $5, $6, $7)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	_, err := dbrepo.DB.ExecContext(
 		ctx,
 		query,
-		order.ShippingAddres,
+		order.PostalCode,
+		order.Address,
+		order.Country,
+		order.City,
 		order.PaymentMethod,
 		order.TotalPrice,
-		order.IsPaid,
-		order.IsDelivered,
 		order.UserId,
 		order.ProductId,
 	)

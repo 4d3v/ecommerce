@@ -87,3 +87,19 @@ func (f *Form) IsUint(field string) {
 		)
 	}
 }
+
+func (f *Form) IsUserActive(field string) bool {
+	if len(f.Get(field)) > 0 {
+		active, err := strconv.ParseBool(f.Get("active"))
+		if err != nil {
+			f.Errors.Add(
+				field,
+				fmt.Sprintf("Field %s should be of boolean type."+
+					"Please use one of the options: 1, t, T, TRUE, true, True,"+
+					"0, f, F, FALSE, false, False", field),
+			)
+		}
+		return active
+	}
+	return true
+}

@@ -47,9 +47,9 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	user, _ := repo.getUserByJwt(r)
 
 	form := forms.New(r.PostForm)
-	form.Required("shipping_address", "payment_method")
-	form.MinLength("shipping_address", 7)
-	form.IsUint("payment_method")
+	form.Required("postal_code", "address", "country", "city",
+		"payment_method", "total_price")
+	form.IsUint("total_price")
 
 	if !form.Valid() {
 		fmt.Println(err)
@@ -71,26 +71,37 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
 		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    "Fail",
-			err:    fmt.Sprintf("%s", err),
-			stCode: http.StatusNotFound,
-		})
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		opts.stCode = http.StatusNotFound
+		sendJson("msgjson", w, opts)
 		return
 	}
 
-	// PayMethod should already be checked for int above
-	payMethod, _ := strconv.Atoi(r.Form.Get("payment_method"))
+	// Fields bellow should already be checked for int above
+	var payMethod int
+	switch r.Form.Get("payMethod") {
+	case "cash":
+		payMethod = cash
+	case "credit":
+		payMethod = credit
+	case "debit":
+		payMethod = debit
+	default:
+		payMethod = cash
+	}
+	totalPrice, _ := strconv.Atoi(r.Form.Get("total_price"))
 
 	order := models.Order{
-		ShippingAddres: r.Form.Get("shipping_address"),
-		PaymentMethod:  payMethod,
-		TotalPrice:     200,
-		IsPaid:         false,
-		IsDelivered:    false,
-		UserId:         user.Id,
-		ProductId:      prod.Id,
+		PostalCode:    r.Form.Get("postal_code"),
+		Address:       r.Form.Get("address"),
+		Country:       r.Form.Get("country"),
+		City:          r.Form.Get("city"),
+		PaymentMethod: payMethod,
+		TotalPrice:    totalPrice,
+		UserId:        user.Id,
+		ProductId:     prod.Id,
 	}
 
 	err = repo.DB.InsertOrder(order)

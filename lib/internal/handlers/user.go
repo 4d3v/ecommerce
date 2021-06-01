@@ -69,6 +69,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 	form.MinLength("password", 6)
 	form.CheckPassword("password", "password_confirm")
 	form.IsEmail("email")
+	userActive := form.IsUserActive("active")
 
 	if !form.Valid() {
 		fmt.Println(err)
@@ -99,6 +100,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		Role:            role,
 		Password:        r.Form.Get("password"),
 		PasswordConfirm: r.Form.Get("password_confirm"),
+		Active:          userActive,
 	}
 
 	err = repo.DB.AdminInsertUser(newUser)
@@ -327,6 +329,35 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Logouit logs out the user
+func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("jwt")
+	if err != nil {
+		fmt.Println(err)
+		sendJson("msgjson", w, &options{
+			ok:     false,
+			msg:    "Unauthenticated",
+			err:    fmt.Sprintf("Unauthenticated! %s", err),
+			stCode: http.StatusUnauthorized,
+		})
+		return
+	}
+
+	jwtCookie := http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		HttpOnly: true,
+		Expires:  time.Now().Add(-time.Hour),
+	}
+
+	http.SetCookie(w, &jwtCookie)
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Logged out successfully",
+		stCode: http.StatusOK,
+	})
+}
+
 // User retrieves logged in user's info
 func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	jwtCookie, err := r.Cookie("jwt")
@@ -485,5 +516,50 @@ func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sendJson("msgjson", w, opts)
+}
+
+func (repo *Repository) ActivateDisableUser(w http.ResponseWriter, r *http.Request) {
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	opts := &options{
+		ok:     true,
+		msg:    "User deleted successfully",
+		stCode: http.StatusOK,
+	}
+
+	if user.Role == owner || user.Role == admin {
+		opts.ok = false
+		opts.msg = "Not appropiate for admins or owners"
+		opts.err = fmt.Sprintf("%s", err)
+		opts.stCode = http.StatusBadRequest
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	err = repo.DB.ActivateDisableUser(user.Id, user.Active)
+	if err != nil {
+		fmt.Println(err)
+		opts.ok = false
+		opts.msg = "Fail"
+		opts.err = fmt.Sprintf("%s", err)
+		opts.stCode = http.StatusBadRequest
+		sendJson("msgjson", w, opts)
+		return
+	}
+
+	jwtCookie := http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		HttpOnly: true,
+		Expires:  time.Now().Add(-time.Hour),
+	}
+
+	http.SetCookie(w, &jwtCookie)
 	sendJson("msgjson", w, opts)
 }

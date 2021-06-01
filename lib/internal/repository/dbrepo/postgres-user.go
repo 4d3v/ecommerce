@@ -28,8 +28,8 @@ func (dbrepo *postgresDbRepo) AdminInsertUser(usr models.User) error {
 	usr.PasswordConfirm = string(hashedPassword)
 
 	query := `
-		INSERT INTO users(name, email, role, password, password_confirm)
-		VALUES($1, $2, $3, $4, $5)
+		INSERT INTO users(name, email, role, password, password_confirm, active)
+		VALUES($1, $2, $3, $4, $5, $6)
 	`
 
 	_, err = dbrepo.DB.ExecContext(
@@ -40,6 +40,7 @@ func (dbrepo *postgresDbRepo) AdminInsertUser(usr models.User) error {
 		&usr.Role,
 		&usr.Password,
 		&usr.PasswordConfirm,
+		&usr.Active,
 	)
 
 	if err != nil {
@@ -365,4 +366,17 @@ func (dbrepo *postgresDbRepo) GetUserByToken(token string) (models.User, error) 
 	}
 
 	return user, nil
+}
+
+func (dbrepo *postgresDbRepo) ActivateDisableUser(id int, active bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `UPDATE users SET active = $1 WHERE id = $2`
+	_, err := dbrepo.DB.ExecContext(ctx, query, !active, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -48,15 +48,20 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE orders(
   id SERIAL PRIMARY KEY,
-  shipping_address VARCHAR(100),
+  postal_code VARCHAR(50),
+  address VARCHAR(100),
+  country VARCHAR(50),
+  city VARCHAR(50),
   payment_method INTEGER,
+  payment_result_status INTEGER NOT NULL DEFAULT 1,
+  payment_result_update_time TIMESTAMPTZ,
   total_price INTEGER,
-  is_paid BOOLEAN,
+  is_paid BOOLEAN NOT NULL DEFAULT FALSE,
   paid_at TIMESTAMPTZ,
-  is_delivered BOOLEAN,
+  is_delivered BOOLEAN NOT NULL DEFAULT FALSE,
   delivered_at TIMESTAMPTZ,
-  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -37,10 +37,14 @@ type Product struct {
 
 // Order is the Order model
 type Order struct {
-	Id             int
-	ShippingAddres string // TODO address
-	PaymentMethod  int    // Enum
-	PaymentResult  string
+	Id                      int
+	PostalCode              string
+	Address                 string
+	Country                 string
+	City                    string
+	PaymentMethod           int // Enum
+	PaymentResultStatus     int // Enum
+	PaymentResultUpdateTime time.Time
 	// ShippingPrice int
 	TotalPrice  int
 	IsPaid      bool
@@ -50,23 +54,9 @@ type Order struct {
 	UserId      int
 	User        User
 	ProductId   int
-	OrderItem   Product
+	Product     Product
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-}
-
-// address is the Order's address struct
-type address struct {
-	PostalCode string
-	Country    string
-	City       string
-	Address    string
-}
-
-// paymentResult is the Order's paymentResult struct
-type paymentResult struct {
-	Status     int
-	UpdateTime time.Time
 }
 
 // MailData holds an email message

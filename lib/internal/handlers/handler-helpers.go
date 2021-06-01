@@ -18,6 +18,12 @@ const (
 	normal            // 3
 )
 
+const (
+	cash   = iota + 1 // 1
+	credit            // 2
+	debit             // 3
+)
+
 type userJson struct {
 	Id              int       `json:"id"`
 	Name            string    `json:"name"`
@@ -45,17 +51,20 @@ type productJson struct {
 }
 
 type orderJson struct {
-	Id             int       `json:"id"`
-	ShippingAddres string    `json:"shipping_address"`
-	PaymentMethod  string    `json:"payment_method"`
-	PaymentResult  string    `json:"payment_result"`
-	TotalPrice     string    `json:"total_price"`
-	IsPaid         bool      `json:"is_paid"`
-	PaidAt         time.Time `json:"paid_at"`
-	IsDelivered    bool      `json:"is_delivered"`
-	DeliveredAt    time.Time `json:"delivered_at"`
-	UserId         int       `json:"user_id"`
-	ProductId      int       `json:"product_id"`
+	Id                  int       `json:"id"`
+	PostalCode          string    `json:"postal_code"`
+	Address             string    `json:"address"`
+	Country             string    `json:"country"`
+	City                string    `json:"city"`
+	PaymentMethod       int       `json:"payment_method"`
+	PaymentResultStatus int       `json:"payment_result_status"`
+	TotalPrice          int       `json:"total_price"`
+	IsPaid              bool      `json:"is_paid"`
+	PaidAt              time.Time `json:"paid_at"`
+	IsDelivered         bool      `json:"is_delivered"`
+	DeliveredAt         time.Time `json:"delivered_at"`
+	UserId              int       `json:"user_id"`
+	ProductId           int       `json:"product_id"`
 }
 
 type msgJson struct {
@@ -176,15 +185,18 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		var resp []orderJson
 		for _, order := range opts.orders {
 			p := orderJson{
-				Id:             order.Id,
-				ShippingAddres: order.ShippingAddres,
-				PaymentMethod:  strconv.Itoa(order.PaymentMethod),
-				PaymentResult:  order.PaymentResult,
-				TotalPrice:     strconv.Itoa(order.TotalPrice),
-				IsPaid:         order.IsPaid,
-				IsDelivered:    order.IsDelivered,
-				UserId:         order.UserId,
-				ProductId:      order.ProductId,
+				Id:                  order.Id,
+				PostalCode:          order.PostalCode,
+				Address:             order.Address,
+				Country:             order.Country,
+				City:                order.City,
+				PaymentMethod:       order.PaymentMethod,
+				PaymentResultStatus: order.PaymentResultStatus,
+				TotalPrice:          order.TotalPrice,
+				IsPaid:              order.IsPaid,
+				IsDelivered:         order.IsDelivered,
+				UserId:              order.UserId,
+				ProductId:           order.ProductId,
 				// PaidAt:         order.PaidAt,
 				// DeliveredAt:    order.DeliveredAt,
 			}

@@ -22,6 +22,7 @@ type DatabaseRepo interface {
 	UpdateMe(user models.User) error
 	ForgotPassword(email string) (string, string, error)
 	ResetPassword(id int, password string) error
+	ActivateDisableUser(id int, active bool) error
 
 	GetOrders(userId int) ([]models.Order, error)
 	InsertOrder(order models.Order) error
