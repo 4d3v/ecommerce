@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/4d3v/ecommerce/internal/forms"
 	"github.com/4d3v/ecommerce/internal/helpers"
 	"github.com/4d3v/ecommerce/internal/models"
 	"github.com/dgrijalva/jwt-go"
@@ -79,6 +80,7 @@ type options struct {
 	user   models.User
 	prods  []models.Product
 	prod   models.Product
+	order  models.Order
 	orders []models.Order
 	ok     bool
 	msg    string
@@ -180,6 +182,30 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		}
 
 		w.Write(newJson)
+
+	case "orderjson":
+		resp := orderJson{
+			Id:                  opts.order.Id,
+			PostalCode:          opts.order.PostalCode,
+			Address:             opts.order.Address,
+			Country:             opts.order.Country,
+			City:                opts.order.City,
+			PaymentMethod:       opts.order.PaymentMethod,
+			PaymentResultStatus: opts.order.PaymentResultStatus,
+			TotalPrice:          opts.order.TotalPrice,
+			IsPaid:              opts.order.IsPaid,
+			IsDelivered:         opts.order.IsDelivered,
+			UserId:              opts.order.UserId,
+			ProductId:           opts.order.ProductId,
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(out)
 
 	case "ordersjson":
 		var resp []orderJson
@@ -283,4 +309,24 @@ func checkUserRestriction(w http.ResponseWriter, user models.User) bool {
 		return false
 	}
 	return true
+}
+
+func sendError(w http.ResponseWriter, errMsg string, stCode int) {
+	sendJson("msgjson", w, &options{
+		ok:     false,
+		msg:    "Fail",
+		err:    errMsg,
+		stCode: stCode,
+	})
+}
+
+func sendFormError(w http.ResponseWriter, errMsg string, stCode int, f *forms.Form) {
+	sendJson("msgjson", w, &options{
+		ok:     false,
+		msg:    "Fail",
+		err:    errMsg,
+		errs:   f.Errors,
+		stCode: stCode,
+	})
+
 }

@@ -21,22 +21,17 @@ func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
-	if userOk := checkUserRestriction(w, user); !userOk {
+	if !checkUserRestriction(w, user) {
 		return
 	}
 
 	users, err := repo.DB.AdminGetUsers()
 	if err != nil {
-		helpers.ServerError(w, err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	opts := &options{
-		users:  users,
-		stCode: http.StatusOK,
-	}
-
-	sendJson("usersjson", w, opts)
+	sendJson("usersjson", w, &options{users: users, stCode: http.StatusOK})
 }
 
 // AdminCreateUser creates a new user (PS normal users should use Signup instead)
@@ -47,7 +42,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 		helpers.ServerError(w, err)
 		return
 	}
-	if userOk := checkUserRestriction(w, user); !userOk {
+	if !checkUserRestriction(w, user) {
 		return
 	}
 
@@ -55,12 +50,6 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
-	}
-
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		stCode: http.StatusOK,
 	}
 
 	form := forms.New(r.PostForm)
@@ -72,13 +61,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 	userActive := form.IsUserActive("active")
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
@@ -105,16 +88,11 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 
 	err = repo.DB.AdminInsertUser(newUser)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // AdminUpdateUser updates user's data, (PS normal users should instead use updateMe)
@@ -125,7 +103,7 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		helpers.ServerError(w, err)
 		return
 	}
-	if userOk := checkUserRestriction(w, user); !userOk {
+	if !checkUserRestriction(w, user) {
 		return
 	}
 
@@ -135,28 +113,15 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		helpers.ServerError(w, err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
 		return
-	}
-
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		err:    "",
-		stCode: http.StatusOK,
 	}
 
 	user, err = repo.DB.GetUserById(id)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -189,16 +154,11 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 
 	err = repo.DB.AdminUpdateUser(user)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // AdminDeleteUser completely deletes the user and all it's data
@@ -209,35 +169,23 @@ func (repo *Repository) AdminDeleteUser(w http.ResponseWriter, r *http.Request) 
 		helpers.ServerError(w, err)
 		return
 	}
-	if userOk := checkUserRestriction(w, user); !userOk {
+	if !checkUserRestriction(w, user) {
 		return
 	}
 
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		helpers.ServerError(w, err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
 		return
-	}
-
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		err:    "",
-		stCode: http.StatusOK,
 	}
 
 	err = repo.DB.AdminDeleteUser(id)
 	if err != nil {
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // Signup sings up a new user
@@ -248,12 +196,6 @@ func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		stCode: http.StatusOK,
-	}
-
 	form := forms.New(r.PostForm)
 	form.Required("name", "email", "password", "password_confirm")
 	form.MinLength("name", 3)
@@ -262,13 +204,7 @@ func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
@@ -281,16 +217,11 @@ func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	err = repo.DB.SignUp(user)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // Login signs in the user into the application
@@ -301,16 +232,21 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	form := forms.New(r.PostForm)
+	form.Required("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		return
+	}
+
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
 
 	token, err := repo.DB.Login(email, password)
 	if err != nil {
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    fmt.Sprintf("%s", err),
-			stCode: http.StatusUnauthorized,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusUnauthorized)
 		return
 	}
 
@@ -333,13 +269,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("jwt")
 	if err != nil {
-		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    "Unauthenticated",
-			err:    fmt.Sprintf("Unauthenticated! %s", err),
-			stCode: http.StatusUnauthorized,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusUnauthorized)
 		return
 	}
 
@@ -362,11 +292,7 @@ func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	jwtCookie, err := r.Cookie("jwt")
 	if err != nil {
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			err:    "Unauthenticated",
-			stCode: http.StatusUnauthorized,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusUnauthorized)
 		return
 	}
 
@@ -378,31 +304,24 @@ func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		fmt.Println("Unauthenticated, ParseWithClaims...")
-		sendJson("msgjson", w,
-			&options{ok: false,
-				err:    "Unauthenticated",
-				stCode: http.StatusUnauthorized,
-			})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusUnauthorized)
 		return
 	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
 	userId, err := strconv.Atoi(claims.Issuer)
 	if err != nil {
-		fmt.Println("Error converting claims issuer (userId) to int", err)
-		helpers.ServerError(w, err)
+		sendError(
+			w,
+			"Error converting claims issuer (userId) to int",
+			http.StatusUnauthorized,
+		)
 		return
 	}
 
 	user, err := repo.DB.GetUserById(userId)
 	if err != nil {
-		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			err:    fmt.Sprintf("%s", err),
-			stCode: http.StatusNotFound,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -417,35 +336,18 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "Token sent to email",
-		stCode: http.StatusOK,
-	}
-
 	form := forms.New(r.PostForm)
 	form.Required("email")
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
 	email, hash, err := repo.DB.ForgotPassword(r.Form.Get("email"))
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -460,7 +362,11 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repo.App.MailChan <- msg
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Token sent to email",
+		stCode: http.StatusOK,
+	})
 }
 
 // ResetPassword resets the user password
@@ -471,12 +377,6 @@ func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "Password set successfully",
-		stCode: http.StatusOK,
-	}
-
 	form := forms.New(r.PostForm)
 	form.Required("password", "password_confirm")
 	form.MinLength("password", 6)
@@ -484,39 +384,27 @@ func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	form.CheckPassword("password", "password_confirm")
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
 	user, err := repo.DB.GetUserByToken(chi.URLParam(r, "token"))
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
 	err = repo.DB.ResetPassword(user.Id, r.Form.Get("password"))
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Password set successfully",
+		stCode: http.StatusOK,
+	})
 }
 
 func (repo *Repository) ActivateDisableUser(w http.ResponseWriter, r *http.Request) {
@@ -527,29 +415,14 @@ func (repo *Repository) ActivateDisableUser(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "User deleted successfully",
-		stCode: http.StatusOK,
-	}
-
 	if user.Role == owner || user.Role == admin {
-		opts.ok = false
-		opts.msg = "Not appropiate for admins or owners"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, "Not appropiate for admins or owners", http.StatusBadRequest)
 		return
 	}
 
 	err = repo.DB.ActivateDisableUser(user.Id, user.Active)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, "Not appropiate for admins or owners", http.StatusBadRequest)
 		return
 	}
 
@@ -561,5 +434,9 @@ func (repo *Repository) ActivateDisableUser(w http.ResponseWriter, r *http.Reque
 	}
 
 	http.SetCookie(w, &jwtCookie)
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "User deleted successfully",
+		stCode: http.StatusOK,
+	})
 }

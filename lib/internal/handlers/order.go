@@ -11,37 +11,58 @@ import (
 	"github.com/go-chi/chi"
 )
 
+// GetOrders gets all orders for a specific user
 func (repo *Repository) GetOrders(w http.ResponseWriter, r *http.Request) {
 	user, _ := repo.getUserByJwt(r)
 
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		stCode: http.StatusOK,
-	}
-
 	orders, err := repo.DB.GetOrders(user.Id)
 	if err != nil {
-		helpers.ServerError(w, err)
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
-	opts.orders = orders
-
-	sendJson("ordersjson", w, opts)
+	sendJson("ordersjson", w, &options{
+		ok:     true,
+		msg:    "Success",
+		orders: orders,
+		stCode: http.StatusOK,
+	})
 }
 
+// GetOrderById retrieves the order by id
+func (repo *Repository) GetOrderById(w http.ResponseWriter, r *http.Request) {
+	user, _ := repo.getUserByJwt(r)
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	order, err := repo.DB.GetOrderById(id, user.Id)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("orderjson", w, &options{
+		ok:     true,
+		msg:    "Success",
+		order:  order,
+		stCode: http.StatusOK,
+	})
+}
+
+// CreateOrder creates a new order
 func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
-	}
-
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		stCode: http.StatusOK,
 	}
 
 	user, _ := repo.getUserByJwt(r)
@@ -53,29 +74,21 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	if !form.Valid() {
 		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		helpers.ServerError(w, err)
+		fmt.Println(err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
 		return
 	}
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
 		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -107,14 +120,50 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	err = repo.DB.InsertOrder(order)
 	if err != nil {
 		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    "Fail",
-			err:    fmt.Sprintf("%s", err),
-			stCode: http.StatusNotFound,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Success",
+		stCode: http.StatusOK,
+	})
+}
+
+// DeleteOrder deletes and order
+func (repo *Repository) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+	user, _ := repo.getUserByJwt(r)
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	order, err := repo.DB.GetOrderById(id, user.Id)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	if order.IsDelivered {
+		sendError(w, "cannot delete a delivered order", http.StatusForbidden)
+		return
+	}
+
+	err = repo.DB.DeleteOrder(order.Id)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Success",
+		stCode: http.StatusOK,
+	})
 }

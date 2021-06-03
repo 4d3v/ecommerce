@@ -15,7 +15,7 @@ import (
 func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := repo.DB.GetProducts()
 	if err != nil {
-		helpers.ServerError(w, err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -41,12 +41,6 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		stCode: http.StatusOK,
-	}
-
 	form := forms.New(r.PostForm)
 	form.Required("name", "brand", "category", "description")
 	form.MinLength("name", 3)
@@ -61,13 +55,7 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
@@ -87,36 +75,25 @@ func (repo *Repository) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = repo.DB.InsertProduct(product)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // GetProductById retrieves the product with specified id
 func (repo *Repository) GetProductById(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		helpers.ServerError(w, err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
 		return
 	}
 
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
 		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    "Fail",
-			err:    fmt.Sprintf("%s", err),
-			stCode: http.StatusNotFound,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -145,30 +122,15 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		fmt.Println("Error converting idParam to int")
-		helpers.ServerError(w, err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
 		return
-	}
-
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		err:    "",
-		stCode: http.StatusOK,
 	}
 
 	prod, err := repo.DB.GetProductById(id)
 	if err != nil {
-		fmt.Println(err)
-		sendJson("msgjson", w, &options{
-			ok:     false,
-			msg:    "Fail",
-			err:    fmt.Sprintf("%s", err),
-			stCode: http.StatusNotFound,
-		})
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -206,29 +168,17 @@ func (repo *Repository) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusBadRequest
-		sendJson("msgjson", w, opts)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
 
 	err = repo.DB.UpdateProductById(prod)
 	if err != nil {
-		fmt.Println(err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = "Invalid form"
-		opts.errs = form.Errors
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // DeleteProduct deletes a product
@@ -250,25 +200,13 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := &options{
-		ok:     true,
-		msg:    "Success",
-		err:    "",
-		stCode: http.StatusOK,
-	}
-
 	err = repo.DB.DeleteProductById(id)
 	if err != nil {
-		fmt.Printf("ERR: %s", err)
-		opts.ok = false
-		opts.msg = "Fail"
-		opts.err = fmt.Sprintf("%s", err)
-		opts.stCode = http.StatusNotFound
-		sendJson("msgjson", w, opts)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
-	sendJson("msgjson", w, opts)
+	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
 // func removeElement(prods []models.Product, id int) ([]models.Product, error) {

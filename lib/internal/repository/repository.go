@@ -25,5 +25,7 @@ type DatabaseRepo interface {
 	ActivateDisableUser(id int, active bool) error
 
 	GetOrders(userId int) ([]models.Order, error)
+	GetOrderById(id, userId int) (models.Order, error)
 	InsertOrder(order models.Order) error
+	DeleteOrder(id int) error
 }

@@ -209,17 +209,22 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 	var (
 		id             int
 		hashedPassword string
+		active         bool
 	)
 
 	row := dbrepo.DB.QueryRowContext(
 		ctx,
-		"SELECT id, password from users where email = $1",
+		"SELECT id, password, active from users where email = $1",
 		email,
 	)
 
-	err := row.Scan(&id, &hashedPassword)
+	err := row.Scan(&id, &hashedPassword, &active)
 	if err != nil {
 		return "", errors.New("incorrect email or password")
+	}
+
+	if !active {
+		return "", errors.New("user does not exist")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
@@ -234,9 +239,7 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 1 day
 	})
 
-	const secretKey = "secret"
-
-	token, err := claims.SignedString([]byte(secretKey))
+	token, err := claims.SignedString([]byte(dbrepo.App.Env["JWT_SECRET"]))
 	if err != nil {
 		return "", err
 	}
