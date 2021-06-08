@@ -60,7 +60,15 @@ func routes() http.Handler {
 		mux.Get("/", handlers.Repo.GetOrders)
 		mux.Get("/{id}", handlers.Repo.GetOrderById)
 		mux.Post("/{id}", handlers.Repo.CreateOrder)
+		mux.Patch("/{id}", handlers.Repo.UpdateOrder)
 		mux.Delete("/{id}", handlers.Repo.DeleteOrder)
+	})
+
+	mux.Route("/adminorders", func(mux chi.Router) {
+		mux.Use(Auth)
+		mux.Get("/", handlers.Repo.AdminGetOpenedOrders)
+		mux.Patch("/paid/{id}", handlers.Repo.AdminUpdateOrderToPaid)
+		mux.Patch("/delivered/{id}", handlers.Repo.AdminUpdateIsDelivered)
 	})
 
 	return mux

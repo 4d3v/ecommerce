@@ -311,6 +311,23 @@ func checkUserRestriction(w http.ResponseWriter, user models.User) bool {
 	return true
 }
 
+func checkPaymentMethod(f *forms.Form) int {
+	var payMethod int
+
+	switch f.Get("payment_method") {
+	case "cash":
+		payMethod = cash
+	case "credit":
+		payMethod = credit
+	case "debit":
+		payMethod = debit
+	default:
+		payMethod = cash
+	}
+
+	return payMethod
+}
+
 func sendError(w http.ResponseWriter, errMsg string, stCode int) {
 	sendJson("msgjson", w, &options{
 		ok:     false,

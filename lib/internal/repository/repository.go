@@ -24,8 +24,13 @@ type DatabaseRepo interface {
 	ResetPassword(id int, password string) error
 	ActivateDisableUser(id int, active bool) error
 
+	AdminGetOpenedOrders() ([]models.Order, error)
+	AdminUpdateOrderToPaid(id int) error
+	AdminUpdateIsDelivered(id int) error
+
 	GetOrders(userId int) ([]models.Order, error)
 	GetOrderById(id, userId int) (models.Order, error)
 	InsertOrder(order models.Order) error
+	UpdateOrder(order models.Order) error
 	DeleteOrder(id int) error
 }
