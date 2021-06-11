@@ -46,7 +46,8 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 
 	query := `
 		SELECT id, name, image, brand, category, description,
-		rating, num_reviews, price, count_in_stock, user_id FROM products
+		rating, num_reviews, price, count_in_stock, user_id,
+		created_at, updated_at FROM products
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query)
@@ -69,6 +70,8 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 			&prod.Price,
 			&prod.CountInStock,
 			&prod.UserId,
+			&prod.CreatedAt,
+			&prod.UpdatedAt,
 		)
 
 		if err != nil {
@@ -92,7 +95,8 @@ func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 
 	query := `
 		SELECT id, name, image, brand, category, description,
-		rating, num_reviews, price, count_in_stock FROM products
+		rating, num_reviews, price, count_in_stock, user_id,
+		created_at, updated_at FROM products
 		WHERE id = $1
 	`
 
@@ -110,6 +114,9 @@ func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 		&prod.NumReviews,
 		&prod.Price,
 		&prod.CountInStock,
+		&prod.UserId,
+		&prod.CreatedAt,
+		&prod.UpdatedAt,
 	)
 
 	if err != nil {

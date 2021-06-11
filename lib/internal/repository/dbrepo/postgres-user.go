@@ -57,7 +57,7 @@ func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
 
 	var users []models.User
 
-	query := `SELECT id, name, email, role, active FROM users`
+	query := `SELECT id, name, email, role, active, created_at, updated_at FROM users`
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query)
 	if err != nil {
@@ -73,6 +73,8 @@ func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
 			&user.Email,
 			&user.Role,
 			&user.Active,
+			&user.CreatedAt,
+			&user.UpdatedAt,
 		)
 
 		if err != nil {
@@ -147,7 +149,7 @@ func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, name, email, role, active FROM users WHERE id = $1`
+	query := `SELECT id, name, email, role, active, created_at, updated_at FROM users WHERE id = $1`
 
 	var user models.User
 
@@ -158,6 +160,8 @@ func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 		&user.Email,
 		&user.Role,
 		&user.Active,
+		&user.CreatedAt,
+		&user.UpdatedAt,
 	)
 
 	if err != nil {

@@ -115,9 +115,9 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
-		payment_result_status, total_price, 
-		is_paid, is_delivered, product_id, user_id
-		FROM orders WHERE user_id = $1
+		payment_result_status, payment_result_update_time, total_price, 
+		is_paid, paid_at, is_delivered, delivered_at, user_id, product_id,
+		created_at, updated_at FROM orders WHERE user_id = $1
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query, userId)
@@ -137,13 +137,16 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 			&order.City,
 			&order.PaymentMethod,
 			&order.PaymentResultStatus,
+			&order.PaymentResultUpdateTime,
 			&order.TotalPrice,
 			&order.IsPaid,
-			// &order.PaidAt,
+			&order.PaidAt,
 			&order.IsDelivered,
-			// &order.DeliveredAt,
+			&order.DeliveredAt,
 			&order.ProductId,
 			&order.UserId,
+			&order.CreatedAt,
+			&order.UpdatedAt,
 		)
 
 		if err != nil {
@@ -166,9 +169,9 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
-		payment_result_status, total_price, 
-		is_paid, is_delivered, product_id, user_id
-		FROM orders WHERE id = $1 AND user_id = $2 
+		payment_result_status, payment_result_update_time, total_price, 
+		is_paid, paid_at, is_delivered, delivered_at, user_id, product_id,
+		created_at, updated_at FROM orders WHERE id = $1 AND user_id = $2 
 	` // ORDER BY id ASC
 
 	var order models.Order
@@ -181,11 +184,16 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 		&order.City,
 		&order.PaymentMethod,
 		&order.PaymentResultStatus,
+		&order.PaymentResultUpdateTime,
 		&order.TotalPrice,
 		&order.IsPaid,
+		&order.PaidAt,
 		&order.IsDelivered,
-		&order.ProductId,
+		&order.DeliveredAt,
 		&order.UserId,
+		&order.ProductId,
+		&order.CreatedAt,
+		&order.UpdatedAt,
 	)
 
 	if err != nil {
