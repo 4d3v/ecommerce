@@ -328,6 +328,50 @@ func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	sendJson("userjson", w, &options{user: user, stCode: http.StatusOK})
 }
 
+// UpdateMe Updates some user's general info
+func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+
+	if len(r.Form.Get("name")) > 0 {
+		form.MinLength("name", 3)
+		user.Name = r.Form.Get("name")
+	}
+	if len(r.Form.Get("email")) > 0 {
+		form.IsEmail("email")
+		user.Email = r.Form.Get("email")
+	}
+
+	if !form.Valid() {
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		return
+	}
+
+	err = repo.DB.UpdateMe(user)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "User updated successfully ",
+		stCode: http.StatusOK,
+	})
+}
+
 // ForgotPassword sends token to specified email so user can reset password
 func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -361,6 +405,7 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		),
 	}
 
+	// fmt.Println("TOKEN", hash)
 	repo.App.MailChan <- msg
 	sendJson("msgjson", w, &options{
 		ok:     true,
@@ -391,6 +436,11 @@ func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	user, err := repo.DB.GetUserByToken(chi.URLParam(r, "token"))
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	if timePassed := time.Since(user.PasswordResetExpires); timePassed.Minutes() > 0 {
+		sendError(w, "reset token expired", http.StatusForbidden)
 		return
 	}
 

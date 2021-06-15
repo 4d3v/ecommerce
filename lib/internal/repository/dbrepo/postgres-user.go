@@ -264,6 +264,7 @@ func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 		&user.Name,
 		&user.Email,
 		time.Now(),
+		&user.Id,
 	)
 
 	if err != nil {
