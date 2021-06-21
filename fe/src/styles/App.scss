@@ -1,0 +1,23 @@
+@import './abstracts/_variables';
+@import './abstracts/_mixins';
+
+@import './base/_global';
+@import './base/_reset';
+@import './base/_utils';
+
+// @import './shared/_sections';
+
+@import './components/product';
+@import './components/header';
+@import './components/footer';
+
+@import './pages/homescreen';
+@import './pages/productscreen';
+
+body {
+  background-color: $base-primary-color;
+}
+
+main {
+  min-height: 80vh;
+}

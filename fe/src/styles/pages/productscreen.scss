@@ -1,0 +1,28 @@
+.prod-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 150px;
+
+  .prod-img-wrapper {
+    height: 500px;
+
+    .prod-img {
+      max-height: 500px;
+    }
+  }
+
+  .prod-opts-wrapper {
+    height: 100%;
+
+    .prod-info {
+      max-height: 75%;
+
+      &__item {
+        margin-left: 1rem;
+
+        button {
+          display: block !important;
+        }
+      }
+    }
+  }
+}

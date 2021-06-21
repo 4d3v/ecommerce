@@ -1,0 +1,114 @@
+.u-txt-left {
+  text-align: left !important;
+}
+
+.u-txt-center {
+  text-align: center !important;
+}
+
+.u-txt-right {
+  text-align: right !important;
+}
+
+.u-m-top-s {
+  margin-top: 1.5rem !important;
+}
+
+.u-m-top-m {
+  margin-top: 3rem !important;
+
+  @include respond(tab-port) {
+    margin-top: 3rem !important;
+  }
+}
+
+.u-m-top-b {
+  margin-top: 7rem !important;
+
+  @include respond(tab-port) {
+    margin-top: 5rem !important;
+  }
+}
+
+.u-m-bottom-s {
+  margin-bottom: 1.5rem !important;
+}
+
+.u-m-bottom-m {
+  margin-bottom: 3rem !important;
+
+  @include respond(tab-port) {
+    margin-bottom: 3rem !important;
+  }
+}
+
+.u-m-bottom-b {
+  margin-bottom: 7rem !important;
+
+  @include respond(tab-port) {
+    margin-bottom: 5rem !important;
+  }
+}
+
+.u-px-s {
+  padding: 0 1.5rem !important;
+}
+
+.u-py-s {
+  padding: 1.5rem 0 !important;
+}
+
+.u-py-ss {
+  padding: 1rem 0 !important;
+}
+
+.u-mx-s {
+  margin: 0 1.5rem !important;
+}
+
+.u-my-s {
+  margin: 1.5rem 0 !important;
+}
+
+.u-my-ss {
+  padding: 1rem 0 !important;
+}
+
+.u-my-t {
+  padding: 0.5rem 0 !important;
+}
+
+.centered {
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+%cover {
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.container {
+  width: 1140px;
+  padding: 0 15px 0 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.btn {
+  display: inline-block;
+  position: relative;
+  width: 100px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 2px;
+  font-size: 0.9em;
+  background-color: $base-secondary-color;
+  color: $base-font-light;
+  cursor: pointer;
+}

@@ -1,0 +1,38 @@
+.card-prod {
+  //   margin-top: 2rem;
+  //   margin-bottom: 2rem;
+  background-color: $base-secondary-color;
+  width: 300px;
+  display: inline-block;
+  margin: auto;
+  border-radius: $border-radius-size;
+  position: relative;
+  text-align: center;
+  box-shadow: -1px 15px 30px -12px black;
+  z-index: 9999;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &__img {
+    position: relative;
+    height: 230px;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    border-top-left-radius: $border-radius-size;
+    border-top-right-radius: $border-radius-size;
+  }
+
+  &__body {
+    font-size: 1.2rem;
+  }
+
+  &__price {
+    font-size: 1.6rem;
+  }
+
+  .rating span {
+    margin: 0.1rem;
+  }
+}
