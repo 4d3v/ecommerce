@@ -1,6 +1,8 @@
-import React from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Rating from '../components/Rating'
+import { IProducts } from '../interfaces/iProducts'
 import products from '../products'
 
 // export interface IProdRouteParams {
@@ -9,8 +11,21 @@ import products from '../products'
 // const { userId, userName } = useParams<IUserPublicProfileRouteParams>()
 
 const Product = () => {
+  const [prod, setProd] = useState<IProducts>()
+
   const { id }: any = useParams()
   const product = products.find((prod) => prod._id === id)
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const { data } = await axios.get(`http://localhost:8080/products/${id}`)
+      setProd(data)
+    }
+
+    fetchProduct()
+  }, [id])
+
+  if (prod) console.log(prod)
 
   return (
     <div className='container u-txt-center'>

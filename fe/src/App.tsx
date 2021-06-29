@@ -8,8 +8,8 @@ import {
   useParams,
 } from 'react-router-dom'
 import Header from './components/Header'
-import HomeScreen from './screeens/HomeScreen'
-import ProductScreen from './screeens/ProductScreen'
+import HomeScreen from './screens/HomeScreen'
+import ProductScreen from './screens/ProductScreen'
 import Footer from './components/Footer'
 import './styles/App.scss'
 
