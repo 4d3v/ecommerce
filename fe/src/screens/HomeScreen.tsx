@@ -1,42 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { listProducts } from '../actions/productActions'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import { RootState } from '../store'
+import { IProduct } from '../type'
 
-interface IProds {
-  products: any[]
+interface IProductList {
+  products: IProduct[]
   loading: boolean
   error: string
 }
 
-const Home = () => {
+const HomeScreen = () => {
   const dispatch = useDispatch()
 
-  const productList: IProds = useSelector(
-    (state: RootState) => state.productList
+  const productList: IProductList = useSelector(
+    // (state: RootState) => state.productList
+    (state: { productList: IProductList }) => state.productList
   )
+
   const { loading, error, products } = productList
 
   useEffect(() => {
     dispatch(listProducts())
   }, [dispatch])
-
-  console.log(productList)
-
-  // const [prods, setProds] = useState<IProducts[]>([])
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     const { data } = await axios.get('http://localhost:8080/products')
-  //     setProds(data)
-  //   }
-
-  //   fetchProducts()
-  // }, [])
-
-  // if (prods) console.log(prods)
 
   return (
     <div className='container u-py-s'>
@@ -56,4 +44,14 @@ const Home = () => {
   )
 }
 
-export default Home
+export default HomeScreen
+
+// const [prods, setProds] = useState<IProducts[]>([])
+// useEffect(() => {
+//   const fetchProducts = async () => {
+//     const { data } = await axios.get('http://localhost:8080/products')
+//     setProds(data)
+//   }
+//   fetchProducts()
+// }, [])
+// if (prods) console.log(prods)
