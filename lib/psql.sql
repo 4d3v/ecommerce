@@ -74,3 +74,13 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 -- TODO SET NOT NULL AFTER TESTING
 -- TODO ADD OTHER TABLES, FOREIGN KEYS, INDEXES
 -- TODO POPULATE DB WITH RAW DATA IN rawdata.sql
+
+-- CREATE TYPE new_type AS (new_date timestamp, some_int bigint);
+-- INSERT INTO new_table VALUES (
+--     '9fd92c53-d0d8-4aba-7925-1ad648d565f2'::uuid,
+--     ARRAY['("now", 146252)'::new_type,
+--           '("now", 526685)'::new_type
+--      ] );
+
+-- update users set flags = array_remove(flags, 'active')
+-- update new_table set new_type_list = array_remove(new_type_list, row('*', 12)::new_type) where id = 1; 
