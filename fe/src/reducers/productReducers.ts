@@ -2,20 +2,21 @@ import { AnyAction } from 'redux'
 import { productActions } from '../constants/productConstants'
 import { IProduct } from '../type'
 
-interface IProducts {
-  products: IProduct[]
-}
-
 const products: IProduct[] = []
+const prodListInitialState: { products: IProduct[] } = {
+    products,
+  },
+  prodDetailsInitialState: { product: IProduct | {} } = {
+    product: {},
+  }
 
-const initialState: IProducts = {
-  products,
-}
-
-export const productListReducer = (state = initialState, action: AnyAction) => {
+export const productListReducer = (
+  state = prodListInitialState,
+  action: AnyAction
+) => {
   switch (action.type) {
     case productActions.PRODUCT_LIST_REQUEST:
-      return { loading: true, products: initialState.products }
+      return { loading: true, products }
     case productActions.PRODUCT_LIST_SUCCESS:
       return { loading: false, products: action.payload }
     case productActions.PRODUCT_LIST_FAIL:
@@ -25,14 +26,10 @@ export const productListReducer = (state = initialState, action: AnyAction) => {
   }
 }
 
-interface IProdTemp {
-  product: IProduct | {}
-}
-const initState: IProdTemp = {
-  product: {},
-}
-
-export const productDetailsReducer = (state = initState, action: AnyAction) => {
+export const productDetailsReducer = (
+  state = prodDetailsInitialState,
+  action: AnyAction
+) => {
   switch (action.type) {
     case productActions.PRODUCT_DETAILS_REQUEST:
       return { loading: true, ...state }

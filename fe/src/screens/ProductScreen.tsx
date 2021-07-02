@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { listProductDetails } from '../actions/productActions'
 import { IProduct } from '../type'
 import Rating from '../components/Rating'
@@ -23,8 +23,11 @@ interface IProductDetails {
 }
 
 const ProductScreen = () => {
+  const [qty, setQty] = useState(1)
+
   const dispatch = useDispatch()
   const params = useParams<RouteParams>()
+  const history = useHistory()
   const productDetails = useSelector(
     (state: { productDetails: IProductDetails }) => state.productDetails
   )
@@ -33,6 +36,10 @@ const ProductScreen = () => {
   useEffect(() => {
     dispatch(listProductDetails(params.id))
   }, [dispatch, params.id])
+
+  const addToCartHandler = () => {
+    history.push(`/cart/${params.id}?qty=${qty}`)
+  }
 
   return (
     <>
@@ -91,9 +98,26 @@ const ProductScreen = () => {
                     ? 'In Stock'
                     : 'Out Of Stock'}
                 </li>
+                {product.count_in_stock !== undefined &&
+                  product.count_in_stock > 0 && (
+                    <li>
+                      <div>Qty: {product.count_in_stock}</div>
+                      <select
+                        value={qty}
+                        onChange={(e) => setQty(Number(e.target.value))}
+                      >
+                        {[...Array(product.count_in_stock)].map((el, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                    </li>
+                  )}
                 <li className='prod-info__item u-my-t'>
                   <button
                     className='btn'
+                    onClick={addToCartHandler}
                     disabled={
                       product?.count_in_stock !== undefined &&
                       product.count_in_stock > 0

@@ -10,6 +10,7 @@ import {
 import Header from './components/Header'
 import HomeScreen from './screens/HomeScreen'
 import ProductScreen from './screens/ProductScreen'
+import CartScreen from './screens/CartScreen'
 import Footer from './components/Footer'
 import './styles/App.scss'
 
@@ -19,15 +20,10 @@ const App = () => {
       <Header />
       <main>
         <Switch>
-          <Route path='/product/:id' exact>
-            <ProductScreen />
-          </Route>
-          <Route path='/topics' exact>
-            <Topics />
-          </Route>
-          <Route path='/' exact>
-            <HomeScreen />
-          </Route>
+          <Route path='/product/:id' component={ProductScreen} exact />
+          <Route path='/topics' component={Topics} exact />
+          <Route path='/cart/:id?' component={CartScreen} exact />
+          <Route path='/' component={HomeScreen} exact />
         </Switch>
       </main>
       <Footer />

@@ -19,4 +19,13 @@ export type ProductsState = {
   products: IProduct
 }
 
-type DispatchType = (args: ArticleAction) => ArticleAction
+export interface ICart {
+  product: number
+  name: string
+  image: string
+  price: number
+  count_in_stock: number
+  qty: number
+}
+
+// type DispatchType = (args: ArticleAction) => ArticleAction
