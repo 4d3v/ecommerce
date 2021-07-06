@@ -11,6 +11,7 @@ import Header from './components/Header'
 import HomeScreen from './screens/HomeScreen'
 import ProductScreen from './screens/ProductScreen'
 import CartScreen from './screens/CartScreen'
+import LoginScreen from './screens/LoginScreen'
 import Footer from './components/Footer'
 import './styles/App.scss'
 
@@ -20,6 +21,7 @@ const App = () => {
       <Header />
       <main>
         <Switch>
+          <Route path='/login' component={LoginScreen} exact />
           <Route path='/product/:id' component={ProductScreen} exact />
           <Route path='/topics' component={Topics} exact />
           <Route path='/cart/:id?' component={CartScreen} exact />

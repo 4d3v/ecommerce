@@ -28,4 +28,14 @@ export interface ICart {
   qty: number
 }
 
+export interface IUser {
+  id: number
+  name: string
+  email: string
+  role: number
+  created_at: Date
+  updated_at: Date
+  token: string
+}
+
 // type DispatchType = (args: ArticleAction) => ArticleAction
