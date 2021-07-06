@@ -206,7 +206,7 @@ func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
 }
 
 // Login logs in the user
-func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
+func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -216,26 +216,40 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 		active         bool
 	)
 
+	var user models.User
+
 	row := dbrepo.DB.QueryRowContext(
 		ctx,
-		"SELECT id, password, active from users where email = $1",
+		`SELECT id, password, active, name, email, role, 
+		created_at, updated_at from users where email = $1`,
 		email,
 	)
 
-	err := row.Scan(&id, &hashedPassword, &active)
+	// err := row.Scan(&id, &hashedPassword, &active)
+	err := row.Scan(
+		&user.Id,
+		&hashedPassword,
+		&active,
+		&user.Name,
+		&user.Email,
+		&user.Role,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
 	if err != nil {
-		return "", errors.New("incorrect email or password")
+		return user, "", errors.New("incorrect email or password")
 	}
 
 	if !active {
-		return "", errors.New("user does not exist")
+		return user, "", errors.New("user does not exist")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", errors.New("incorrect email or password")
+		return user, "", errors.New("incorrect email or password")
 	} else if err != nil {
-		return "", err
+		return user, "", err
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
@@ -245,10 +259,10 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (string, error) {
 
 	token, err := claims.SignedString([]byte(dbrepo.App.Env["JWT_SECRET"]))
 	if err != nil {
-		return "", err
+		return user, "", err
 	}
 
-	return token, nil
+	return user, token, nil
 }
 
 // UpdateMe updates user's data

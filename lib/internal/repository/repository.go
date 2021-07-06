@@ -18,7 +18,7 @@ type DatabaseRepo interface {
 	GetUserByToken(token string) (models.User, error)
 
 	SignUp(user models.User) error
-	Login(email, password string) (string, error)
+	Login(email, password string) (models.User, string, error)
 	UpdateMe(user models.User) error
 	ForgotPassword(email string) (string, string, error)
 	ResetPassword(id int, password string) error

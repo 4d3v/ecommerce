@@ -244,7 +244,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
 
-	token, err := repo.DB.Login(email, password)
+	user, token, err := repo.DB.Login(email, password)
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusUnauthorized)
 		return
@@ -258,10 +258,12 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &jwtCookie)
-	sendJson("msgjson", w, &options{
+	sendJson("loginsuccess", w, &options{
 		ok:     true,
 		msg:    "Logged in succesfully",
 		stCode: http.StatusOK,
+		user:   user,
+		token:  token,
 	})
 }
 

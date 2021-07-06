@@ -79,6 +79,16 @@ type orderJson struct {
 	// Product models.Product
 }
 
+type loginSuccess struct {
+	Id              int    `json:"id"`
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	Role            int    `json:"role"` // ENUM
+	CreatedAt       string `json:"created_at"`
+	UpdatedAt       string `json:"updated_at"`
+	Token           string `json:"token"`
+}
+
 type msgJson struct {
 	Ok      bool                `json:"ok"`
 	Message string              `json:"message"`
@@ -98,6 +108,7 @@ type options struct {
 	err    string
 	errs   map[string][]string
 	stCode int
+	token  string
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -269,6 +280,25 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		}
 
 		w.Write(newJson)
+
+	case "loginsuccess":
+		resp := loginSuccess {
+			Id:        opts.user.Id,
+			Name:      opts.user.Name,
+			Email:     opts.user.Email,
+			Role:      opts.user.Role,
+			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
+			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
+			Token:     opts.token,
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(out)
 
 	case "msgjson":
 		resp := msgJson{
