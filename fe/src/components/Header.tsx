@@ -1,12 +1,13 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { logout } from '../actions/userActions'
 import { IUser } from '../type'
 
 interface IUserInfo {
   userInfo: IUser
-  loading: boolean
-  error: string
+  // loading: boolean
+  // error: string
 }
 
 const Header = () => {
@@ -14,8 +15,11 @@ const Header = () => {
   const userLogin = useSelector(
     (state: { userLogin: IUserInfo }) => state.userLogin
   )
-  const { userInfo, loading, error } = userLogin
-  console.log(userLogin)
+  const { userInfo } = userLogin
+
+  const logoutHandler = () => {
+    dispatch(logout())
+  }
 
   return (
     <header id='header'>
@@ -29,7 +33,7 @@ const Header = () => {
               <i className='fas fa-shopping-cart'></i> Cart
             </Link>
           </li>
-          <li>
+          <li className='userinfo-dropdown'>
             {userInfo ? (
               <>
                 <a href='#'>{userInfo.name}</a>
@@ -40,9 +44,9 @@ const Header = () => {
                     </Link>
                   </li>
                   <li className='dropdown__li'>
-                    <Link to='#' className='nav-link'>
+                    <span className='nav-link' onClick={logoutHandler}>
                       Logout
-                    </Link>
+                    </span>
                   </li>
                 </ul>
               </>

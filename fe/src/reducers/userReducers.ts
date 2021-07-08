@@ -39,3 +39,19 @@ export const userSignUpReducer = (
       return state
   }
 }
+
+export const userDetailsReducer = (
+  state = userInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_DETAILS_REQUEST:
+      return { loading: true }
+    case userActions.USER_DETAILS_SUCCESS:
+      return { loading: false, userInfo: action.payload }
+    case userActions.USER_DETAILS_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}

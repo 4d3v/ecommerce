@@ -15,10 +15,6 @@ export interface IProduct {
   updated_at: Date
 }
 
-export type ProductsState = {
-  products: IProduct
-}
-
 export interface ICart {
   product: number
   name: string

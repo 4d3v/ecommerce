@@ -1,13 +1,13 @@
 import axios from 'axios'
+import { BASE_URL } from '../constants/endPoints'
 import { productActions } from '../constants/productConstants'
 import { AppDispatch } from '../store'
 
-// redux-thunk allows usage of async functions
 export const listProducts = () => async (dispatch: AppDispatch) => {
   try {
     dispatch({ type: productActions.PRODUCT_LIST_REQUEST })
 
-    const { data } = await axios.get('http://localhost:8080/products')
+    const { data } = await axios.get(`${BASE_URL}/products`)
 
     dispatch({
       type: productActions.PRODUCT_LIST_SUCCESS,
@@ -30,7 +30,7 @@ export const listProductDetails =
     try {
       dispatch({ type: productActions.PRODUCT_DETAILS_REQUEST })
 
-      const { data } = await axios.get(`http://localhost:8080/products/${id}`)
+      const { data } = await axios.get(`${BASE_URL}/products/${id}`)
 
       dispatch({
         type: productActions.PRODUCT_DETAILS_SUCCESS,

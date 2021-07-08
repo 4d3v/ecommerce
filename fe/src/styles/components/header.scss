@@ -17,11 +17,15 @@ header {
         display: inherit;
       }
 
+      .userinfo-dropdown {
+        position: relative;
+      }
+
       .dropdown {
         display: none;
         position: absolute;
-        top: 35px;
-        right: 35px;
+        top: 16px;
+        left: -30px;
         background-color: $base-secondary-color;
         padding: 0;
         overflow: hidden;

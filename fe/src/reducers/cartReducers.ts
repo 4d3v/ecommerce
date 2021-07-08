@@ -1,9 +1,9 @@
 import { AnyAction } from 'redux'
 import { cartActions } from '../constants/cartConstants'
+import { ICart } from '../type'
 
-// Temporarily using any
-const cart: any[] = []
-const initialState: { cartItems: any[] } = {
+const cart: ICart[] = []
+const initialState: { cartItems: ICart[] } = {
   cartItems: cart,
 }
 

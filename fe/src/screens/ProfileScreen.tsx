@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { login } from '../actions/userActions'
+import { getUser } from '../actions/userActions'
 import { IUser } from '../type'
 
 interface LocationParams {
@@ -18,31 +18,36 @@ interface IUserInfo {
   error: string
 }
 
-const LoginScreen = () => {
+const ProfileScreen = () => {
   const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
 
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setpasswordConfirm] = useState('')
 
   const dispatch = useDispatch()
+  const userDetails = useSelector(
+    (state: { userDetails: IUserInfo }) => state.userDetails
+  )
+  const { loading, userInfo, error } = userDetails
+
   const userLogin = useSelector(
     (state: { userLogin: IUserInfo }) => state.userLogin
   )
-  const { loading, userInfo, error } = userLogin
-
-  const redirect = location.search ? location.search.split('=')[1] : '/'
-  console.log('redirect', redirect)
 
   useEffect(() => {
+    console.log(userInfo)
+    console.log(userLogin)
     if (userInfo) {
-      history.push(redirect)
+      //   history.push(redirect)
     }
-  }, [history, userInfo, redirect])
+  }, [history, userInfo, userLogin])
 
   const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
     e.preventDefault()
-    dispatch(login(email, password))
+    // dispatch(signup(name, email, password, passwordConfirm))
   }
 
   return (
@@ -51,6 +56,15 @@ const LoginScreen = () => {
       {error && <Message error={error} />}
       {loading && <Loader />}
       <form onSubmit={submitHandler}>
+        <label htmlFor='name'>Name</label>
+        <input
+          type='text'
+          placeholder='Enter name'
+          name='name'
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
         <label htmlFor='email'>Email</label>
         <input
           type='email'
@@ -69,19 +83,21 @@ const LoginScreen = () => {
           required
         />
 
-        <button className='btn' type='submit'>
-          Login
-        </button>
+        <label htmlFor='passconfirm'>Password</label>
+        <input
+          type='password'
+          placeholder='Confirm password'
+          name='passconfirm'
+          onChange={(e) => setpasswordConfirm(e.target.value)}
+          required
+        />
 
-        <div className='u-py-s'>
-          New customer ?
-          <Link to={redirect ? `/signup?redirect=${redirect}` : '/signup'}>
-            Sign Up
-          </Link>
-        </div>
+        <button className='btn' type='submit'>
+          Update
+        </button>
       </form>
     </div>
   )
 }
 
-export default LoginScreen
+export default ProfileScreen

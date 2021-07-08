@@ -255,6 +255,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 24), // 1 day
+		// Secure: false,	
 	}
 
 	http.SetCookie(w, &jwtCookie)
@@ -267,7 +268,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Logouit logs out the user
+// Logout logs out the user
 func (repo *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("jwt")
 	if err != nil {

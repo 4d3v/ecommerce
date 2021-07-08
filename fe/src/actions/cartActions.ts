@@ -1,11 +1,12 @@
 import axios from 'axios'
 import { cartActions } from '../constants/cartConstants'
+import { BASE_URL } from '../constants/endPoints'
 import { AppDispatch } from '../store'
 
 // TEMP using getState as any
 export const addToCart =
   (id: string, qty: number) => async (dispatch: AppDispatch, getState: any) => {
-    const { data } = await axios.get(`http://localhost:8080/products/${id}`)
+    const { data } = await axios.get(`${BASE_URL}/products/${id}`)
 
     dispatch({
       type: cartActions.CART_ADD_ITEM,

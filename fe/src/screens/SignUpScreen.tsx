@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { login } from '../actions/userActions'
+import { signup } from '../actions/userActions'
 import { IUser } from '../type'
 
 interface LocationParams {
@@ -18,21 +18,22 @@ interface IUserInfo {
   error: string
 }
 
-const LoginScreen = () => {
+const SignUpScreen = () => {
   const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
 
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setpasswordConfirm] = useState('')
 
   const dispatch = useDispatch()
-  const userLogin = useSelector(
-    (state: { userLogin: IUserInfo }) => state.userLogin
+  const userSignUp = useSelector(
+    (state: { userSignUp: IUserInfo }) => state.userSignUp
   )
-  const { loading, userInfo, error } = userLogin
+  const { loading, userInfo, error } = userSignUp
 
   const redirect = location.search ? location.search.split('=')[1] : '/'
-  console.log('redirect', redirect)
 
   useEffect(() => {
     if (userInfo) {
@@ -42,7 +43,7 @@ const LoginScreen = () => {
 
   const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
     e.preventDefault()
-    dispatch(login(email, password))
+    dispatch(signup(name, email, password, passwordConfirm))
   }
 
   return (
@@ -51,6 +52,15 @@ const LoginScreen = () => {
       {error && <Message error={error} />}
       {loading && <Loader />}
       <form onSubmit={submitHandler}>
+        <label htmlFor='name'>Name</label>
+        <input
+          type='text'
+          placeholder='Enter name'
+          name='name'
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
         <label htmlFor='email'>Email</label>
         <input
           type='email'
@@ -69,14 +79,23 @@ const LoginScreen = () => {
           required
         />
 
+        <label htmlFor='passconfirm'>Password</label>
+        <input
+          type='password'
+          placeholder='Confirm password'
+          name='passconfirm'
+          onChange={(e) => setpasswordConfirm(e.target.value)}
+          required
+        />
+
         <button className='btn' type='submit'>
-          Login
+          Sign Up
         </button>
 
         <div className='u-py-s'>
-          New customer ?
-          <Link to={redirect ? `/signup?redirect=${redirect}` : '/signup'}>
-            Sign Up
+          Have an account ?
+          <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
+            Login
           </Link>
         </div>
       </form>
@@ -84,4 +103,4 @@ const LoginScreen = () => {
   )
 }
 
-export default LoginScreen
+export default SignUpScreen

@@ -214,9 +214,8 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string
 		id             int
 		hashedPassword string
 		active         bool
+		user           models.User
 	)
-
-	var user models.User
 
 	row := dbrepo.DB.QueryRowContext(
 		ctx,
@@ -244,6 +243,8 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string
 	if !active {
 		return user, "", errors.New("user does not exist")
 	}
+
+	id = user.Id
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {

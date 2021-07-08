@@ -6,7 +6,11 @@ import {
   productListReducer,
 } from './reducers/productReducers'
 import { cartReducer } from './reducers/cartReducers'
-import { userLoginReducer, userSignUpReducer } from './reducers/userReducers'
+import {
+  userDetailsReducer,
+  userLoginReducer,
+  userSignUpReducer,
+} from './reducers/userReducers'
 
 const cartItemsJson = localStorage.getItem('cartItems'),
   cartItemsFromStorage = cartItemsJson !== null ? JSON.parse(cartItemsJson) : []
@@ -19,12 +23,12 @@ const reducer = combineReducers({
     productDetails: productDetailsReducer,
     userLogin: userLoginReducer,
     userSignUp: userSignUpReducer,
+    userDetails: userDetailsReducer,
     cart: cartReducer,
   }),
   initialState = {
     cart: { cartItems: cartItemsFromStorage },
     userLogin: userInfoFromStorage,
-    // userLogin: { userInfo: userInfoFromStorage },
   },
   middleware = [thunk],
   store = createStore(
@@ -36,3 +40,7 @@ const reducer = combineReducers({
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 export default store
+
+/**
+ * redux-thunk allows usage of async functions
+ */
