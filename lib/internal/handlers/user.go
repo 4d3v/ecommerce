@@ -261,7 +261,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &jwtCookie)
 	sendJson("loginsuccess", w, &options{
 		ok:     true,
-		msg:    "Logged in succesfully",
+		msg:    "Logged in successfully",
 		stCode: http.StatusOK,
 		user:   user,
 		token:  token,
@@ -331,6 +331,23 @@ func (repo *Repository) User(w http.ResponseWriter, r *http.Request) {
 	sendJson("userjson", w, &options{user: user, stCode: http.StatusOK})
 }
 
+// Me retrieves logged in user's info using user id
+func (repo *Repository) Me(w http.ResponseWriter, r *http.Request) {
+	userId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	user, err := repo.DB.GetUserById(userId)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("userjson", w, &options{user: user, stCode: http.StatusOK})
+}
+
 // UpdateMe Updates some user's general info
 func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -368,7 +385,8 @@ func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendJson("msgjson", w, &options{
+	sendJson("updatesuccess", w, &options{
+		user:   user,
 		ok:     true,
 		msg:    "User updated successfully ",
 		stCode: http.StatusOK,

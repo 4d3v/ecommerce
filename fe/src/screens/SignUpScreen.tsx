@@ -48,10 +48,14 @@ const SignUpScreen = () => {
 
   return (
     <div className='container'>
-      <h1>Sign In</h1>
-      {error && <Message error={error} />}
+      <h1 className='u-txt-center u-py-ss'>Sign Up</h1>
+      {error && (
+        <div className='u-txt-center u-py-ss'>
+          <Message error={error} />
+        </div>
+      )}
       {loading && <Loader />}
-      <form onSubmit={submitHandler}>
+      <form className='form' onSubmit={submitHandler}>
         <label htmlFor='name'>Name</label>
         <input
           type='text'
@@ -88,12 +92,10 @@ const SignUpScreen = () => {
           required
         />
 
-        <button className='btn' type='submit'>
-          Sign Up
-        </button>
+        <button type='submit'>Sign Up</button>
 
         <div className='u-py-s'>
-          Have an account ?
+          Have an account?{' '}
           <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
             Login
           </Link>

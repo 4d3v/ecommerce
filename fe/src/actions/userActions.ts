@@ -1,7 +1,10 @@
 import axios from 'axios'
+import { useCookies } from 'react-cookie'
 import { BASE_URL } from '../constants/endPoints'
 import { userActions } from '../constants/userConstants'
 import { AppDispatch } from '../store'
+import { IUser } from '../type'
+import { getFormErrors } from './actionsUtils'
 
 export const login =
   (email: string, password: string) => async (dispatch: AppDispatch) => {
@@ -10,15 +13,10 @@ export const login =
         type: userActions.USER_LOGIN_REQUEST,
       })
 
-      // const { data } = await axios.post(
-      // `${BASE_URL}/login`,
-      //   { email, password },
-      //   { headers: { 'content-type': 'application/json' } }
-      // )
       const { data } = await axios.post(
         `${BASE_URL}/login`,
-        `email=${email}&password=${password}`
-        // { withCredentials: true }
+        `email=${email}&password=${password}`,
+        { withCredentials: true }
       )
 
       dispatch({
@@ -26,17 +24,25 @@ export const login =
         payload: data,
       })
 
-      localStorage.setItem('userInfo', JSON.stringify({ userInfo: data }))
+      localStorage.setItem(
+        'userInfo',
+        JSON.stringify({
+          userInfo: {
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          },
+        })
+      )
     } catch (error) {
+      const customError = getFormErrors(error)
       dispatch({
         type: userActions.USER_LOGIN_FAIL,
-        payload: JSON.stringify(error),
-        //   payload:
-        //     error.response && error.response.data.message
-        //       ? error.response.data.message
-        //       : error.message,
+        payload: customError.length > 0 ? customError : error.message,
       })
-      console.log(error.response.data)
     }
   }
 
@@ -68,17 +74,13 @@ export const signup =
         payload: data,
       })
 
-      // localStorage.setItem('userInfo', JSON.stringify({ userInfo: data }))
+      localStorage.setItem('userInfo', JSON.stringify({ userInfo: data }))
     } catch (error) {
+      const customError = getFormErrors(error)
       dispatch({
         type: userActions.USER_SIGNUP_FAIL,
-        payload: JSON.stringify(error),
-        //   payload:
-        //     error.response && error.response.data.message
-        //       ? error.response.data.message
-        //       : error.message,
+        payload: customError.length > 0 ? customError : error.message,
       })
-      console.log(error.response.data)
     }
   }
 
@@ -93,25 +95,74 @@ export const getUser =
         userLogin: { userInfo },
       } = getState()
 
-      const { data } = await axios.get(`${BASE_URL}/user`, {
+      const {
+        data,
+        config: { headers },
+      } = await axios.get(`${BASE_URL}/user`, {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },
+        withCredentials: true,
       })
 
       dispatch({
-        type: userActions.USER_LOGIN_SUCCESS,
+        type: userActions.USER_DETAILS_SUCCESS,
         payload: data,
       })
     } catch (error) {
+      const customError = getFormErrors(error)
       dispatch({
-        type: userActions.USER_SIGNUP_FAIL,
-        payload: JSON.stringify(error),
-        //   payload:
-        //     error.response && error.response.data.message
-        //       ? error.response.data.message
-        //       : error.message,
+        type: userActions.USER_DETAILS_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
       })
-      console.log(error.response.data)
+    }
+  }
+
+export const updateUser =
+  (user: IUser) => async (dispatch: AppDispatch, getState: any) => {
+    try {
+      dispatch({
+        type: userActions.USER_UPDATE_PROFILE_REQUEST,
+      })
+
+      const {
+        userLogin: { userInfo },
+      } = getState()
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/updateme`,
+        `name=${user.name}&email=${user.email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: userActions.USER_UPDATE_PROFILE_SUCCESS,
+        payload: data,
+      })
+
+      localStorage.setItem(
+        'userInfo',
+        JSON.stringify({
+          userInfo: {
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          },
+        })
+      )
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: userActions.USER_UPDATE_PROFILE_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
     }
   }

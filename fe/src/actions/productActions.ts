@@ -2,6 +2,7 @@ import axios from 'axios'
 import { BASE_URL } from '../constants/endPoints'
 import { productActions } from '../constants/productConstants'
 import { AppDispatch } from '../store'
+import { getFormErrors } from './actionsUtils'
 
 export const listProducts = () => async (dispatch: AppDispatch) => {
   try {
@@ -14,13 +15,10 @@ export const listProducts = () => async (dispatch: AppDispatch) => {
       payload: data,
     })
   } catch (error) {
+    const customError = getFormErrors(error)
     dispatch({
       type: productActions.PRODUCT_LIST_FAIL,
-      payload: JSON.stringify(error),
-      //   payload:
-      //     error.response && error.response.data.message
-      //       ? error.response.data.message
-      //       : error.message,
+      payload: customError.length > 0 ? customError : error.message,
     })
   }
 }
@@ -37,14 +35,10 @@ export const listProductDetails =
         payload: data,
       })
     } catch (error) {
+      const customError = getFormErrors(error)
       dispatch({
         type: productActions.PRODUCT_DETAILS_FAIL,
-        payload: JSON.stringify(error),
-        //   payload:
-        //     error.response && error.response.data.message
-        //       ? error.response.data.message
-        //       : error.message,
+        payload: customError.length > 0 ? customError : error.message,
       })
-      console.log(error.response.data.error)
     }
   }

@@ -86,7 +86,19 @@ type loginSuccess struct {
 	Role            int    `json:"role"` // ENUM
 	CreatedAt       string `json:"created_at"`
 	UpdatedAt       string `json:"updated_at"`
-	Token           string `json:"token"`
+	Ok              bool   `json:"ok"`
+	Message         string `json:"message"`
+}
+
+type updateSuccess struct {
+	Id              int    `json:"id"`
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	Role            int    `json:"role"` // ENUM
+	CreatedAt       string `json:"created_at"`
+	UpdatedAt       string `json:"updated_at"`
+	Ok              bool   `json:"ok"`
+	Message         string `json:"message"`
 }
 
 type msgJson struct {
@@ -289,7 +301,28 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			Role:      opts.user.Role,
 			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
 			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
-			Token:     opts.token,
+			Ok:        opts.ok,
+			Message:   opts.msg,
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(out)
+
+	case "updatesuccess":
+		resp := updateSuccess {
+			Id:        opts.user.Id,
+			Name:      opts.user.Name,
+			Email:     opts.user.Email,
+			Role:      opts.user.Role,
+			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
+			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
+			Ok:        opts.ok,
+			Message:   opts.msg,
 		}
 
 		out, err := json.Marshal(resp)
@@ -407,5 +440,4 @@ func sendFormError(w http.ResponseWriter, errMsg string, stCode int, f *forms.Fo
 		errs:   f.Errors,
 		stCode: stCode,
 	})
-
 }

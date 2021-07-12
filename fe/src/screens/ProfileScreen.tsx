@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { getUser } from '../actions/userActions'
+import { getUser, updateUser } from '../actions/userActions'
 import { IUser } from '../type'
 
 interface LocationParams {
@@ -18,14 +18,21 @@ interface IUserInfo {
   error: string
 }
 
+interface IUserUpdateProfile {
+  loading: boolean
+  success: boolean
+  userInfo: IUser
+  error: string
+}
+
 const ProfileScreen = () => {
   const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordConfirm, setpasswordConfirm] = useState('')
+  const [curPassword, setCurPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
 
   const dispatch = useDispatch()
   const userDetails = useSelector(
@@ -37,30 +44,61 @@ const ProfileScreen = () => {
     (state: { userLogin: IUserInfo }) => state.userLogin
   )
 
-  useEffect(() => {
-    console.log(userInfo)
-    console.log(userLogin)
-    if (userInfo) {
-      //   history.push(redirect)
-    }
-  }, [history, userInfo, userLogin])
+  const userUpdateProfile = useSelector(
+    (state: { userUpdateProfile: IUserUpdateProfile }) =>
+      state.userUpdateProfile
+  )
 
-  const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
+  useEffect(() => {
+    if (!userLogin.userInfo) {
+      history.push('/login')
+    } else if (!userInfo) {
+      dispatch(getUser(userLogin.userInfo.id))
+    } else {
+      setName(userInfo.name)
+      setEmail(userInfo.email)
+    }
+  }, [dispatch, history, userInfo, userLogin])
+
+  const updateUserDetails = (
+    e: React.MouseEvent<HTMLFormElement, MouseEvent>
+  ) => {
     e.preventDefault()
-    // dispatch(signup(name, email, password, passwordConfirm))
+    dispatch(updateUser({ id: userInfo.id, name, email }))
+  }
+
+  const updateUserPassword = (
+    e: React.MouseEvent<HTMLFormElement, MouseEvent>
+  ) => {
+    e.preventDefault()
   }
 
   return (
     <div className='container'>
-      <h1>Sign In</h1>
-      {error && <Message error={error} />}
+      <h1 className='u-txt-center u-my-s'>My Profile</h1>
+      {error && (
+        <div className='u-txt-center u-py-ss'>
+          <Message error={error} />
+        </div>
+      )}
+      {userUpdateProfile.error && (
+        <div className='u-txt-center u-py-ss'>
+          <Message error={userUpdateProfile.error} />
+        </div>
+      )}
+      {userUpdateProfile.success && (
+        <div className='u-txt-center u-py-ss'>
+          <Message info={'User updated successfully'} />
+        </div>
+      )}
       {loading && <Loader />}
-      <form onSubmit={submitHandler}>
+      <form className='form' onSubmit={updateUserDetails}>
         <label htmlFor='name'>Name</label>
         <input
           type='text'
           placeholder='Enter name'
           name='name'
+          value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
@@ -70,31 +108,34 @@ const ProfileScreen = () => {
           type='email'
           placeholder='Enter email'
           name='email'
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
-        <label htmlFor='pass'>Password</label>
+        <button type='submit'>Update user details</button>
+      </form>
+
+      <form className='form' onSubmit={updateUserPassword}>
+        <label htmlFor='curpass'>Current password</label>
         <input
           type='password'
-          placeholder='Enter password'
-          name='pass'
-          onChange={(e) => setPassword(e.target.value)}
+          placeholder='Enter current password'
+          name='curpass'
+          onChange={(e) => setCurPassword(e.target.value)}
           required
         />
 
-        <label htmlFor='passconfirm'>Password</label>
+        <label htmlFor='newpass'>New password</label>
         <input
           type='password'
-          placeholder='Confirm password'
-          name='passconfirm'
-          onChange={(e) => setpasswordConfirm(e.target.value)}
+          placeholder='Enter new password'
+          name='newpass'
+          onChange={(e) => setNewPassword(e.target.value)}
           required
         />
 
-        <button className='btn' type='submit'>
-          Update
-        </button>
+        <button type='submit'>Update user password</button>
       </form>
     </div>
   )

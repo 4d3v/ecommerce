@@ -36,10 +36,10 @@ const Header = () => {
           <li className='userinfo-dropdown'>
             {userInfo ? (
               <>
-                <a href='#'>{userInfo.name}</a>
+                <span>{userInfo.name}</span>
                 <ul className='dropdown'>
                   <li className='dropdown__li'>
-                    <Link to='#' className='nav-link'>
+                    <Link to='/profile' className='nav-link'>
                       Profile
                     </Link>
                   </li>

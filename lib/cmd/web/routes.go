@@ -14,7 +14,7 @@ func routes() http.Handler {
 
 	mux.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedOrigins: []string{"https://localhost:3000", "http://localhost:3000"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -33,6 +33,7 @@ func routes() http.Handler {
 	mux.Post("/login", handlers.Repo.Login)
 	mux.Get("/logout", handlers.Repo.Logout)
 	mux.Get("/user", handlers.Repo.User)
+	mux.Get("/me/{id}", handlers.Repo.Me)
 	mux.Patch("/updateme", handlers.Repo.UpdateMe)
 	mux.Get("/actdis", handlers.Repo.ActivateDisableUser)
 

@@ -12,10 +12,12 @@
 @import './components/footer';
 @import './components/loader';
 @import './components/message';
+@import './components/form';
 
 @import './pages/homescreen';
 @import './pages/productscreen';
 @import './pages/cartscreen';
+@import './pages/profilescreen';
 
 body {
   background-color: $base-primary-color;
