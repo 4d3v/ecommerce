@@ -46,9 +46,28 @@ export const login =
     }
   }
 
-export const logout = () => (dispatch: AppDispatch) => {
-  dispatch({ type: userActions.USER_LOGOUT })
-  localStorage.removeItem('userInfo')
+export const logout = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({ type: userActions.USER_LOGOUT_REQUEST })
+
+    const { data } = await axios.get(`${BASE_URL}/logout`, {
+      withCredentials: true,
+    })
+    console.log('logout', data)
+
+    dispatch({
+      type: userActions.USER_LOGOUT_SUCCESS,
+      payload: data,
+    })
+
+    localStorage.removeItem('userInfo')
+  } catch (error) {
+    const customError = getFormErrors(error)
+    dispatch({
+      type: userActions.USER_LOGOUT_FAIL,
+      payload: customError.length > 0 ? customError : error.message,
+    })
+  }
 }
 
 export const signup =
@@ -61,7 +80,8 @@ export const signup =
 
       const { data } = await axios.post(
         `${BASE_URL}/signup`,
-        `name=${name}&email=${email}&password=${password}&password_confirm=${passwordConfirm}`
+        `name=${name}&email=${email}&password=${password}&password_confirm=${passwordConfirm}`,
+        { withCredentials: true }
       )
 
       dispatch({
@@ -71,6 +91,11 @@ export const signup =
 
       dispatch({
         type: userActions.USER_LOGIN_SUCCESS,
+        payload: data,
+      })
+
+      dispatch({
+        type: userActions.USER_DETAILS_SUCCESS,
         payload: data,
       })
 
@@ -164,5 +189,38 @@ export const updateUser =
         type: userActions.USER_UPDATE_PROFILE_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
+    }
+  }
+
+export const updateUserPass =
+  (curPassword: string, newPassword: string, newPasswordConfirm: string) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: userActions.USER_UPDATE_PASSWORD_REQUEST,
+      })
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/updatepassword`,
+        `cur_password=${curPassword}&password=${newPassword}&password_confirm=${newPasswordConfirm}`,
+        {
+          // headers: {
+          //   Authorization: `Bearer ${userInfo.token}`,
+          // },
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: userActions.USER_UPDATE_PASSWORD_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: userActions.USER_UPDATE_PASSWORD_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(customError)
     }
   }

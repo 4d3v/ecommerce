@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { getUser, updateUser } from '../actions/userActions'
+import { getUser, updateUser, updateUserPass } from '../actions/userActions'
 import { IUser } from '../type'
 
 interface LocationParams {
@@ -25,6 +25,12 @@ interface IUserUpdateProfile {
   error: string
 }
 
+interface IUserUpdatePassword {
+  loading: boolean
+  success: boolean
+  error: string
+}
+
 const ProfileScreen = () => {
   const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
@@ -33,6 +39,7 @@ const ProfileScreen = () => {
   const [email, setEmail] = useState('')
   const [curPassword, setCurPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
 
   const dispatch = useDispatch()
   const userDetails = useSelector(
@@ -49,14 +56,24 @@ const ProfileScreen = () => {
       state.userUpdateProfile
   )
 
+  const userUpdatePassword = useSelector(
+    (state: { userUpdatePassword: IUserUpdatePassword }) =>
+      state.userUpdatePassword
+  )
+
   useEffect(() => {
+    console.log('been called')
+    console.log(userInfo)
+
     if (!userLogin.userInfo) {
       history.push('/login')
     } else if (!userInfo) {
       dispatch(getUser(userLogin.userInfo.id))
+      console.log(1)
     } else {
       setName(userInfo.name)
       setEmail(userInfo.email)
+      console.log(2)
     }
   }, [dispatch, history, userInfo, userLogin])
 
@@ -71,6 +88,7 @@ const ProfileScreen = () => {
     e: React.MouseEvent<HTMLFormElement, MouseEvent>
   ) => {
     e.preventDefault()
+    dispatch(updateUserPass(curPassword, newPassword, newPasswordConfirm))
   }
 
   return (
@@ -84,6 +102,16 @@ const ProfileScreen = () => {
       {userUpdateProfile.error && (
         <div className='u-txt-center u-py-ss'>
           <Message error={userUpdateProfile.error} />
+        </div>
+      )}
+      {userUpdatePassword.error && (
+        <div className='u-txt-center u-py-ss'>
+          <Message error={userUpdatePassword.error} />
+        </div>
+      )}
+      {userUpdatePassword.success && (
+        <div className='u-txt-center u-py-ss'>
+          <Message info={'User password updated successfully'} />
         </div>
       )}
       {userUpdateProfile.success && (
@@ -132,6 +160,15 @@ const ProfileScreen = () => {
           placeholder='Enter new password'
           name='newpass'
           onChange={(e) => setNewPassword(e.target.value)}
+          required
+        />
+
+        <label htmlFor='newpassconfirm'>Confirm New password</label>
+        <input
+          type='password'
+          placeholder='Confirm new password'
+          name='newpassconfirm'
+          onChange={(e) => setNewPasswordConfirm(e.target.value)}
           required
         />
 

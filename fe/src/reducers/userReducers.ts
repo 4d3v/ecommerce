@@ -17,10 +17,24 @@ export const userLoginReducer = (
       return { loading: false, userInfo: action.payload }
     case userActions.USER_LOGIN_FAIL:
       return { loading: false, error: action.payload }
-    case userActions.USER_LOGOUT:
-      return {}
     default:
       return state
+  }
+}
+
+export const userLogoutReducer = (
+  state = userInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_LOGOUT_REQUEST:
+      return { loading: true }
+    case userActions.USER_LOGOUT_SUCCESS:
+      return { loading: false, userInfo: {} }
+    case userActions.USER_LOGOUT_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return {}
   }
 }
 
@@ -66,6 +80,22 @@ export const userUpdateProfileReducer = (
     case userActions.USER_UPDATE_PROFILE_SUCCESS:
       return { loading: false, success: true, userInfo: action.payload }
     case userActions.USER_UPDATE_PROFILE_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export const userUpdatePasswordReducer = (
+  state = userInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_UPDATE_PASSWORD_REQUEST:
+      return { loading: true }
+    case userActions.USER_UPDATE_PASSWORD_SUCCESS:
+      return { loading: false, success: true }
+    case userActions.USER_UPDATE_PASSWORD_FAIL:
       return { loading: false, error: action.payload }
     default:
       return state

@@ -9,7 +9,9 @@ import { cartReducer } from './reducers/cartReducers'
 import {
   userDetailsReducer,
   userLoginReducer,
+  userLogoutReducer,
   userSignUpReducer,
+  userUpdatePasswordReducer,
   userUpdateProfileReducer,
 } from './reducers/userReducers'
 
@@ -23,9 +25,11 @@ const reducer = combineReducers({
     productList: productListReducer,
     productDetails: productDetailsReducer,
     userLogin: userLoginReducer,
+    userLogout: userLogoutReducer,
     userSignUp: userSignUpReducer,
     userDetails: userDetailsReducer,
     userUpdateProfile: userUpdateProfileReducer,
+    userUpdatePassword: userUpdatePasswordReducer,
     cart: cartReducer,
   }),
   initialState = {
