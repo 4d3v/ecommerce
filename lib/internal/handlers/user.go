@@ -61,7 +61,7 @@ func (repo *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) 
 	userActive := form.IsUserActive("active")
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
@@ -204,7 +204,7 @@ func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
@@ -215,13 +215,27 @@ func (repo *Repository) SignUp(w http.ResponseWriter, r *http.Request) {
 		PasswordConfirm: r.Form.Get("password_confirm"),
 	}
 
-	err = repo.DB.SignUp(user)
+	user, token, err := repo.DB.SignUp(user)
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
+	jwtCookie := http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		HttpOnly: true,
+		Expires:  time.Now().Add(time.Hour * 24), // 1 day
+		// Secure: false,
+	}
+
+	http.SetCookie(w, &jwtCookie)
+	sendJson("signupsuccess", w, &options{
+		ok:     true,
+		msg:    "Signed up successfully",
+		stCode: http.StatusOK,
+		user:   user,
+	})
 }
 
 // Login signs in the user into the application
@@ -237,7 +251,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
@@ -255,7 +269,7 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		HttpOnly: true,
 		Expires:  time.Now().Add(time.Hour * 24), // 1 day
-		// Secure: false,	
+		// Secure: false,
 	}
 
 	http.SetCookie(w, &jwtCookie)
@@ -264,7 +278,6 @@ func (repo *Repository) Login(w http.ResponseWriter, r *http.Request) {
 		msg:    "Logged in successfully",
 		stCode: http.StatusOK,
 		user:   user,
-		token:  token,
 	})
 }
 
@@ -364,6 +377,7 @@ func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
+	fmt.Println(user)
 
 	if len(r.Form.Get("name")) > 0 {
 		form.MinLength("name", 3)
@@ -375,13 +389,62 @@ func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
 	err = repo.DB.UpdateMe(user)
 	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	sendJson("updatesuccess", w, &options{
+		user:   user,
+		ok:     true,
+		msg:    "User updated successfully ",
+		stCode: http.StatusOK,
+	})
+}
+
+// UpdatePassword Updates user's password
+func (repo *Repository) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	userDbPassword, err := repo.DB.GetUserPass(user.Id)
+	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("cur_password", "password", "password_confirm")
+	form.MinLength("password", 6)
+	form.MinLength("password_confirm", 6)
+	form.CheckPassword("password", "password_confirm")
+	curPassword := r.Form.Get("cur_password")
+	user.Password = r.Form.Get("password")
+	user.PasswordConfirm = r.Form.Get("password_confirm")
+
+	if !form.Valid() {
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
+		return
+	}
+
+	err = repo.DB.UpdatePassword(userDbPassword, curPassword, user)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -406,7 +469,7 @@ func (repo *Repository) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	form.IsEmail("email")
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
@@ -450,13 +513,13 @@ func (repo *Repository) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	form.CheckPassword("password", "password_confirm")
 
 	if !form.Valid() {
-		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		sendFormError(w, "Invalid form", http.StatusBadRequest, form)
 		return
 	}
 
 	user, err := repo.DB.GetUserByToken(chi.URLParam(r, "token"))
 	if err != nil {
-		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
@@ -493,7 +556,7 @@ func (repo *Repository) ActivateDisableUser(w http.ResponseWriter, r *http.Reque
 
 	err = repo.DB.ActivateDisableUser(user.Id, user.Active)
 	if err != nil {
-		sendError(w, "Not appropiate for admins or owners", http.StatusBadRequest)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 

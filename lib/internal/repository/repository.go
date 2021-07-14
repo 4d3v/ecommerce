@@ -15,11 +15,13 @@ type DatabaseRepo interface {
 	AdminDeleteUser(id int) error
 
 	GetUserById(id int) (models.User, error)
+	GetUserPass(id int) (string, error)
 	GetUserByToken(token string) (models.User, error)
 
-	SignUp(user models.User) error
+	SignUp(user models.User) (models.User, string, error)
 	Login(email, password string) (models.User, string, error)
 	UpdateMe(user models.User) error
+	UpdatePassword(userDbPassword string, curPassword string, user models.User) error
 	ForgotPassword(email string) (string, string, error)
 	ResetPassword(id int, password string) error
 	ActivateDisableUser(id int, active bool) error

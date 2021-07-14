@@ -171,15 +171,36 @@ func (dbrepo *postgresDbRepo) GetUserById(id int) (models.User, error) {
 	return user, nil
 }
 
-// SignUp signs a user up
-func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
+// GetUserById retrieves user's info
+func (dbrepo *postgresDbRepo) GetUserPass(id int) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+
+	var password string
+
+	query := `SELECT password FROM users WHERE id = $1`
+
+	row := dbrepo.DB.QueryRowContext(ctx, query, id)
+	err := row.Scan(&password)
+
+	if err != nil {
+		return "", err
+	}
+
+	return password, nil
+}
+
+// SignUp signs a user up
+func (dbrepo *postgresDbRepo) SignUp(user models.User) (models.User, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var newId int
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 	if err != nil {
 		fmt.Println("[bcrypt]:", err)
-		return err
+		return user, "", err
 	}
 	user.Password = string(hashedPassword)
 	user.PasswordConfirm = string(hashedPassword)
@@ -187,22 +208,33 @@ func (dbrepo *postgresDbRepo) SignUp(user models.User) error {
 	query := `
 		INSERT INTO users(name, email, password, password_confirm)
 		VALUES($1, $2, $3, $4)
+		RETURNING id
 	`
 
-	_, err = dbrepo.DB.ExecContext(
+	err = dbrepo.DB.QueryRowContext(
 		ctx,
 		query,
 		&user.Name,
 		&user.Email,
 		&user.Password,
 		&user.PasswordConfirm,
-	)
+	).Scan(&newId)
 
 	if err != nil {
-		return err
+		return user, "", err
 	}
 
-	return nil
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    strconv.Itoa(newId),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 1 day
+	})
+
+	token, err := claims.SignedString([]byte(dbrepo.App.Env["JWT_SECRET"]))
+	if err != nil {
+		return user, "", err
+	}
+
+	return user, token, err
 }
 
 // Login logs in the user
@@ -266,7 +298,7 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string
 	return user, token, nil
 }
 
-// UpdateMe updates user's data
+// UpdateMe updates user's info
 func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -278,6 +310,44 @@ func (dbrepo *postgresDbRepo) UpdateMe(user models.User) error {
 		query,
 		&user.Name,
 		&user.Email,
+		time.Now(),
+		&user.Id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdatePassword updates user's password
+func (dbrepo *postgresDbRepo) UpdatePassword(userDbPassword string, curPassword string, user models.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := bcrypt.CompareHashAndPassword([]byte(userDbPassword), []byte(curPassword))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return errors.New("your current password is incorrect")
+	} else if err != nil {
+		return err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		fmt.Println("[bcrypt]:", err)
+		return err
+	}
+	user.Password = string(hashedPassword)
+	user.PasswordConfirm = string(hashedPassword)
+
+	query := `UPDATE users SET password = $1, password_confirm  = $2, updated_at = $3 WHERE id = $4`
+
+	_, err = dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		&user.Password,
+		&user.PasswordConfirm,
 		time.Now(),
 		&user.Id,
 	)

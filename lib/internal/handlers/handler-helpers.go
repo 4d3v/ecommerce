@@ -79,26 +79,26 @@ type orderJson struct {
 	// Product models.Product
 }
 
-type loginSuccess struct {
-	Id              int    `json:"id"`
-	Name            string `json:"name"`
-	Email           string `json:"email"`
-	Role            int    `json:"role"` // ENUM
-	CreatedAt       string `json:"created_at"`
-	UpdatedAt       string `json:"updated_at"`
-	Ok              bool   `json:"ok"`
-	Message         string `json:"message"`
+type logsignSuccess struct {
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Role      int    `json:"role"` // ENUM
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Ok        bool   `json:"ok"`
+	Message   string `json:"message"`
 }
 
 type updateSuccess struct {
-	Id              int    `json:"id"`
-	Name            string `json:"name"`
-	Email           string `json:"email"`
-	Role            int    `json:"role"` // ENUM
-	CreatedAt       string `json:"created_at"`
-	UpdatedAt       string `json:"updated_at"`
-	Ok              bool   `json:"ok"`
-	Message         string `json:"message"`
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Role      int    `json:"role"` // ENUM
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Ok        bool   `json:"ok"`
+	Message   string `json:"message"`
 }
 
 type msgJson struct {
@@ -120,7 +120,7 @@ type options struct {
 	err    string
 	errs   map[string][]string
 	stCode int
-	token  string
+	// token  string
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -294,7 +294,27 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(newJson)
 
 	case "loginsuccess":
-		resp := loginSuccess {
+		resp := logsignSuccess{
+			Id:        opts.user.Id,
+			Name:      opts.user.Name,
+			Email:     opts.user.Email,
+			Role:      opts.user.Role,
+			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
+			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
+			Ok:        opts.ok,
+			Message:   opts.msg,
+		}
+
+		out, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(out)
+
+	case "signupsuccess":
+		resp := logsignSuccess{
 			Id:        opts.user.Id,
 			Name:      opts.user.Name,
 			Email:     opts.user.Email,
@@ -314,7 +334,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(out)
 
 	case "updatesuccess":
-		resp := updateSuccess {
+		resp := updateSuccess{
 			Id:        opts.user.Id,
 			Name:      opts.user.Name,
 			Email:     opts.user.Email,
