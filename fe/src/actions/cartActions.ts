@@ -2,6 +2,7 @@ import axios from 'axios'
 import { cartActions } from '../constants/cartConstants'
 import { BASE_URL } from '../constants/endPoints'
 import { AppDispatch } from '../store'
+import { IShippingAddress } from '../type'
 
 // TEMP using getState as any
 export const addToCart =
@@ -31,4 +32,14 @@ export const removeFromCart =
     })
 
     localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems))
+  }
+
+export const addShippingAddress =
+  (shippingAddress: IShippingAddress) => (dispatch: AppDispatch) => {
+    dispatch({
+      type: cartActions.CART_ADD_SHIPPING_ADDRESS,
+      payload: shippingAddress,
+    })
+
+    localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress))
   }

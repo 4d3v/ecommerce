@@ -1,0 +1,10 @@
+.checkoutsteps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .disabled {
+    color: #827e9f;
+    cursor: default;
+  }
+}

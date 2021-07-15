@@ -34,4 +34,11 @@ export interface IUser {
   token?: string
 }
 
+export interface IShippingAddress {
+  address: string
+  city: string
+  postalCode: string
+  country: string
+}
+
 // type DispatchType = (args: ArticleAction) => ArticleAction

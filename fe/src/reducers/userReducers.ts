@@ -17,6 +17,8 @@ export const userLoginReducer = (
       return { loading: false, userInfo: action.payload }
     case userActions.USER_LOGIN_FAIL:
       return { loading: false, error: action.payload }
+    case userActions.USER_LOGOUT:
+      return {}
     default:
       return state
   }
@@ -65,6 +67,8 @@ export const userDetailsReducer = (
       return { loading: false, userInfo: action.payload }
     case userActions.USER_DETAILS_FAIL:
       return { loading: false, error: action.payload }
+    case userActions.USER_DETAILS_RESET:
+      return { userInfo: {} }
     default:
       return state
   }
@@ -81,6 +85,8 @@ export const userUpdateProfileReducer = (
       return { loading: false, success: true, userInfo: action.payload }
     case userActions.USER_UPDATE_PROFILE_FAIL:
       return { loading: false, error: action.payload }
+    case userActions.USER_UPDATE_PROFILE_RESET:
+      return {}
     default:
       return state
   }

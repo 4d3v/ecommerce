@@ -5,6 +5,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getUser, updateUser, updateUserPass } from '../actions/userActions'
 import { IUser } from '../type'
+import { userActions } from '../constants/userConstants'
 
 interface LocationParams {
   search: string
@@ -62,20 +63,16 @@ const ProfileScreen = () => {
   )
 
   useEffect(() => {
-    console.log('been called')
-    console.log(userInfo)
-
     if (!userLogin.userInfo) {
       history.push('/login')
-    } else if (!userInfo) {
+    } else if (!userInfo || !userInfo.name || userUpdateProfile.success) {
+      dispatch({ type: userActions.USER_UPDATE_PROFILE_RESET })
       dispatch(getUser(userLogin.userInfo.id))
-      console.log(1)
     } else {
       setName(userInfo.name)
       setEmail(userInfo.email)
-      console.log(2)
     }
-  }, [dispatch, history, userInfo, userLogin])
+  }, [dispatch, history, userInfo, userLogin, userUpdateProfile.success])
 
   const updateUserDetails = (
     e: React.MouseEvent<HTMLFormElement, MouseEvent>

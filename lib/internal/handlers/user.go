@@ -377,7 +377,6 @@ func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	fmt.Println(user)
 
 	if len(r.Form.Get("name")) > 0 {
 		form.MinLength("name", 3)

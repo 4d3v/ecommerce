@@ -1,11 +1,19 @@
 import { AnyAction } from 'redux'
 import { cartActions } from '../constants/cartConstants'
-import { ICart } from '../type'
+import { ICart, IShippingAddress } from '../type'
 
 const cart: ICart[] = []
-const initialState: { cartItems: ICart[] } = {
-  cartItems: cart,
+const shippingAddress: IShippingAddress = {
+  address: '',
+  city: '',
+  postalCode: '',
+  country: '',
 }
+const initialState: { cartItems: ICart[]; shippingAddress: IShippingAddress } =
+  {
+    cartItems: cart,
+    shippingAddress: shippingAddress,
+  }
 
 export const cartReducer = (state = initialState, action: AnyAction) => {
   switch (action.type) {
@@ -33,6 +41,12 @@ export const cartReducer = (state = initialState, action: AnyAction) => {
         cartItems: state.cartItems.filter(
           (el) => el.product !== action.payload
         ),
+      }
+
+    case cartActions.CART_ADD_SHIPPING_ADDRESS:
+      return {
+        ...state,
+        shippingAddress: action.payload,
       }
 
     default:

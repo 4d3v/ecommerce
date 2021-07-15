@@ -3,7 +3,7 @@ import { Link, useHistory, useLocation, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import { addToCart, removeFromCart } from '../actions/cartActions'
-import { ICart } from '../type'
+import { ICart, IShippingAddress } from '../type'
 
 interface RouteParams {
   id: string
@@ -18,6 +18,7 @@ interface HistoryParams {}
 
 interface ICartItems {
   cartItems: ICart[]
+  shippingAddress: IShippingAddress
 }
 
 export const CartScreen = () => {

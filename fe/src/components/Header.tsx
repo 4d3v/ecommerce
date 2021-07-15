@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { logout } from '../actions/userActions'
@@ -16,6 +16,10 @@ const Header = () => {
     (state: { userLogin: IUserInfo }) => state.userLogin
   )
   const { userInfo } = userLogin
+
+  // const userLogout = useSelector(
+  //   (state: { userLogout: IUserInfo }) => state.userLogout
+  // )
 
   const logoutHandler = () => {
     dispatch(logout())

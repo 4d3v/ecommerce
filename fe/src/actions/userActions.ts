@@ -53,10 +53,14 @@ export const logout = () => async (dispatch: AppDispatch) => {
     const { data } = await axios.get(`${BASE_URL}/logout`, {
       withCredentials: true,
     })
-    console.log('logout', data)
 
     dispatch({
       type: userActions.USER_LOGOUT_SUCCESS,
+      payload: data,
+    })
+
+    dispatch({
+      type: userActions.USER_LOGOUT,
       payload: data,
     })
 
@@ -150,17 +154,18 @@ export const updateUser =
         type: userActions.USER_UPDATE_PROFILE_REQUEST,
       })
 
-      const {
-        userLogin: { userInfo },
-      } = getState()
+      // const {
+      //   userLogin: { userInfo },
+      // } = getState()
+      // console.log(userInfo)
 
       const { data } = await axios.patch(
         `${BASE_URL}/updateme`,
         `name=${user.name}&email=${user.email}`,
         {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
+          // headers: {
+          //   Authorization: `Bearer ${userInfo.token}`,
+          // },
           withCredentials: true,
         }
       )

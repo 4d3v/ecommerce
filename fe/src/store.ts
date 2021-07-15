@@ -18,6 +18,10 @@ import {
 const cartItemsJson = localStorage.getItem('cartItems'),
   cartItemsFromStorage = cartItemsJson !== null ? JSON.parse(cartItemsJson) : []
 
+const shippingAddressJson = localStorage.getItem('shippingAddress'),
+  shippingAddressFromStorage =
+    shippingAddressJson !== null ? JSON.parse(shippingAddressJson) : {}
+
 const userInfoJson = localStorage.getItem('userInfo'),
   userInfoFromStorage = userInfoJson !== null ? JSON.parse(userInfoJson) : {}
 
@@ -33,7 +37,11 @@ const reducer = combineReducers({
     cart: cartReducer,
   }),
   initialState = {
-    cart: { cartItems: cartItemsFromStorage },
+    cart: {
+      cartItems: cartItemsFromStorage,
+      shippingAddress: shippingAddressFromStorage,
+    },
+    // shippingAddress: shippingAddressFromStorage,
     userLogin: userInfoFromStorage,
   },
   middleware = [thunk],
