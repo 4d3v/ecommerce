@@ -122,19 +122,19 @@ type msgJson struct {
 }
 
 type options struct {
-	users  []models.User
-	user   models.User
-	prods  []models.Product
-	prod   models.Product
-	order  models.Order
-	orders []models.Order
-	cops   []models.CustomOrderedProd
-	ok     bool
-	msg    string
-	err    string
-	errs   map[string][]string
-	stCode int
-	data   map[string]interface{}
+	users   []models.User
+	user    models.User
+	prods   []models.Product
+	prod    models.Product
+	order   models.Order
+	orders  []models.Order
+	cops    []models.CustomOrderedProd
+	ok      bool
+	msg     string
+	err     string
+	errs    map[string][]string
+	stCode  int
+	dataMap map[string]interface{}
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -394,7 +394,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		resp := msgJson{
 			Ok:      opts.ok,
 			Message: opts.msg,
-			Data:    opts.data,
+			Data:    opts.dataMap,
 			Error:   opts.err,
 			Errors:  opts.errs,
 		}

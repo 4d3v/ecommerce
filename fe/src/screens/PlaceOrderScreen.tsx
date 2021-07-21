@@ -1,18 +1,27 @@
+import axios from 'axios'
 import React from 'react'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { createOrder } from '../actions/orderActions'
+import { Link, useHistory } from 'react-router-dom'
+import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
-import { ICart, IOrder, IPaymentMethod, IShippingAddress } from '../type'
+import { ICart, IPaymentMethod, IShippingAddress } from '../type'
 
 interface IOrderSt {
   loading: boolean
   success: boolean
-  order: any
   error: string
+  order: {
+    ok: boolean
+    message: string
+    data: { order_id: number }
+    // error: string
+    // errors: string[]
+  }
 }
+
+interface HistoryParams {}
 
 interface ICartItems {
   cartItems: ICart[]
@@ -22,6 +31,7 @@ interface ICartItems {
 
 const PlaceOrderScreen = () => {
   const dispatch = useDispatch()
+  const history = useHistory<HistoryParams>()
 
   const cart = useSelector((state: { cart: ICartItems }) => state.cart)
 
@@ -41,11 +51,19 @@ const PlaceOrderScreen = () => {
   )
   const { order, success, error } = orderCreate
 
-  // useEffect(() => {
-  // if (success) {
-  //   history.push(`/order/${order.id}`)
-  // }
-  // }, [history, success])
+  const dispatchOrderedProds = (): void => {
+    cart.cartItems.forEach(async (item) => {
+      dispatch(createOrderedProds(item.productId, order.data.order_id))
+    })
+  }
+
+  useEffect(() => {
+    if (success) {
+      // that means we made an order
+      dispatchOrderedProds()
+      history.push(`/order/${order.data.order_id}`)
+    }
+  }, [history, success])
 
   const placeOrderHandler = () => {
     if (cart.cartItems.length === 0) {
@@ -104,7 +122,7 @@ const PlaceOrderScreen = () => {
 
                     <div>
                       {/* TEMP item.product is the id ... change to product_id */}
-                      <Link to={`/product/${item.product}`}>{item.name}</Link>
+                      <Link to={`/product/${item.productId}`}>{item.name}</Link>
                     </div>
 
                     <div>

@@ -16,7 +16,7 @@ export interface IProduct {
 }
 
 export interface ICart {
-  product: number
+  productId: number
   name: string
   image: string
   price: number

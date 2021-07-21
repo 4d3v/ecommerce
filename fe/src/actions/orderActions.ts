@@ -22,8 +22,6 @@ export const createOrder =
         { withCredentials: true }
       )
 
-      console.log(data)
-
       dispatch({
         type: orderActions.ORDER_CREATE_SUCCESS,
         payload: data,
@@ -32,6 +30,35 @@ export const createOrder =
       const customError = getFormErrors(error)
       dispatch({
         type: orderActions.ORDER_CREATE_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
+export const createOrderedProds =
+  (productId: number, orderId: number) =>
+  async (dispatch: AppDispatch, getState: any) => {
+    try {
+      dispatch({
+        type: orderActions.ORDERED_PROD_CREATE_REQUEST,
+      })
+
+      const { data } = await axios.post(
+        `${BASE_URL}/orderedprods`,
+        `product_id=${productId}&order_id=${orderId}`,
+        { withCredentials: true }
+      )
+      console.log(data)
+
+      dispatch({
+        type: orderActions.ORDERED_PROD_CREATE_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: orderActions.ORDERED_PROD_CREATE_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(error.response)

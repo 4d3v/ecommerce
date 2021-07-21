@@ -179,14 +179,14 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := make(map[string]interface{})
-	data["order_id"] = orderId
+	dtMap := make(map[string]interface{})
+	dtMap["order_id"] = orderId
 
 	sendJson("msgjson", w, &options{
-		ok:     true,
-		msg:    "Order created with success",
-		data:   data,
-		stCode: http.StatusOK,
+		ok:      true,
+		msg:     "Order created with success",
+		dataMap: dtMap,
+		stCode:  http.StatusOK,
 	})
 }
 

@@ -61,7 +61,7 @@ export const CartScreen = () => {
               {cartItems.map((item) => (
                 <li
                   className='cart-itemslist__li u-py-s u-my-s'
-                  key={item.product}
+                  key={item.productId}
                 >
                   {' '}
                   {/* item.product is the id */}
@@ -73,7 +73,7 @@ export const CartScreen = () => {
                     />
                   </div>
                   <div className='cart-itemslist__linkwrapper'>
-                    <Link to={`/product/${item.product}`}>{item.name}</Link>
+                    <Link to={`/product/${item.productId}`}>{item.name}</Link>
                   </div>
                   <div>${item.price}</div>
                   <div>
@@ -82,7 +82,7 @@ export const CartScreen = () => {
                       onChange={(e) =>
                         dispatch(
                           addToCart(
-                            String(item.product),
+                            String(item.productId),
                             Number(e.target.value)
                           )
                         )
@@ -96,7 +96,9 @@ export const CartScreen = () => {
                     </select>
                   </div>
                   <div>
-                    <button onClick={() => removeFromCartHandler(item.product)}>
+                    <button
+                      onClick={() => removeFromCartHandler(item.productId)}
+                    >
                       <i className='fas fa-trash'></i>
                     </button>
                   </div>
