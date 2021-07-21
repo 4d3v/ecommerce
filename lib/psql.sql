@@ -61,7 +61,6 @@ CREATE TABLE orders(
   is_delivered BOOLEAN NOT NULL DEFAULT FALSE,
   delivered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -70,6 +69,32 @@ CREATE TRIGGER set_timestamp
 BEFORE UPDATE ON orders
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE orderedprods(
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON orderedprods
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+-- E.G
+-- select p.name, u.username FROM orderedprods as op
+-- JOIN products as p ON p.id = op.product_id
+-- JOIN users as u ON u.id = op.user_id
+-- WHERE op.order_id = $1;
+-- E.G 2
+-- select u.name, p.name, o.address from orderedprods as op
+-- join products as p on p.id = op.product_id
+-- join users as u on u.id = op.user_id
+-- join orders as o on o.id = op.order_id
+-- where op.order_id = 1;
 
 -- TODO SET NOT NULL AFTER TESTING
 -- TODO ADD OTHER TABLES, FOREIGN KEYS, INDEXES

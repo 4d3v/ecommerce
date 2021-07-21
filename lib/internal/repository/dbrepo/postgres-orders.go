@@ -17,8 +17,7 @@ func (dbrepo *postgresDbRepo) AdminGetOpenedOrders() ([]models.Order, error) {
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_status, total_price, is_paid, is_delivered, 
-		product_id, user_id FROM orders
-		WHERE is_delivered = $1
+		user_id FROM orders WHERE is_delivered = $1
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query, false)
@@ -43,7 +42,6 @@ func (dbrepo *postgresDbRepo) AdminGetOpenedOrders() ([]models.Order, error) {
 			// &order.PaidAt,
 			&order.IsDelivered,
 			// &order.DeliveredAt,
-			&order.ProductId,
 			&order.UserId,
 		)
 
@@ -116,8 +114,8 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_status, payment_result_update_time, total_price, 
-		is_paid, paid_at, is_delivered, delivered_at, user_id, product_id,
-		created_at, updated_at FROM orders WHERE user_id = $1
+		is_paid, paid_at, is_delivered, delivered_at, user_id, created_at,
+		updated_at FROM orders WHERE user_id = $1
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query, userId)
@@ -143,7 +141,6 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 			&order.PaidAt,
 			&order.IsDelivered,
 			&order.DeliveredAt,
-			&order.ProductId,
 			&order.UserId,
 			&order.CreatedAt,
 			&order.UpdatedAt,
@@ -170,8 +167,8 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_status, payment_result_update_time, total_price, 
-		is_paid, paid_at, is_delivered, delivered_at, user_id, product_id,
-		created_at, updated_at FROM orders WHERE id = $1 AND user_id = $2 
+		is_paid, paid_at, is_delivered, delivered_at, user_id, created_at,
+		updated_at FROM orders WHERE id = $1 AND user_id = $2 
 	` // ORDER BY id ASC
 
 	var order models.Order
@@ -191,7 +188,6 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 		&order.IsDelivered,
 		&order.DeliveredAt,
 		&order.UserId,
-		&order.ProductId,
 		&order.CreatedAt,
 		&order.UpdatedAt,
 	)
@@ -203,19 +199,21 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 	return order, nil
 }
 
-func (dbrepo *postgresDbRepo) InsertOrder(order models.Order) error {
+func (dbrepo *postgresDbRepo) InsertOrder(order models.Order) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	var newId int
+
 	query := `
 		INSERT INTO orders(
-		postal_code, address, country, city, payment_method, 
-		total_price, user_id, product_id
-		)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+		postal_code, address, country, city,
+		payment_method, total_price, user_id)
+		VALUES($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id
 	`
 
-	_, err := dbrepo.DB.ExecContext(
+	err := dbrepo.DB.QueryRowContext(
 		ctx,
 		query,
 		order.PostalCode,
@@ -225,14 +223,13 @@ func (dbrepo *postgresDbRepo) InsertOrder(order models.Order) error {
 		order.PaymentMethod,
 		order.TotalPrice,
 		order.UserId,
-		order.ProductId,
-	)
+	).Scan(&newId)
 
 	if err != nil {
-		return err
+		return newId, err
 	}
 
-	return nil
+	return newId, nil
 }
 
 func (dbrepo *postgresDbRepo) UpdateOrder(order models.Order) error {

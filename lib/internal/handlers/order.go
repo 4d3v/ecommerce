@@ -158,20 +158,6 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		fmt.Println(err)
-		sendError(w, "invalid id parameter", http.StatusBadRequest)
-		return
-	}
-
-	prod, err := repo.DB.GetProductById(id)
-	if err != nil {
-		fmt.Println(err)
-		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
-		return
-	}
-
 	// Fields bellow should already be checked for int
 	payMethod := checkPaymentMethod(form)
 	totalPrice, _ := strconv.Atoi(r.Form.Get("total_price"))
@@ -184,19 +170,22 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		PaymentMethod: payMethod,
 		TotalPrice:    totalPrice,
 		UserId:        user.Id,
-		ProductId:     prod.Id,
 	}
 
-	err = repo.DB.InsertOrder(order)
+	orderId, err := repo.DB.InsertOrder(order)
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
 
+	data := make(map[string]interface{})
+	data["order_id"] = orderId
+
 	sendJson("msgjson", w, &options{
 		ok:     true,
-		msg:    "Success",
+		msg:    "Order created with success",
+		data:   data,
 		stCode: http.StatusOK,
 	})
 }

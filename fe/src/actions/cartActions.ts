@@ -2,7 +2,7 @@ import axios from 'axios'
 import { cartActions } from '../constants/cartConstants'
 import { BASE_URL } from '../constants/endPoints'
 import { AppDispatch } from '../store'
-import { IShippingAddress } from '../type'
+import { IPaymentMethod, IShippingAddress } from '../type'
 
 // TEMP using getState as any
 export const addToCart =
@@ -42,4 +42,14 @@ export const addShippingAddress =
     })
 
     localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress))
+  }
+
+export const addPaymentMethod =
+  (paymentMethod: IPaymentMethod) => (dispatch: AppDispatch) => {
+    dispatch({
+      type: cartActions.CART_ADD_PAYMENT_METHOD,
+      payload: paymentMethod,
+    })
+
+    localStorage.setItem('paymentMethod', JSON.stringify(paymentMethod))
   }

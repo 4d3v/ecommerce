@@ -72,11 +72,23 @@ type orderJson struct {
 	IsDelivered             bool   `json:"is_delivered"`
 	DeliveredAt             string `json:"delivered_at"`
 	UserId                  int    `json:"user_id"`
-	ProductId               int    `json:"product_id"`
 	CreatedAt               string `json:"created_at"`
 	UpdatedAt               string `json:"updated_at"`
 	// User models.User
 	// Product models.Product
+}
+
+// SELECT p.name, p.image, p.brand, p.price, o.id, o.total_price,
+// 		op.created_at, op.updated_at FROM orderedprods AS op
+type customOrderedProdJson struct {
+	ProdName        string
+	ProdImage       string
+	ProdBrand       string
+	ProdPrice       int
+	OrderId         int
+	OrderTotalPrice int
+	OpCreated_At    string
+	OpUpdatedAt     string
 }
 
 type logsignSuccess struct {
@@ -102,10 +114,11 @@ type updateSuccess struct {
 }
 
 type msgJson struct {
-	Ok      bool                `json:"ok"`
-	Message string              `json:"message"`
-	Error   string              `json:"error"`
-	Errors  map[string][]string `json:"errors"`
+	Ok      bool                   `json:"ok"`
+	Message string                 `json:"message"`
+	Data    map[string]interface{} `json:"data"`
+	Error   string                 `json:"error"`
+	Errors  map[string][]string    `json:"errors"`
 }
 
 type options struct {
@@ -115,12 +128,13 @@ type options struct {
 	prod   models.Product
 	order  models.Order
 	orders []models.Order
+	cops   []models.CustomOrderedProd
 	ok     bool
 	msg    string
 	err    string
 	errs   map[string][]string
 	stCode int
-	// token  string
+	data   map[string]interface{}
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -242,7 +256,6 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			IsDelivered:             opts.order.IsDelivered,
 			DeliveredAt:             opts.order.DeliveredAt.Format(timeFormatStr),
 			UserId:                  opts.order.UserId,
-			ProductId:               opts.order.ProductId,
 			CreatedAt:               opts.order.CreatedAt.Format(timeFormatStr),
 			UpdatedAt:               opts.order.UpdatedAt.Format(timeFormatStr),
 			// User: opts.order.User
@@ -275,7 +288,6 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 				IsDelivered:             order.IsDelivered,
 				DeliveredAt:             order.DeliveredAt.Format(timeFormatStr),
 				UserId:                  order.UserId,
-				ProductId:               order.ProductId,
 				CreatedAt:               order.CreatedAt.Format(timeFormatStr),
 				UpdatedAt:               order.UpdatedAt.Format(timeFormatStr),
 				// User: opts.order.User
@@ -283,6 +295,31 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			}
 
 			resp = append(resp, p)
+		}
+
+		newJson, err := json.Marshal(resp)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(newJson)
+
+	case "orderedprodsjson":
+		var resp []customOrderedProdJson
+		for _, cop := range opts.cops {
+			copJson := customOrderedProdJson{
+				ProdName:        cop.ProdName,
+				ProdImage:       cop.ProdImage,
+				ProdBrand:       cop.ProdBrand,
+				ProdPrice:       cop.ProdPrice,
+				OrderId:         cop.OrderId,
+				OrderTotalPrice: cop.OrderTotalPrice,
+				OpCreated_At:    cop.OpCreated_At.Format(timeFormatStr),
+				OpUpdatedAt:     cop.OpUpdatedAt.Format(timeFormatStr),
+			}
+
+			resp = append(resp, copJson)
 		}
 
 		newJson, err := json.Marshal(resp)
@@ -357,6 +394,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		resp := msgJson{
 			Ok:      opts.ok,
 			Message: opts.msg,
+			Data:    opts.data,
 			Error:   opts.err,
 			Errors:  opts.errs,
 		}

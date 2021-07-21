@@ -32,7 +32,10 @@ type DatabaseRepo interface {
 
 	GetOrders(userId int) ([]models.Order, error)
 	GetOrderById(id, userId int) (models.Order, error)
-	InsertOrder(order models.Order) error
+	InsertOrder(order models.Order) (int, error)
 	UpdateOrder(order models.Order) error
 	DeleteOrder(id int) error
+
+	InsertOrderedProd(orderedProd models.OrderedProd) error
+	GetOrderedProds(userId int, orderId int) ([]models.CustomOrderedProd, error)
 }

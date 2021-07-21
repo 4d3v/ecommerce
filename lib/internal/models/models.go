@@ -53,10 +53,29 @@ type Order struct {
 	DeliveredAt time.Time
 	UserId      int
 	User        User
-	ProductId   int
-	Product     Product
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+// OrderedProd is the OrderedProd model
+type OrderedProd struct {
+	Id        int
+	UserId    int
+	ProductId int
+	OrderId   int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type CustomOrderedProd struct {
+	ProdName        string
+	ProdImage       string
+	ProdBrand       string
+	ProdPrice       int
+	OrderId         int
+	OrderTotalPrice int
+	OpCreated_At    time.Time
+	OpUpdatedAt     time.Time
 }
 
 // MailData holds an email message

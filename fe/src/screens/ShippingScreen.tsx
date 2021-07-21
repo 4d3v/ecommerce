@@ -3,7 +3,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { addShippingAddress } from '../actions/cartActions'
 import CheckoutSteps from '../components/CheckoutSteps'
-import { ICart, IShippingAddress } from '../type'
+import { ICart, IPaymentMethod, IShippingAddress } from '../type'
 
 interface LocationParams {
   search: string
@@ -14,6 +14,7 @@ interface HistoryParams {}
 interface ICartItems {
   cartItems: ICart[]
   shippingAddress: IShippingAddress
+  paymentMethod: IPaymentMethod
 }
 
 const ShippingScreen = () => {

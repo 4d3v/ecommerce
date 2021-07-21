@@ -41,4 +41,15 @@ export interface IShippingAddress {
   country: string
 }
 
+export interface IOrder {
+  postalCode: string
+  address: string
+  country: string
+  city: string
+  paymentMethod: int
+  totalPrice: int
+}
+
+export type IPaymentMethod = string
+
 // type DispatchType = (args: ArticleAction) => ArticleAction
