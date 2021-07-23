@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useCookies } from 'react-cookie'
 import { BASE_URL } from '../constants/endPoints'
 import { userActions } from '../constants/userConstants'
 import { AppDispatch } from '../store'
@@ -124,10 +123,11 @@ export const getUser =
         userLogin: { userInfo },
       } = getState()
 
-      const {
-        data,
-        config: { headers },
-      } = await axios.get(`${BASE_URL}/user`, {
+      // const {
+      //   data,
+      //   config: { headers },
+      // } = await axios.get(`${BASE_URL}/user`, {
+      const { data } = await axios.get(`${BASE_URL}/user`, {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },

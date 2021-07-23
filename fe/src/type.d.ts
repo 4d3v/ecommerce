@@ -34,6 +34,7 @@ export interface IUser {
   token?: string
 }
 
+// TODO change to match backend
 export interface IShippingAddress {
   address: string
   city: string
@@ -41,13 +42,34 @@ export interface IShippingAddress {
   country: string
 }
 
-export interface IOrder {
+// TODO change to match backend
+export interface ICreateOrder {
   postalCode: string
   address: string
   country: string
   city: string
   paymentMethod: int
   totalPrice: int
+}
+
+export interface IOrderDetails {
+  id: number
+  address: string
+  city: string
+  postal_code: string
+  country: string
+  payment_method: int
+  total_price: int
+  is_delivered: boolean
+  delivered_at: string
+  is_paid: false
+  paid_at: string
+  payment_method: number
+  payment_result_status: number
+  payment_result_update_time: string
+  user_id: number
+  created_at: string
+  updated_at: string
 }
 
 export type IPaymentMethod = string

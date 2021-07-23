@@ -14,7 +14,12 @@ import {
   userUpdatePasswordReducer,
   userUpdateProfileReducer,
 } from './reducers/userReducers'
-import { orderCreateReducer } from './reducers/orderReducers'
+import {
+  orderCreateReducer,
+  orderDetailsReducer,
+  orderedProdsCreateReducer,
+  orderedProdsDetailsReducer,
+} from './reducers/orderReducers'
 
 const cartItemsJson = localStorage.getItem('cartItems'),
   cartItemsFromStorage = cartItemsJson !== null ? JSON.parse(cartItemsJson) : []
@@ -36,6 +41,9 @@ const reducer = combineReducers({
     userUpdateProfile: userUpdateProfileReducer,
     userUpdatePassword: userUpdatePasswordReducer,
     orderCreate: orderCreateReducer,
+    orderedProdsCreate: orderedProdsCreateReducer,
+    orderDetails: orderDetailsReducer,
+    orderedProdsDetails: orderedProdsDetailsReducer,
     cart: cartReducer,
   }),
   initialState = {

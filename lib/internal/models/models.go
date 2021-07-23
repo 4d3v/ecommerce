@@ -68,14 +68,17 @@ type OrderedProd struct {
 }
 
 type CustomOrderedProd struct {
-	ProdName        string
-	ProdImage       string
-	ProdBrand       string
-	ProdPrice       int
-	OrderId         int
-	OrderTotalPrice int
-	OpCreated_At    time.Time
-	OpUpdatedAt     time.Time
+	ProdName         string
+	ProdImage        string
+	ProdBrand        string
+	ProdPrice        int
+	ProdCountInStock int
+	UserName         string
+	UserEmail        string
+	OrderId          int
+	OrderTotalPrice  int
+	OpCreated_At     time.Time
+	OpUpdatedAt      time.Time
 }
 
 // MailData holds an email message

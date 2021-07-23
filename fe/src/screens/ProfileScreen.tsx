@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getUser, updateUser, updateUserPass } from '../actions/userActions'
 import { IUser } from '../type'
 import { userActions } from '../constants/userConstants'
-
-interface LocationParams {
-  search: string
-}
 
 interface HistoryParams {}
 
@@ -33,7 +29,6 @@ interface IUserUpdatePassword {
 }
 
 const ProfileScreen = () => {
-  const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
 
   const [name, setName] = useState('')

@@ -36,6 +36,7 @@ const SignUpScreen = () => {
   const userDetails = useSelector(
     (state: { userDetails: IUserInfo }) => state.userDetails
   )
+  console.log(userDetails)
 
   const redirect = location.search ? location.search.split('=')[1] : '/'
 

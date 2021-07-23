@@ -39,8 +39,9 @@ func (dbrepo *postgresDbRepo) GetOrderedProds(userId int, orderId int) ([]models
 	var customOrderedProds []models.CustomOrderedProd
 
 	query := `
-        SELECT p.name, p.image, p.brand, p.price, o.id, o.total_price,
-		op.created_at, op.updated_at FROM orderedprods AS op
+        SELECT p.name, p.image, p.brand, p.price, p.count_in_stock, 
+		o.id, o.total_price, u.name, u.email, op.created_at, op.updated_at 
+		FROM orderedprods AS op
 		JOIN products AS p ON p.id = op.product_id
 		JOIN users AS u ON u.id = op.user_id
 		JOIN orders AS o ON o.id = op.order_id
@@ -62,8 +63,11 @@ func (dbrepo *postgresDbRepo) GetOrderedProds(userId int, orderId int) ([]models
 			&customOrderedProd.ProdImage,
 			&customOrderedProd.ProdBrand,
 			&customOrderedProd.ProdPrice,
+			&customOrderedProd.ProdCountInStock,
 			&customOrderedProd.OrderId,
 			&customOrderedProd.OrderTotalPrice,
+			&customOrderedProd.UserName,
+			&customOrderedProd.UserEmail,
 			&customOrderedProd.OpCreated_At,
 			&customOrderedProd.OpUpdatedAt,
 		)

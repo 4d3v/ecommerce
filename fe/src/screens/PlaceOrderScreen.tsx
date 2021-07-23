@@ -1,6 +1,4 @@
-import axios from 'axios'
-import React from 'react'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
@@ -36,7 +34,7 @@ const PlaceOrderScreen = () => {
   const cart = useSelector((state: { cart: ICartItems }) => state.cart)
 
   // Calcs
-  const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)
+  // const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)
 
   const itemsPrice = cart.cartItems.reduce(
       (acc: number, curItem: ICart) => acc + curItem.price * curItem.qty,
@@ -51,19 +49,15 @@ const PlaceOrderScreen = () => {
   )
   const { order, success, error } = orderCreate
 
-  const dispatchOrderedProds = (): void => {
-    cart.cartItems.forEach(async (item) => {
-      dispatch(createOrderedProds(item.productId, order.data.order_id))
-    })
-  }
-
   useEffect(() => {
     if (success) {
       // that means we made an order
-      dispatchOrderedProds()
+      cart.cartItems.forEach(async (item) => {
+        dispatch(createOrderedProds(item.productId, order.data.order_id))
+      })
       history.push(`/order/${order.data.order_id}`)
     }
-  }, [history, success])
+  }, [dispatch, history, success, cart.cartItems, order.data.order_id])
 
   const placeOrderHandler = () => {
     if (cart.cartItems.length === 0) {

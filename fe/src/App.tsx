@@ -19,6 +19,7 @@ import './styles/App.scss'
 import ShippingScreen from './screens/ShippingScreen'
 import PaymentScreen from './screens/PaymentScreen'
 import PlaceOrderScreen from './screens/PlaceOrderScreen'
+import OrderScreen from './screens/OrderScreen'
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path='/signup' component={SignUpScreen} exact />
           <Route path='/login' component={LoginScreen} exact />
           <Route path='/profile' component={ProfileScreen} exact />
+          <Route path='/order/:orderid' component={OrderScreen} exact />
           <Route path='/product/:id' component={ProductScreen} exact />
           <Route path='/topics' component={Topics} exact />
           <Route path='/cart/:id?' component={CartScreen} exact />

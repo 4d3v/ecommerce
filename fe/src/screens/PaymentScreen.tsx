@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
-import { shallowEqual, useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { addPaymentMethod } from '../actions/cartActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import { ICart, IPaymentMethod, IShippingAddress } from '../type'
-
-interface LocationParams {
-  search: string
-}
 
 interface HistoryParams {}
 
@@ -18,7 +14,6 @@ interface ICartItems {
 }
 
 const PaymentScreen = () => {
-  const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
 
   const dispatch = useDispatch()

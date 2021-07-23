@@ -81,14 +81,17 @@ type orderJson struct {
 // SELECT p.name, p.image, p.brand, p.price, o.id, o.total_price,
 // 		op.created_at, op.updated_at FROM orderedprods AS op
 type customOrderedProdJson struct {
-	ProdName        string
-	ProdImage       string
-	ProdBrand       string
-	ProdPrice       int
-	OrderId         int
-	OrderTotalPrice int
-	OpCreated_At    string
-	OpUpdatedAt     string
+	ProdName         string `json:"prod_name"`
+	ProdImage        string `json:"prod_image"`
+	ProdBrand        string `json:"prod_brand"`
+	ProdPrice        int    `json:"prod_price"`
+	ProdCountInStock int    `json:"prod_count_in_stock"`
+	OrderId          int    `json:"order_id"`
+	OrderTotalPrice  int    `json:"order_total_price"`
+	UserName         string `json:"user_name"`
+	UserEmail        string `json:"user_email"`
+	OpCreatedAt      string `json:"op_created_at"`
+	OpUpdatedAt      string `json:"op_updated_at"`
 }
 
 type logsignSuccess struct {
@@ -309,14 +312,17 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		var resp []customOrderedProdJson
 		for _, cop := range opts.cops {
 			copJson := customOrderedProdJson{
-				ProdName:        cop.ProdName,
-				ProdImage:       cop.ProdImage,
-				ProdBrand:       cop.ProdBrand,
-				ProdPrice:       cop.ProdPrice,
-				OrderId:         cop.OrderId,
-				OrderTotalPrice: cop.OrderTotalPrice,
-				OpCreated_At:    cop.OpCreated_At.Format(timeFormatStr),
-				OpUpdatedAt:     cop.OpUpdatedAt.Format(timeFormatStr),
+				ProdName:         cop.ProdName,
+				ProdImage:        cop.ProdImage,
+				ProdBrand:        cop.ProdBrand,
+				ProdPrice:        cop.ProdPrice,
+				ProdCountInStock: cop.ProdCountInStock,
+				OrderId:          cop.OrderId,
+				OrderTotalPrice:  cop.OrderTotalPrice,
+				UserName:         cop.UserName,
+				UserEmail:        cop.UserEmail,
+				OpCreatedAt:      cop.OpCreated_At.Format(timeFormatStr),
+				OpUpdatedAt:      cop.OpUpdatedAt.Format(timeFormatStr),
 			}
 
 			resp = append(resp, copJson)
