@@ -4,29 +4,14 @@ import { useHistory } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getUser, updateUser, updateUserPass } from '../actions/userActions'
-import { IUser } from '../type'
+import {
+  IUserInfoRdx,
+  IUserUpdatePasswordRdx,
+  IUserUpdateProfileRdx,
+} from '../type'
 import { userActions } from '../constants/userConstants'
 
 interface HistoryParams {}
-
-interface IUserInfo {
-  loading: boolean
-  userInfo: IUser
-  error: string
-}
-
-interface IUserUpdateProfile {
-  loading: boolean
-  success: boolean
-  userInfo: IUser
-  error: string
-}
-
-interface IUserUpdatePassword {
-  loading: boolean
-  success: boolean
-  error: string
-}
 
 const ProfileScreen = () => {
   const history = useHistory<HistoryParams>()
@@ -39,21 +24,21 @@ const ProfileScreen = () => {
 
   const dispatch = useDispatch()
   const userDetails = useSelector(
-    (state: { userDetails: IUserInfo }) => state.userDetails
+    (state: { userDetails: IUserInfoRdx }) => state.userDetails
   )
   const { loading, userInfo, error } = userDetails
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfo }) => state.userLogin
+    (state: { userLogin: IUserInfoRdx }) => state.userLogin
   )
 
   const userUpdateProfile = useSelector(
-    (state: { userUpdateProfile: IUserUpdateProfile }) =>
+    (state: { userUpdateProfile: IUserUpdateProfileRdx }) =>
       state.userUpdateProfile
   )
 
   const userUpdatePassword = useSelector(
-    (state: { userUpdatePassword: IUserUpdatePassword }) =>
+    (state: { userUpdatePassword: IUserUpdatePasswordRdx }) =>
       state.userUpdatePassword
   )
 

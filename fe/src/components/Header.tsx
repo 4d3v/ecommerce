@@ -2,24 +2,14 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { logout } from '../actions/userActions'
-import { IUser } from '../type'
-
-interface IUserInfo {
-  userInfo: IUser
-  // loading: boolean
-  // error: string
-}
+import { IUserInfoRdx } from '../type'
 
 const Header = () => {
   const dispatch = useDispatch()
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfo }) => state.userLogin
+    (state: { userLogin: IUserInfoRdx }) => state.userLogin
   )
   const { userInfo } = userLogin
-
-  // const userLogout = useSelector(
-  //   (state: { userLogout: IUserInfo }) => state.userLogout
-  // )
 
   const logoutHandler = () => {
     dispatch(logout())

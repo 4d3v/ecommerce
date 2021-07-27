@@ -4,19 +4,13 @@ import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { signup } from '../actions/userActions'
-import { IUser } from '../type'
+import { IUserInfoRdx } from '../type'
 
 interface LocationParams {
   search: string
 }
 
 interface HistoryParams {}
-
-interface IUserInfo {
-  loading: boolean
-  userInfo: IUser
-  error: string
-}
 
 const SignUpScreen = () => {
   const location = useLocation<LocationParams>()
@@ -29,12 +23,12 @@ const SignUpScreen = () => {
 
   const dispatch = useDispatch()
   const userSignUp = useSelector(
-    (state: { userSignUp: IUserInfo }) => state.userSignUp
+    (state: { userSignUp: IUserInfoRdx }) => state.userSignUp
   )
   const { loading, userInfo, error } = userSignUp
 
   const userDetails = useSelector(
-    (state: { userDetails: IUserInfo }) => state.userDetails
+    (state: { userDetails: IUserInfoRdx }) => state.userDetails
   )
   console.log(userDetails)
 

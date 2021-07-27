@@ -3,7 +3,7 @@ import { Link, useHistory, useLocation, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import { addToCart, removeFromCart } from '../actions/cartActions'
-import { ICart, IShippingAddress } from '../type'
+import { ICart, ICartItemsRdx } from '../type'
 
 interface RouteParams {
   id: string
@@ -16,11 +16,6 @@ interface LocationParams {
 
 interface HistoryParams {}
 
-interface ICartItems {
-  cartItems: ICart[]
-  shippingAddress: IShippingAddress
-}
-
 export const CartScreen = () => {
   const params = useParams<RouteParams>()
   const location = useLocation<LocationParams>()
@@ -31,7 +26,7 @@ export const CartScreen = () => {
     : 1
 
   const dispatch = useDispatch()
-  const cart = useSelector((state: { cart: ICartItems }) => state.cart)
+  const cart = useSelector((state: { cart: ICartItemsRdx }) => state.cart)
   const { cartItems } = cart
 
   useEffect(() => {

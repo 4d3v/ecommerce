@@ -4,34 +4,20 @@ import { Link, useHistory } from 'react-router-dom'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
-import { ICart, IPaymentMethod, IShippingAddress } from '../type'
-
-interface IOrderSt {
-  loading: boolean
-  success: boolean
-  error: string
-  order: {
-    ok: boolean
-    message: string
-    data: { order_id: number }
-    // error: string
-    // errors: string[]
-  }
-}
+import { ICart, ICartItemsRdx, IOrderCreateRdx } from '../type'
 
 interface HistoryParams {}
-
-interface ICartItems {
-  cartItems: ICart[]
-  shippingAddress: IShippingAddress
-  paymentMethod: IPaymentMethod
-}
 
 const PlaceOrderScreen = () => {
   const dispatch = useDispatch()
   const history = useHistory<HistoryParams>()
 
-  const cart = useSelector((state: { cart: ICartItems }) => state.cart)
+  const cart = useSelector((state: { cart: ICartItemsRdx }) => state.cart)
+
+  const orderCreate = useSelector(
+    (state: { orderCreate: IOrderCreateRdx }) => state.orderCreate
+  )
+  const { order, success, error } = orderCreate
 
   // Calcs
   // const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)
@@ -44,11 +30,6 @@ const PlaceOrderScreen = () => {
     taxPrice = Number((0.15 * itemsPrice).toFixed(2)),
     totalPrice = itemsPrice + shippingPrice + taxPrice
 
-  const orderCreate = useSelector(
-    (state: { orderCreate: IOrderSt }) => state.orderCreate
-  )
-  const { order, success, error } = orderCreate
-
   useEffect(() => {
     if (success) {
       // that means we made an order
@@ -57,7 +38,7 @@ const PlaceOrderScreen = () => {
       })
       history.push(`/order/${order.data.order_id}`)
     }
-  }, [dispatch, history, success, cart.cartItems, order.data.order_id])
+  }, [dispatch, history, success, cart.cartItems, order])
 
   const placeOrderHandler = () => {
     if (cart.cartItems.length === 0) {

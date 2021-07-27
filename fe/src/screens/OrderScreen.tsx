@@ -1,5 +1,4 @@
-import React from 'react'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import {
@@ -8,18 +7,7 @@ import {
 } from '../actions/orderActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-
-interface IOrderDetailsSt {
-  loading: boolean
-  error: string
-  orderItem: any // TEMP using any
-}
-
-interface IOrderedProdsSt {
-  loading: boolean
-  error: string
-  orderedProds: any // TEMP using any
-}
+import { IOrderDetailsRdx, IOrderedProdsRdx } from '../type'
 
 interface RouteParams {
   orderid: string
@@ -30,16 +18,17 @@ const OrderScreen = () => {
   const params = useParams<RouteParams>()
 
   const orderDetails = useSelector(
-    (state: { orderDetails: IOrderDetailsSt }) => state.orderDetails
+    (state: { orderDetails: IOrderDetailsRdx }) => state.orderDetails
   )
   const { orderItem, loading, error } = orderDetails
 
   const orderedProdsDetails = useSelector(
-    (state: { orderedProdsDetails: IOrderedProdsSt }) =>
+    (state: { orderedProdsDetails: IOrderedProdsRdx }) =>
       state.orderedProdsDetails
   )
   const { orderedProds } = orderedProdsDetails
-  console.log(orderedProds)
+  console.log(orderedProds) ///////////// TODO orderDetails should have username and email
+  console.log(orderDetails) //////////// TODO check TODOs on the orderScreen page (/order/:orderid)
 
   // Calcs
   // const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)

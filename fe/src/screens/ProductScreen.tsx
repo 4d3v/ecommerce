@@ -2,24 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import { listProductDetails } from '../actions/productActions'
-import { IProduct } from '../type'
+import { IProductDetailsRdx } from '../type'
 import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 
-// interface MatchParams {
-//   id: string
-// }
-// interface MatchProps extends RouteComponentProps<MatchParams> {}
-
 interface RouteParams {
   id: string
-}
-
-interface IProductDetails {
-  product: IProduct
-  loading: boolean
-  error: string
 }
 
 const ProductScreen = () => {
@@ -29,7 +18,7 @@ const ProductScreen = () => {
   const params = useParams<RouteParams>()
   const history = useHistory()
   const productDetails = useSelector(
-    (state: { productDetails: IProductDetails }) => state.productDetails
+    (state: { productDetails: IProductDetailsRdx }) => state.productDetails
   )
   const { product, loading, error } = productDetails
 

@@ -4,20 +4,13 @@ import { listProducts } from '../actions/productActions'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import { IProduct } from '../type'
-
-interface IProductList {
-  products: IProduct[]
-  loading: boolean
-  error: string
-}
+import { IProductListRdx } from '../type'
 
 const HomeScreen = () => {
   const dispatch = useDispatch()
 
-  const productList: IProductList = useSelector(
-    // (state: RootState) => state.productList
-    (state: { productList: IProductList }) => state.productList
+  const productList: IProductListRdx = useSelector(
+    (state: { productList: IProductListRdx }) => state.productList
   )
 
   const { loading, error, products } = productList
@@ -45,13 +38,3 @@ const HomeScreen = () => {
 }
 
 export default HomeScreen
-
-// const [prods, setProds] = useState<IProducts[]>([])
-// useEffect(() => {
-//   const fetchProducts = async () => {
-//     const { data } = await axios.get('http://localhost:8080/products')
-//     setProds(data)
-//   }
-//   fetchProducts()
-// }, [])
-// if (prods) console.log(prods)

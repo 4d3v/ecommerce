@@ -3,21 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { addShippingAddress } from '../actions/cartActions'
 import CheckoutSteps from '../components/CheckoutSteps'
-import { ICart, IPaymentMethod, IShippingAddress } from '../type'
+import { ICartItemsRdx } from '../type'
 
 interface HistoryParams {}
-
-interface ICartItems {
-  cartItems: ICart[]
-  shippingAddress: IShippingAddress
-  paymentMethod: IPaymentMethod
-}
 
 const ShippingScreen = () => {
   const history = useHistory<HistoryParams>()
 
   const dispatch = useDispatch()
-  const cart = useSelector((state: { cart: ICartItems }) => state.cart)
+  const cart = useSelector((state: { cart: ICartItemsRdx }) => state.cart)
   const { shippingAddress } = cart
 
   const [address, setAddress] = useState(shippingAddress.address)

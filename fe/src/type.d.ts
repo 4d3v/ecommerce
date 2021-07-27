@@ -75,3 +75,80 @@ export interface IOrderDetails {
 export type IPaymentMethod = string
 
 // type DispatchType = (args: ArticleAction) => ArticleAction
+
+// SCREENS
+export interface IProductListRdx {
+  products: IProduct[]
+  loading: boolean
+  error: string
+}
+
+export interface IProductDetailsRdx {
+  product: IProduct
+  loading: boolean
+  error: string
+}
+
+export interface IUserInfoRdx {
+  loading: boolean
+  userInfo: IUser
+  error: string
+}
+
+export interface IUserUpdateProfileRdx {
+  loading: boolean
+  success: boolean
+  userInfo: IUser
+  error: string
+}
+
+export interface IUserUpdatePasswordRdx {
+  loading: boolean
+  success: boolean
+  error: string
+}
+
+export interface ICartItemsRdx {
+  cartItems: ICart[]
+  shippingAddress: IShippingAddress
+  paymentMethod: IPaymentMethod
+}
+
+export interface IOrderCreateRdx {
+  loading: boolean
+  success: boolean
+  error: string
+  order: {
+    ok: boolean
+    message: string
+    data: { order_id: number }
+    // error: string
+    // errors: string[]
+  }
+}
+
+export interface IOrderDetailsRdx {
+  loading: boolean
+  error: string
+  orderItem: any // TEMP using any Should be IOrderDetails
+}
+
+interface IOrderedProds {
+  order_id: number
+  order_total_price: number
+  prod_brand: string
+  prod_count_in_stock: number
+  prod_image: string
+  prod_name: string
+  prod_price: number
+  user_email: string
+  user_name: string
+  op_created_at: string
+  op_updated_at: string
+}
+
+export interface IOrderedProdsRdx {
+  loading: boolean
+  error: string
+  orderedProds: IOrderedProds[] // TEMP using any
+}
