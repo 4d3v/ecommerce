@@ -129,6 +129,8 @@ func (repo *Repository) GetOrderById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	order.User = user
+
 	sendJson("orderjson", w, &options{
 		ok:     true,
 		msg:    "Success",

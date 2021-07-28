@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   getOrderDetails,
   getOrderedProdsDetails,
 } from '../actions/orderActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { IOrderDetailsRdx, IOrderedProdsRdx } from '../type'
+import { IOrderDetailsRdx, IOrderedProds, IOrderedProdsRdx } from '../type'
+import OrderSummary from '../components/OrderSummary'
+import OrderItemsInfo from '../components/OrderItemsInfo'
 
 interface RouteParams {
   orderid: string
@@ -27,19 +29,7 @@ const OrderScreen = () => {
       state.orderedProdsDetails
   )
   const { orderedProds } = orderedProdsDetails
-  console.log(orderedProds) ///////////// TODO orderDetails should have username and email
-  console.log(orderDetails) //////////// TODO check TODOs on the orderScreen page (/order/:orderid)
-
-  // Calcs
-  // const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)
-
-  const itemsPrice = orderedProds.reduce(
-      (acc: number, curItem: any) => acc + curItem.price * curItem.qty, // TODO add qty on create
-      0
-    ),
-    shippingPrice = itemsPrice > 100 ? 0 : 30,
-    taxPrice = Number((0.15 * itemsPrice).toFixed(2)),
-    totalPrice = itemsPrice + shippingPrice + taxPrice
+  console.log(orderDetails) //////////// TODO change IOrderDetailsRdx interface from any to proper typings
 
   useEffect(() => {
     dispatch(getOrderDetails(Number(params.orderid)))
@@ -54,19 +44,19 @@ const OrderScreen = () => {
     !loading &&
     !orderedProdsDetails.loading &&
     orderItem && (
-      <>
-        <div className='container'>
-          <h1>Order {orderItem.id}</h1>
-          <ul>
+      <div className='container'>
+        <div className='order-wrapper u-my-s'>
+          <ul className='order-info'>
+            <h1>Order {orderItem.id}</h1>
             <li>
               <h2>Shipping</h2>
               <div>
-                <strong>Name: {orderedProds[0].user_name}</strong>
+                <strong>Name: {orderItem.user.Name}</strong>
               </div>
               <div>
                 <strong>
-                  <a href={`mailto:${orderedProds[0].user_email}`}>
-                    Email: {orderedProds[0].user_email}
+                  <a href={`mailto:${orderItem.user.Email}`}>
+                    Email: {orderItem.user.Email}
                   </a>
                 </strong>
               </div>
@@ -101,77 +91,14 @@ const OrderScreen = () => {
 
             <li>
               <h2>Order Items</h2>
-              {orderedProds.length === 0 ? (
-                <Message info='Your cart is empty' />
-              ) : (
-                <ul>
-                  {orderedProds.map((prod: any, idx: number) => (
-                    <li key={idx}>
-                      <div>
-                        <img
-                          height='150px'
-                          src={`/images/${prod.prod_image}`}
-                          alt={prod.prod_name}
-                        />
-                      </div>
-
-                      <div>
-                        {/* <Link to={`/product/${prod.productId}`}> */}
-                        {prod.prod_name} {prod.prod_brand}
-                        {/* </Link> */}
-                      </div>
-
-                      <div>
-                        {prod.prod_price}, total_price: {orderItem.total_price}
-                      </div>
-                      <div style={{ color: '#ffff00' }}>
-                        <p>TODO Qty: TODO add qty on create for orderedProds</p>
-                        <p>
-                          TODO Price: TODO remove price from orderedProds cos we
-                          have this data on orderItem.total_price
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <OrderItemsInfo products={orderedProds} />
             </li>
           </ul>
+
+          {/* RIGHT COL */}
+          <OrderSummary orderedProds={orderedProds} />
         </div>
-
-        {/*RIGHT COL*/}
-        <div>
-          <div>
-            <ul>
-              <li>
-                <h2>Order Summary</h2>
-              </li>
-
-              <li>
-                <div>Items</div>
-                <div>${itemsPrice}</div>
-              </li>
-
-              <li>
-                <div>Shipping</div>
-                <div>${shippingPrice}</div>
-              </li>
-
-              <li>
-                <div>Tax</div>
-                <div>${taxPrice}</div>
-              </li>
-
-              <li>
-                <div>Total</div>
-                <div>${totalPrice}</div>
-              </li>
-
-              <li>{error && <Message error={error} />}</li>
-            </ul>
-          </div>
-        </div>
-      </>
+      </div>
     )
   )
 }

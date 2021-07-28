@@ -22,9 +22,10 @@ func (repo *Repository) CreateOrderedProd(w http.ResponseWriter, r *http.Request
 	user, _ := repo.getUserByJwt(r)
 
 	form := forms.New(r.PostForm)
-	form.Required("product_id", "order_id")
+	form.Required("product_id", "order_id", "qty")
 	form.IsUint("product_id")
 	form.IsUint("order_id")
+	form.IsUint("qty")
 
 	if !form.Valid() {
 		fmt.Println(err)
@@ -34,11 +35,13 @@ func (repo *Repository) CreateOrderedProd(w http.ResponseWriter, r *http.Request
 
 	prodId, _ := strconv.Atoi(r.Form.Get("product_id"))
 	orderId, _ := strconv.Atoi(r.Form.Get("order_id"))
+	qty, _ := strconv.Atoi(r.Form.Get("qty"))
 
 	orderedProd := models.OrderedProd{
 		UserId:    user.Id,
 		ProductId: prodId,
 		OrderId:   orderId,
+		Qty:       qty,
 	}
 
 	err = repo.DB.InsertOrderedProd(orderedProd)

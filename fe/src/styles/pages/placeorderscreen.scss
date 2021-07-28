@@ -1,0 +1,35 @@
+.placeorder-wrapper {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+
+  .placeorder-info,
+  .placeorder-summary {
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+    }
+  }
+
+  .order-info {
+    margin: 0 6px;
+
+    // &__wrapper {
+    // }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1rem 0;
+    }
+
+    &__imgwrapper {
+      img {
+        height: 80px;
+      }
+    }
+  }
+}

@@ -4,6 +4,8 @@ import { Link, useHistory } from 'react-router-dom'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
+import OrderItemsInfo from '../components/OrderItemsInfo'
+import OrderSummary from '../components/OrderSummary'
 import { ICart, ICartItemsRdx, IOrderCreateRdx } from '../type'
 
 interface HistoryParams {}
@@ -18,9 +20,6 @@ const PlaceOrderScreen = () => {
     (state: { orderCreate: IOrderCreateRdx }) => state.orderCreate
   )
   const { order, success, error } = orderCreate
-
-  // Calcs
-  // const addDecimals = (num: number) => (Math.round(num * 100) / 100).toFixed(2)
 
   const itemsPrice = cart.cartItems.reduce(
       (acc: number, curItem: ICart) => acc + curItem.price * curItem.qty,
@@ -57,12 +56,14 @@ const PlaceOrderScreen = () => {
     )
   }
 
-  return (
+  return error ? (
+    <Message error={error} />
+  ) : (
     <div className='container'>
       <CheckoutSteps step1 step2 step3 step4 />
       {/*LEFT COL*/}
-      <div>
-        <ul>
+      <div className='placeorder-wrapper u-my-s'>
+        <ul className='placeorder-info'>
           <li>
             <h2>Shipping</h2>
             <p>
@@ -80,78 +81,22 @@ const PlaceOrderScreen = () => {
 
           <li>
             <h2>Order Items</h2>
-            {cart.cartItems.length === 0 ? (
-              <Message info='Your cart is empty' />
-            ) : (
-              <ul>
-                {cart.cartItems.map((item, idx) => (
-                  <li key={idx}>
-                    <div>
-                      {/* TEMP using height */}
-                      <img
-                        height='150px'
-                        src={`/images/${item.image}`}
-                        alt={item.name}
-                      />
-                    </div>
+            <OrderItemsInfo cartProds={cart.cartItems} />
+          </li>
 
-                    <div>
-                      {/* TEMP item.product is the id ... change to product_id */}
-                      <Link to={`/product/${item.productId}`}>{item.name}</Link>
-                    </div>
-
-                    <div>
-                      {item.qty} x ${item.price} = ${item.qty * item.price}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <li>
+            <button
+              className='btn'
+              disabled={cart.cartItems.length === 0}
+              onClick={placeOrderHandler}
+            >
+              Place Order
+            </button>
           </li>
         </ul>
-      </div>
 
-      {/*RIGHT COL*/}
-      <div>
-        <div>
-          <ul>
-            <li>
-              <h2>Order Summary</h2>
-            </li>
-
-            <li>
-              <div>Items</div>
-              <div>${itemsPrice}</div>
-            </li>
-
-            <li>
-              <div>Shipping</div>
-              <div>${shippingPrice}</div>
-            </li>
-
-            <li>
-              <div>Tax</div>
-              <div>${taxPrice}</div>
-            </li>
-
-            <li>
-              <div>Total</div>
-              <div>${totalPrice}</div>
-            </li>
-
-            <li>{error && <Message error={error} />}</li>
-
-            <li>
-              <button
-                className='btn'
-                disabled={cart.cartItems.length === 0}
-                onClick={placeOrderHandler}
-              >
-                Place Order
-              </button>
-            </li>
-          </ul>
-        </div>
+        {/* RIGHT COL */}
+        <OrderSummary cartItemsPrice={itemsPrice} />
       </div>
     </div>
   )

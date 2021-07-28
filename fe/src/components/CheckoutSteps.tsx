@@ -15,7 +15,7 @@ const CheckoutSteps = ({
   step4 = false,
 }: IProps) => {
   return (
-    <nav className='container'>
+    <nav>
       <ul className='checkoutsteps u-txt-center u-my-ss'>
         <li>
           <Link

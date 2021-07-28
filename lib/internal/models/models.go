@@ -63,18 +63,21 @@ type OrderedProd struct {
 	UserId    int
 	ProductId int
 	OrderId   int
+	Qty       int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
+// CustomOrderedProd is used on the GET request for /orderedprods/{orderid}
 type CustomOrderedProd struct {
+	Id               int
 	ProdName         string
 	ProdImage        string
 	ProdBrand        string
 	ProdPrice        int
 	ProdCountInStock int
-	UserName         string
-	UserEmail        string
+	ProdQty          int
+	UserId           int
 	OrderId          int
 	OrderTotalPrice  int
 	OpCreated_At     time.Time

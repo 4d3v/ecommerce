@@ -14,11 +14,15 @@
 @import './components/message';
 @import './components/form';
 @import './components/checkoutsteps';
+@import './components/orderitemsinfo';
+@import './components/ordersummary';
 
 @import './pages/homescreen';
 @import './pages/productscreen';
 @import './pages/cartscreen';
 @import './pages/profilescreen';
+@import './pages/placeorderscreen';
+@import './pages/orderscreen';
 
 body {
   background-color: $base-primary-color;

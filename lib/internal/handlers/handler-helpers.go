@@ -58,38 +58,36 @@ type productJson struct {
 }
 
 type orderJson struct {
-	Id                      int    `json:"id"`
-	PostalCode              string `json:"postal_code"`
-	Address                 string `json:"address"`
-	Country                 string `json:"country"`
-	City                    string `json:"city"`
-	PaymentMethod           int    `json:"payment_method"`
-	PaymentResultStatus     int    `json:"payment_result_status"`
-	PaymentResultUpdateTime string `json:"payment_result_update_time"`
-	TotalPrice              int    `json:"total_price"`
-	IsPaid                  bool   `json:"is_paid"`
-	PaidAt                  string `json:"paid_at"`
-	IsDelivered             bool   `json:"is_delivered"`
-	DeliveredAt             string `json:"delivered_at"`
-	UserId                  int    `json:"user_id"`
-	CreatedAt               string `json:"created_at"`
-	UpdatedAt               string `json:"updated_at"`
-	// User models.User
+	Id                      int         `json:"id"`
+	PostalCode              string      `json:"postal_code"`
+	Address                 string      `json:"address"`
+	Country                 string      `json:"country"`
+	City                    string      `json:"city"`
+	PaymentMethod           int         `json:"payment_method"`
+	PaymentResultStatus     int         `json:"payment_result_status"`
+	PaymentResultUpdateTime string      `json:"payment_result_update_time"`
+	TotalPrice              int         `json:"total_price"`
+	IsPaid                  bool        `json:"is_paid"`
+	PaidAt                  string      `json:"paid_at"`
+	IsDelivered             bool        `json:"is_delivered"`
+	DeliveredAt             string      `json:"delivered_at"`
+	UserId                  int         `json:"user_id"`
+	CreatedAt               string      `json:"created_at"`
+	UpdatedAt               string      `json:"updated_at"`
+	User                    models.User `json:"user"`
 	// Product models.Product
 }
 
-// SELECT p.name, p.image, p.brand, p.price, o.id, o.total_price,
-// 		op.created_at, op.updated_at FROM orderedprods AS op
 type customOrderedProdJson struct {
+	Id               int    `json:"id"`
 	ProdName         string `json:"prod_name"`
 	ProdImage        string `json:"prod_image"`
 	ProdBrand        string `json:"prod_brand"`
 	ProdPrice        int    `json:"prod_price"`
 	ProdCountInStock int    `json:"prod_count_in_stock"`
+	ProdQty          int    `json:"prod_qty"`
+	UserId           int    `json:"user_id"`
 	OrderId          int    `json:"order_id"`
-	OrderTotalPrice  int    `json:"order_total_price"`
-	UserName         string `json:"user_name"`
-	UserEmail        string `json:"user_email"`
 	OpCreatedAt      string `json:"op_created_at"`
 	OpUpdatedAt      string `json:"op_updated_at"`
 }
@@ -259,9 +257,9 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			IsDelivered:             opts.order.IsDelivered,
 			DeliveredAt:             opts.order.DeliveredAt.Format(timeFormatStr),
 			UserId:                  opts.order.UserId,
+			User:                    opts.order.User,
 			CreatedAt:               opts.order.CreatedAt.Format(timeFormatStr),
 			UpdatedAt:               opts.order.UpdatedAt.Format(timeFormatStr),
-			// User: opts.order.User
 			// Product: opts.order.Product
 		}
 
@@ -312,15 +310,15 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		var resp []customOrderedProdJson
 		for _, cop := range opts.cops {
 			copJson := customOrderedProdJson{
+				Id:               cop.Id,
 				ProdName:         cop.ProdName,
 				ProdImage:        cop.ProdImage,
 				ProdBrand:        cop.ProdBrand,
 				ProdPrice:        cop.ProdPrice,
 				ProdCountInStock: cop.ProdCountInStock,
+				ProdQty:          cop.ProdQty,
+				UserId:           cop.UserId,
 				OrderId:          cop.OrderId,
-				OrderTotalPrice:  cop.OrderTotalPrice,
-				UserName:         cop.UserName,
-				UserEmail:        cop.UserEmail,
 				OpCreatedAt:      cop.OpCreated_At.Format(timeFormatStr),
 				OpUpdatedAt:      cop.OpUpdatedAt.Format(timeFormatStr),
 			}

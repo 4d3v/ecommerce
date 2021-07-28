@@ -1,0 +1,13 @@
+.order-summary {
+  margin: 0 6px;
+
+  &__wrapper {
+    border: 1px solid $base-font-light;
+    border-radius: 4px;
+    padding: 4px;
+
+    li {
+      margin: 2px 0;
+    }
+  }
+}
