@@ -37,7 +37,7 @@ export const createOrder =
   }
 
 export const createOrderedProds =
-  (productId: number, orderId: number) =>
+  (productId: number, orderId: number, qty: number) =>
   async (dispatch: AppDispatch, getState: any) => {
     try {
       dispatch({
@@ -46,7 +46,7 @@ export const createOrderedProds =
 
       const { data } = await axios.post(
         `${BASE_URL}/orderedprods`,
-        `product_id=${productId}&order_id=${orderId}`,
+        `product_id=${productId}&order_id=${orderId}&qty=${qty}`,
         { withCredentials: true }
       )
 
@@ -108,6 +108,51 @@ export const getOrderedProdsDetails =
       const customError = getFormErrors(error)
       dispatch({
         type: orderActions.ORDERED_PRODS_DETAILS_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
+// TEMP using any for paymentResult which is coming from paypal
+export const payOrder =
+  (
+    orderId: number,
+    paymentResult: {
+      paymentResultId: string
+      paymentResultStatus: string
+      paymentResultUpdateTime: string
+      paymentResultEmailAddress: string
+    }
+  ) =>
+  async (dispatch: AppDispatch, getState: any) => {
+    try {
+      dispatch({
+        type: orderActions.ORDER_PAY_REQUEST,
+      })
+
+      const {
+        paymentResultId,
+        paymentResultStatus,
+        paymentResultUpdateTime,
+        paymentResultEmailAddress,
+      } = paymentResult
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/orders/${orderId}/pay`,
+        `payment_result_id=${paymentResultId}&payment_result_status=${paymentResultStatus}
+         &payment_result_update_time=${paymentResultUpdateTime}&payment_result_email_address=${paymentResultEmailAddress}`,
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: orderActions.ORDER_PAY_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: orderActions.ORDER_PAY_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(error.response)

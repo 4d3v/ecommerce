@@ -34,6 +34,7 @@ type DatabaseRepo interface {
 	GetOrderById(id, userId int) (models.Order, error)
 	InsertOrder(order models.Order) (int, error)
 	UpdateOrder(order models.Order) error
+	SetOrderToPaid(order models.Order) error
 	DeleteOrder(id int) error
 
 	InsertOrderedProd(orderedProd models.OrderedProd) error

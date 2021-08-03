@@ -58,23 +58,25 @@ type productJson struct {
 }
 
 type orderJson struct {
-	Id                      int         `json:"id"`
-	PostalCode              string      `json:"postal_code"`
-	Address                 string      `json:"address"`
-	Country                 string      `json:"country"`
-	City                    string      `json:"city"`
-	PaymentMethod           int         `json:"payment_method"`
-	PaymentResultStatus     int         `json:"payment_result_status"`
-	PaymentResultUpdateTime string      `json:"payment_result_update_time"`
-	TotalPrice              int         `json:"total_price"`
-	IsPaid                  bool        `json:"is_paid"`
-	PaidAt                  string      `json:"paid_at"`
-	IsDelivered             bool        `json:"is_delivered"`
-	DeliveredAt             string      `json:"delivered_at"`
-	UserId                  int         `json:"user_id"`
-	CreatedAt               string      `json:"created_at"`
-	UpdatedAt               string      `json:"updated_at"`
-	User                    models.User `json:"user"`
+	Id                        int         `json:"id"`
+	PostalCode                string      `json:"postal_code"`
+	Address                   string      `json:"address"`
+	Country                   string      `json:"country"`
+	City                      string      `json:"city"`
+	PaymentMethod             int         `json:"payment_method"`
+	PaymentResultId           string      `json:"payment_result_id"`
+	PaymentResultStatus       string      `json:"payment_result_status"`
+	PaymentResultUpdateTime   string      `json:"payment_result_update_time"`
+	PaymentResultEmailAddress string      `json:"payment_result_email_address "`
+	TotalPrice                float64     `json:"total_price"`
+	IsPaid                    bool        `json:"is_paid"`
+	PaidAt                    string      `json:"paid_at"`
+	IsDelivered               bool        `json:"is_delivered"`
+	DeliveredAt               string      `json:"delivered_at"`
+	UserId                    int         `json:"user_id"`
+	CreatedAt                 string      `json:"created_at"`
+	UpdatedAt                 string      `json:"updated_at"`
+	User                      models.User `json:"user"`
 	// Product models.Product
 }
 
@@ -243,23 +245,25 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 
 	case "orderjson":
 		resp := orderJson{
-			Id:                      opts.order.Id,
-			PostalCode:              opts.order.PostalCode,
-			Address:                 opts.order.Address,
-			Country:                 opts.order.Country,
-			City:                    opts.order.City,
-			PaymentMethod:           opts.order.PaymentMethod,
-			PaymentResultStatus:     opts.order.PaymentResultStatus,
-			PaymentResultUpdateTime: opts.order.PaymentResultUpdateTime.Format(timeFormatStr),
-			TotalPrice:              opts.order.TotalPrice,
-			IsPaid:                  opts.order.IsPaid,
-			PaidAt:                  opts.order.PaidAt.Format(timeFormatStr),
-			IsDelivered:             opts.order.IsDelivered,
-			DeliveredAt:             opts.order.DeliveredAt.Format(timeFormatStr),
-			UserId:                  opts.order.UserId,
-			User:                    opts.order.User,
-			CreatedAt:               opts.order.CreatedAt.Format(timeFormatStr),
-			UpdatedAt:               opts.order.UpdatedAt.Format(timeFormatStr),
+			Id:                        opts.order.Id,
+			PostalCode:                opts.order.PostalCode,
+			Address:                   opts.order.Address,
+			Country:                   opts.order.Country,
+			City:                      opts.order.City,
+			PaymentMethod:             opts.order.PaymentMethod,
+			PaymentResultId:           opts.order.PaymentResultId,
+			PaymentResultStatus:       opts.order.PaymentResultStatus,
+			PaymentResultUpdateTime:   opts.order.PaymentResultUpdateTime.Format(timeFormatStr),
+			PaymentResultEmailAddress: opts.order.PaymentResultEmailAddress,
+			TotalPrice:                opts.order.TotalPrice,
+			IsPaid:                    opts.order.IsPaid,
+			PaidAt:                    opts.order.PaidAt.Format(timeFormatStr),
+			IsDelivered:               opts.order.IsDelivered,
+			DeliveredAt:               opts.order.DeliveredAt.Format(timeFormatStr),
+			UserId:                    opts.order.UserId,
+			User:                      opts.order.User,
+			CreatedAt:                 opts.order.CreatedAt.Format(timeFormatStr),
+			UpdatedAt:                 opts.order.UpdatedAt.Format(timeFormatStr),
 			// Product: opts.order.Product
 		}
 
@@ -275,22 +279,24 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		var resp []orderJson
 		for _, order := range opts.orders {
 			p := orderJson{
-				Id:                      order.Id,
-				PostalCode:              order.PostalCode,
-				Address:                 order.Address,
-				Country:                 order.Country,
-				City:                    order.City,
-				PaymentMethod:           order.PaymentMethod,
-				PaymentResultStatus:     order.PaymentResultStatus,
-				PaymentResultUpdateTime: order.PaymentResultUpdateTime.Format(timeFormatStr),
-				TotalPrice:              order.TotalPrice,
-				IsPaid:                  order.IsPaid,
-				PaidAt:                  order.PaidAt.Format(timeFormatStr),
-				IsDelivered:             order.IsDelivered,
-				DeliveredAt:             order.DeliveredAt.Format(timeFormatStr),
-				UserId:                  order.UserId,
-				CreatedAt:               order.CreatedAt.Format(timeFormatStr),
-				UpdatedAt:               order.UpdatedAt.Format(timeFormatStr),
+				Id:                        order.Id,
+				PostalCode:                order.PostalCode,
+				Address:                   order.Address,
+				Country:                   order.Country,
+				City:                      order.City,
+				PaymentMethod:             order.PaymentMethod,
+				PaymentResultId:           order.PaymentResultId,
+				PaymentResultStatus:       order.PaymentResultStatus,
+				PaymentResultUpdateTime:   order.PaymentResultUpdateTime.Format(timeFormatStr),
+				PaymentResultEmailAddress: order.PaymentResultEmailAddress,
+				TotalPrice:                order.TotalPrice,
+				IsPaid:                    order.IsPaid,
+				PaidAt:                    order.PaidAt.Format(timeFormatStr),
+				IsDelivered:               order.IsDelivered,
+				DeliveredAt:               order.DeliveredAt.Format(timeFormatStr),
+				UserId:                    order.UserId,
+				CreatedAt:                 order.CreatedAt.Format(timeFormatStr),
+				UpdatedAt:                 order.UpdatedAt.Format(timeFormatStr),
 				// User: opts.order.User
 				// Product: opts.order.Product
 			}
@@ -453,6 +459,17 @@ func (repo *Repository) getUserByJwt(r *http.Request) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (repo *Repository) GetPaypalConfigId(w http.ResponseWriter, r *http.Request) {
+	dtMap := make(map[string]interface{})
+	dtMap["paypal_client_id"] = repo.App.Env["PAYPAL_CLIENT_ID"]
+	sendJson("msgjson", w, &options{
+		ok:      true,
+		msg:     "Success",
+		stCode:  http.StatusOK,
+		dataMap: dtMap,
+	})
 }
 
 func checkUserRestriction(w http.ResponseWriter, user models.User) bool {

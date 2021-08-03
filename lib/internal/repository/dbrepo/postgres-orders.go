@@ -113,9 +113,10 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
-		payment_result_status, payment_result_update_time, total_price, 
-		is_paid, paid_at, is_delivered, delivered_at, user_id, created_at,
-		updated_at FROM orders WHERE user_id = $1
+		payment_result_id, payment_result_status, payment_result_update_time, 
+		payment_result_email_address, total_price, is_paid, paid_at, 
+		is_delivered, delivered_at, user_id, created_at, updated_at 
+		FROM orders WHERE user_id = $1
 	` // ORDER BY id ASC
 
 	rows, err := dbrepo.DB.QueryContext(ctx, query, userId)
@@ -134,8 +135,10 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 			&order.Country,
 			&order.City,
 			&order.PaymentMethod,
+			&order.PaymentResultId,
 			&order.PaymentResultStatus,
 			&order.PaymentResultUpdateTime,
+			&order.PaymentResultEmailAddress,
 			&order.TotalPrice,
 			&order.IsPaid,
 			&order.PaidAt,
@@ -166,9 +169,10 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
-		payment_result_status, payment_result_update_time, total_price, 
-		is_paid, paid_at, is_delivered, delivered_at, user_id, created_at,
-		updated_at FROM orders WHERE id = $1 AND user_id = $2 
+		payment_result_id, payment_result_status, payment_result_update_time, 
+		payment_result_email_address, total_price, is_paid, paid_at,
+		is_delivered, delivered_at, user_id, created_at, updated_at 
+		FROM orders WHERE id = $1 AND user_id = $2 
 	` // ORDER BY id ASC
 
 	var order models.Order
@@ -180,8 +184,10 @@ func (dbrepo *postgresDbRepo) GetOrderById(id, userId int) (models.Order, error)
 		&order.Country,
 		&order.City,
 		&order.PaymentMethod,
+		&order.PaymentResultId,
 		&order.PaymentResultStatus,
 		&order.PaymentResultUpdateTime,
+		&order.PaymentResultEmailAddress,
 		&order.TotalPrice,
 		&order.IsPaid,
 		&order.PaidAt,
@@ -252,6 +258,40 @@ func (dbrepo *postgresDbRepo) UpdateOrder(order models.Order) error {
 
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (dbrepo *postgresDbRepo) SetOrderToPaid(order models.Order) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		UPDATE orders SET is_paid = $1, updated_at = $2, payment_result_id = $3,
+		payment_result_status = $4, payment_result_update_time = $5,
+		payment_result_email_address = $6 WHERE id = $7 AND user_id = $8
+	`
+
+	sqlRes, err := dbrepo.DB.ExecContext(ctx, query,
+		true,
+		time.Now(),
+		&order.PaymentResultId,
+		&order.PaymentResultStatus,
+		&order.PaymentResultUpdateTime,
+		&order.PaymentResultEmailAddress,
+		&order.Id,
+		&order.UserId,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	rows, err := sqlRes.RowsAffected() // Should affect a row
+	if err != nil || rows == 0 {
+		return errors.New("no orders found with specified id")
+
 	}
 
 	return nil

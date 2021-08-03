@@ -21,6 +21,12 @@ import PaymentScreen from './screens/PaymentScreen'
 import PlaceOrderScreen from './screens/PlaceOrderScreen'
 import OrderScreen from './screens/OrderScreen'
 
+declare global {
+  interface Window {
+    paypal: any
+  }
+}
+
 const App = () => {
   return (
     <Router>

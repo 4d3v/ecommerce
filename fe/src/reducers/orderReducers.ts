@@ -2,20 +2,22 @@ import { AnyAction } from 'redux'
 import { orderActions } from '../constants/orderConstants'
 import { ICreateOrder, IOrderDetails, IShippingAddress } from '../type'
 
-const userInitialState: {
+const orderInitialState: {
   order: ICreateOrder | null
   orderItem: IOrderDetails | null
   orderedProds: any // TEMP
   shippingAddress: IShippingAddress | {}
+  orderPay: any
 } = {
   order: null,
   orderItem: null,
   orderedProds: [],
   shippingAddress: {},
+  orderPay: {},
 }
 
 export const orderCreateReducer = (
-  state = userInitialState,
+  state = orderInitialState,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -31,7 +33,7 @@ export const orderCreateReducer = (
 }
 
 export const orderedProdsCreateReducer = (
-  state = userInitialState,
+  state = orderInitialState,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -47,7 +49,7 @@ export const orderedProdsCreateReducer = (
 }
 
 export const orderDetailsReducer = (
-  state = userInitialState,
+  state = orderInitialState,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -63,7 +65,7 @@ export const orderDetailsReducer = (
 }
 
 export const orderedProdsDetailsReducer = (
-  state = userInitialState,
+  state = orderInitialState,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -73,6 +75,26 @@ export const orderedProdsDetailsReducer = (
       return { loading: false, orderedProds: action.payload }
     case orderActions.ORDERED_PRODS_DETAILS_FAIL:
       return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+const orderPayInitialState: { orderPay: any } = { orderPay: {} }
+
+export const orderPayReducer = (
+  state = orderPayInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case orderActions.ORDER_PAY_REQUEST:
+      return { loading: true }
+    case orderActions.ORDER_PAY_SUCCESS:
+      return { loading: false, success: true }
+    case orderActions.ORDER_PAY_FAIL:
+      return { loading: false, error: action.payload }
+    case orderActions.ORDER_PAY_RESET:
+      return {}
     default:
       return state
   }

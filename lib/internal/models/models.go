@@ -37,24 +37,26 @@ type Product struct {
 
 // Order is the Order model
 type Order struct {
-	Id                      int
-	PostalCode              string
-	Address                 string
-	Country                 string
-	City                    string
-	PaymentMethod           int // Enum
-	PaymentResultStatus     int // Enum
-	PaymentResultUpdateTime time.Time
+	Id                        int
+	PostalCode                string
+	Address                   string
+	Country                   string
+	City                      string
+	PaymentMethod             int // Enum
+	PaymentResultId           string
+	PaymentResultStatus       string
+	PaymentResultUpdateTime   time.Time
+	PaymentResultEmailAddress string
+	TotalPrice                float64
+	IsPaid                    bool
+	PaidAt                    time.Time
+	IsDelivered               bool
+	DeliveredAt               time.Time
+	UserId                    int
+	User                      User
+	CreatedAt                 time.Time
+	UpdatedAt                 time.Time
 	// ShippingPrice int
-	TotalPrice  int
-	IsPaid      bool
-	PaidAt      time.Time
-	IsDelivered bool
-	DeliveredAt time.Time
-	UserId      int
-	User        User
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 // OrderedProd is the OrderedProd model

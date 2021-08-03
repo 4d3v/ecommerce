@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
@@ -9,6 +9,8 @@ import OrderSummary from '../components/OrderSummary'
 import { ICart, ICartItemsRdx, IOrderCreateRdx } from '../type'
 
 interface HistoryParams {}
+
+let orderedProdsCreated = 0
 
 const PlaceOrderScreen = () => {
   const dispatch = useDispatch()
@@ -21,6 +23,10 @@ const PlaceOrderScreen = () => {
   )
   const { order, success, error } = orderCreate
 
+  // const orderedProdsCreate = useSelector(
+  //   (state: any) => state.orderedProdsCreate
+  // )
+
   const itemsPrice = cart.cartItems.reduce(
       (acc: number, curItem: ICart) => acc + curItem.price * curItem.qty,
       0
@@ -31,11 +37,20 @@ const PlaceOrderScreen = () => {
 
   useEffect(() => {
     if (success) {
-      // that means we made an order
-      cart.cartItems.forEach(async (item) => {
-        dispatch(createOrderedProds(item.productId, order.data.order_id))
-      })
-      history.push(`/order/${order.data.order_id}`)
+      const createOrdProds = async () => {
+        await Promise.all(
+          cart.cartItems.map(async (item: ICart) => {
+            dispatch(
+              createOrderedProds(item.productId, order.data.order_id, item.qty)
+            )
+            orderedProdsCreated++
+          })
+        )
+      }
+      createOrdProds()
+
+      if (orderedProdsCreated === cart.cartItems.length)
+        history.push(`/order/${order.data.order_id}`)
     }
   }, [dispatch, history, success, cart.cartItems, order])
 

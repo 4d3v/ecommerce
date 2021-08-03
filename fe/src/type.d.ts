@@ -151,3 +151,9 @@ export interface IOrderedProdsRdx {
   error: string
   orderedProds: IOrderedProds[] // TEMP using any
 }
+
+export interface IOrderPayRdx {
+  loading: boolean
+  success: boolean
+  error: string
+}

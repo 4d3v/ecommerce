@@ -1,5 +1,5 @@
 import React from 'react'
-import { ICart, IOrderedProds } from '../type'
+import { IOrderedProds } from '../type'
 
 interface IProps {
   orderedProds?: IOrderedProds[] | null
@@ -28,29 +28,27 @@ const OrderSummary = ({
     totalPrice = itemsPrice + shippingPrice + taxPrice
 
   return (
-    <div className='order-summary'>
-      <ul className='order-summary__wrapper'>
-        <li>
-          <h2>Order Summary</h2>
-        </li>
+    <ul className='order-summary__wrapper'>
+      <li>
+        <h2>Order Summary</h2>
+      </li>
 
-        <li>
-          <div>Items ${itemsPrice}</div>
-        </li>
+      <li>
+        <div>Items ${itemsPrice}</div>
+      </li>
 
-        <li>
-          <div>Shipping ${shippingPrice}</div>
-        </li>
+      <li>
+        <div>Shipping ${shippingPrice}</div>
+      </li>
 
-        <li>
-          <div>Tax ${taxPrice}</div>
-        </li>
+      <li>
+        <div>Tax ${taxPrice}</div>
+      </li>
 
-        <li>
-          <div>Total ${totalPrice}</div>
-        </li>
-      </ul>
-    </div>
+      <li>
+        <div>Total ${totalPrice}</div>
+      </li>
+    </ul>
   )
 }
 

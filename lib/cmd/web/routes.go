@@ -38,6 +38,8 @@ func routes() http.Handler {
 	mux.Patch("/updatepassword", handlers.Repo.UpdatePassword)
 	mux.Get("/actdis", handlers.Repo.ActivateDisableUser)
 
+	mux.Get("/config/paypal", handlers.Repo.GetPaypalConfigId)
+
 	mux.Route("/products", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetProducts)
 		mux.Get("/{id}", handlers.Repo.GetProductById)
@@ -64,6 +66,7 @@ func routes() http.Handler {
 		mux.Post("/", handlers.Repo.CreateOrder)
 		mux.Get("/{id}", handlers.Repo.GetOrderById)
 		mux.Patch("/{id}", handlers.Repo.UpdateOrder)
+		mux.Patch("/{orderid}/pay", handlers.Repo.PayOrder)
 		mux.Delete("/{id}", handlers.Repo.DeleteOrder)
 	})
 

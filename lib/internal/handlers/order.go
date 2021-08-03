@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/4d3v/ecommerce/internal/forms"
 	"github.com/4d3v/ecommerce/internal/helpers"
@@ -105,7 +106,6 @@ func (repo *Repository) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	sendJson("ordersjson", w, &options{
 		ok:     true,
-		msg:    "Success",
 		orders: orders,
 		stCode: http.StatusOK,
 	})
@@ -133,7 +133,6 @@ func (repo *Repository) GetOrderById(w http.ResponseWriter, r *http.Request) {
 
 	sendJson("orderjson", w, &options{
 		ok:     true,
-		msg:    "Success",
 		order:  order,
 		stCode: http.StatusOK,
 	})
@@ -148,11 +147,11 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, _ := repo.getUserByJwt(r)
-
+	fmt.Println(r.Form.Get("total_price"))
 	form := forms.New(r.PostForm)
 	form.Required("postal_code", "address", "country", "city",
 		"payment_method", "total_price")
-	form.IsUint("total_price")
+	// form.IsUFloat("total_price")
 
 	if !form.Valid() {
 		fmt.Println(err)
@@ -162,7 +161,7 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	// Fields bellow should already be checked for int
 	payMethod := checkPaymentMethod(form)
-	totalPrice, _ := strconv.Atoi(r.Form.Get("total_price"))
+	totalPrice, _ := strconv.ParseFloat(r.Form.Get("total_price"), 64)
 
 	order := models.Order{
 		PostalCode:    r.Form.Get("postal_code"),
@@ -251,6 +250,58 @@ func (repo *Repository) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 
 	// Fields bellow should already be checked for int above
 	err = repo.DB.UpdateOrder(order)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("msgjson", w, &options{
+		ok:     true,
+		msg:    "Success",
+		stCode: http.StatusOK,
+	})
+}
+
+// PayOrder update to paid and set some new details to an existing order
+func (repo *Repository) PayOrder(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	user, _ := repo.getUserByJwt(r)
+
+	orderId, err := strconv.Atoi(chi.URLParam(r, "orderid"))
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("payment_result_id", "payment_result_status",
+		"payment_result_update_time", "payment_result_email_address")
+	form.IsEmail("payment_result_email_address")
+
+	if !form.Valid() {
+		fmt.Println(err)
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		return
+	}
+
+	order := models.Order{
+		Id:                  orderId,
+		PaymentResultId:     r.Form.Get("payment_result_id"),
+		PaymentResultStatus: r.Form.Get("payment_result_status"),
+		// PaymentResultUpdateTime: r.Form.Get("payment_result_update_time"), // TEMP
+		PaymentResultUpdateTime:   time.Now(), // TEMP
+		PaymentResultEmailAddress: r.Form.Get("payment_result_email_address"),
+		UserId:                    user.Id,
+	}
+
+	err = repo.DB.SetOrderToPaid(order)
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
