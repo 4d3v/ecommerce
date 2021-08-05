@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ICart, IOrderedProds } from '../type'
+import { ICart, IOrderedProd } from '../type'
 
 interface IProps {
-  products?: IOrderedProds[]
+  products?: IOrderedProd[]
   cartProds?: ICart[]
 }
 

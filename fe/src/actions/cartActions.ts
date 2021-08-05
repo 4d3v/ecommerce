@@ -34,6 +34,15 @@ export const removeFromCart =
     localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems))
   }
 
+export const removeAllFromCart =
+  () => (dispatch: AppDispatch, getState: any) => {
+    dispatch({
+      type: cartActions.CART_REMOVE_ALL_ITEMS,
+    })
+
+    localStorage.setItem('cartItems', JSON.stringify(getState().cart.cartItems))
+  }
+
 export const addShippingAddress =
   (shippingAddress: IShippingAddress) => (dispatch: AppDispatch) => {
     dispatch({

@@ -1,8 +1,8 @@
 import React from 'react'
-import { IOrderedProds } from '../type'
+import { IOrderedProd } from '../type'
 
 interface IProps {
-  orderedProds?: IOrderedProds[] | null
+  orderedProds?: IOrderedProd[] | null
   cartItemsPrice?: number | null
 }
 
@@ -16,7 +16,7 @@ const OrderSummary = ({
   let itemsPrice = 0
   if (orderedProds) {
     itemsPrice = orderedProds.reduce(
-      (acc: number, orderedProd: IOrderedProds) =>
+      (acc: number, orderedProd: IOrderedProd) =>
         acc + orderedProd.prod_price * orderedProd.prod_qty,
       0
     )

@@ -6,6 +6,7 @@ import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
 import OrderItemsInfo from '../components/OrderItemsInfo'
 import OrderSummary from '../components/OrderSummary'
+import { orderActions } from '../constants/orderConstants'
 import { ICart, ICartItemsRdx, IOrderCreateRdx } from '../type'
 
 interface HistoryParams {}
@@ -21,7 +22,7 @@ const PlaceOrderScreen = () => {
   const orderCreate = useSelector(
     (state: { orderCreate: IOrderCreateRdx }) => state.orderCreate
   )
-  const { order, success, error } = orderCreate
+  // const { order, success, error } = orderCreate
 
   // const orderedProdsCreate = useSelector(
   //   (state: any) => state.orderedProdsCreate
@@ -36,12 +37,15 @@ const PlaceOrderScreen = () => {
     totalPrice = itemsPrice + shippingPrice + taxPrice
 
   useEffect(() => {
-    if (success) {
+    // If order is created with success
+    if (orderCreate && orderCreate.success) {
+      const orderCreatedId = orderCreate.order.data.order_id
+
       const createOrdProds = async () => {
         await Promise.all(
           cart.cartItems.map(async (item: ICart) => {
             dispatch(
-              createOrderedProds(item.productId, order.data.order_id, item.qty)
+              createOrderedProds(item.productId, orderCreatedId, item.qty)
             )
             orderedProdsCreated++
           })
@@ -49,10 +53,15 @@ const PlaceOrderScreen = () => {
       }
       createOrdProds()
 
-      if (orderedProdsCreated === cart.cartItems.length)
-        history.push(`/order/${order.data.order_id}`)
+      dispatch({ type: orderActions.ORDER_DETAILS_RESET })
+      dispatch({ type: orderActions.ORDER_CREATE_RESET })
+
+      if (orderedProdsCreated === cart.cartItems.length) {
+        orderedProdsCreated = 0
+        history.push(`/order/${orderCreatedId}`)
+      }
     }
-  }, [dispatch, history, success, cart.cartItems, order])
+  }, [dispatch, history, cart.cartItems, orderCreate])
 
   const placeOrderHandler = () => {
     if (cart.cartItems.length === 0) {
@@ -71,8 +80,8 @@ const PlaceOrderScreen = () => {
     )
   }
 
-  return error ? (
-    <Message error={error} />
+  return orderCreate && orderCreate.error ? (
+    <Message error={orderCreate.error} />
   ) : (
     <div className='container'>
       <CheckoutSteps step1 step2 step3 step4 />

@@ -133,7 +133,7 @@ export interface IOrderDetailsRdx {
   orderItem: any // TEMP using any Should be IOrderDetails
 }
 
-interface IOrderedProds {
+interface IOrderedProd {
   prod_brand: string
   prod_count_in_stock: number
   prod_qty: number
@@ -149,11 +149,18 @@ interface IOrderedProds {
 export interface IOrderedProdsRdx {
   loading: boolean
   error: string
-  orderedProds: IOrderedProds[] // TEMP using any
+  orderedProds: IOrderedProd[] // TEMP using any
 }
 
 export interface IOrderPayRdx {
   loading: boolean
   success: boolean
   error: string
+}
+
+export interface IPaypalPaymentResult {
+  paymentResultId: string
+  paymentResultStatus: string
+  paymentResultUpdateTime: string
+  paymentResultEmailAddress: string
 }

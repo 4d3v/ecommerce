@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   BrowserRouter as Router,
   Switch,
@@ -20,6 +20,9 @@ import ShippingScreen from './screens/ShippingScreen'
 import PaymentScreen from './screens/PaymentScreen'
 import PlaceOrderScreen from './screens/PlaceOrderScreen'
 import OrderScreen from './screens/OrderScreen'
+import axios from 'axios'
+import { BASE_URL } from './constants/endPoints'
+import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 
 declare global {
   interface Window {
@@ -28,25 +31,49 @@ declare global {
 }
 
 const App = () => {
+  const [paycId, setPaycId] = useState('NOT_SET')
+  const initialPaypalOptions = {
+    'client-id': paycId,
+    currency: 'USD',
+    intent: 'capture',
+  }
+  useEffect(() => {
+    const getPaypalClientId = async () => {
+      const {
+        data: {
+          data: { paypal_client_id },
+        },
+      } = await axios.get(`${BASE_URL}/config/paypal`)
+
+      setPaycId(paypal_client_id)
+    }
+
+    if (paycId === 'NOT_SET') getPaypalClientId()
+  }, [paycId])
+
   return (
     <Router>
-      <Header />
-      <main>
-        <Switch>
-          <Route path='/placeorder' component={PlaceOrderScreen} exact />
-          <Route path='/payment' component={PaymentScreen} exact />
-          <Route path='/shipping' component={ShippingScreen} exact />
-          <Route path='/signup' component={SignUpScreen} exact />
-          <Route path='/login' component={LoginScreen} exact />
-          <Route path='/profile' component={ProfileScreen} exact />
-          <Route path='/order/:orderid' component={OrderScreen} exact />
-          <Route path='/product/:id' component={ProductScreen} exact />
-          <Route path='/topics' component={Topics} exact />
-          <Route path='/cart/:id?' component={CartScreen} exact />
-          <Route path='/' component={HomeScreen} exact />
-        </Switch>
-      </main>
-      <Footer />
+      {paycId !== 'NOT_SET' && (
+        <PayPalScriptProvider options={initialPaypalOptions}>
+          <Header />
+          <main>
+            <Switch>
+              <Route path='/placeorder' component={PlaceOrderScreen} exact />
+              <Route path='/payment' component={PaymentScreen} exact />
+              <Route path='/shipping' component={ShippingScreen} exact />
+              <Route path='/signup' component={SignUpScreen} exact />
+              <Route path='/login' component={LoginScreen} exact />
+              <Route path='/profile' component={ProfileScreen} exact />
+              <Route path='/order/:orderid' component={OrderScreen} exact />
+              <Route path='/product/:id' component={ProductScreen} exact />
+              <Route path='/topics' component={Topics} exact />
+              <Route path='/cart/:id?' component={CartScreen} exact />
+              <Route path='/' component={HomeScreen} exact />
+            </Switch>
+          </main>
+          <Footer />
+        </PayPalScriptProvider>
+      )}
     </Router>
   )
 }

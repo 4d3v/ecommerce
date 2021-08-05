@@ -147,7 +147,7 @@ func (repo *Repository) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, _ := repo.getUserByJwt(r)
-	fmt.Println(r.Form.Get("total_price"))
+
 	form := forms.New(r.PostForm)
 	form.Required("postal_code", "address", "country", "city",
 		"payment_method", "total_price")

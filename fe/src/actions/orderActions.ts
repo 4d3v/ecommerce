@@ -2,11 +2,11 @@ import axios from 'axios'
 import { BASE_URL } from '../constants/endPoints'
 import { orderActions } from '../constants/orderConstants'
 import { AppDispatch } from '../store'
-import { ICreateOrder } from '../type'
+import { ICreateOrder, IPaypalPaymentResult } from '../type'
 import { getFormErrors } from './actionsUtils'
 
 export const createOrder =
-  (order: ICreateOrder) => async (dispatch: AppDispatch, getState: any) => {
+  (order: ICreateOrder) => async (dispatch: AppDispatch) => {
     try {
       dispatch({
         type: orderActions.ORDER_CREATE_REQUEST,
@@ -38,7 +38,7 @@ export const createOrder =
 
 export const createOrderedProds =
   (productId: number, orderId: number, qty: number) =>
-  async (dispatch: AppDispatch, getState: any) => {
+  async (dispatch: AppDispatch) => {
     try {
       dispatch({
         type: orderActions.ORDERED_PRODS_CREATE_REQUEST,
@@ -65,7 +65,7 @@ export const createOrderedProds =
   }
 
 export const getOrderDetails =
-  (orderId: number) => async (dispatch: AppDispatch, getState: any) => {
+  (orderId: number) => async (dispatch: AppDispatch) => {
     try {
       dispatch({
         type: orderActions.ORDER_DETAILS_REQUEST,
@@ -89,11 +89,11 @@ export const getOrderDetails =
     }
   }
 
-export const getOrderedProdsDetails =
-  (orderId: number) => async (dispatch: AppDispatch, getState: any) => {
+export const getOrderedProds =
+  (orderId: number) => async (dispatch: AppDispatch) => {
     try {
       dispatch({
-        type: orderActions.ORDERED_PRODS_DETAILS_REQUEST,
+        type: orderActions.ORDERED_PRODS_LIST_REQUEST,
       })
 
       const { data } = await axios.get(`${BASE_URL}/orderedprods/${orderId}`, {
@@ -101,31 +101,22 @@ export const getOrderedProdsDetails =
       })
 
       dispatch({
-        type: orderActions.ORDERED_PRODS_DETAILS_SUCCESS,
+        type: orderActions.ORDERED_PRODS_LIST_SUCCESS,
         payload: data,
       })
     } catch (error) {
       const customError = getFormErrors(error)
       dispatch({
-        type: orderActions.ORDERED_PRODS_DETAILS_FAIL,
+        type: orderActions.ORDERED_PRODS_LIST_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(error.response)
     }
   }
 
-// TEMP using any for paymentResult which is coming from paypal
 export const payOrder =
-  (
-    orderId: number,
-    paymentResult: {
-      paymentResultId: string
-      paymentResultStatus: string
-      paymentResultUpdateTime: string
-      paymentResultEmailAddress: string
-    }
-  ) =>
-  async (dispatch: AppDispatch, getState: any) => {
+  (orderId: number, paymentResult: IPaypalPaymentResult) =>
+  async (dispatch: AppDispatch) => {
     try {
       dispatch({
         type: orderActions.ORDER_PAY_REQUEST,

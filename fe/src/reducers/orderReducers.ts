@@ -1,23 +1,10 @@
 import { AnyAction } from 'redux'
 import { orderActions } from '../constants/orderConstants'
-import { ICreateOrder, IOrderDetails, IShippingAddress } from '../type'
+import { ICreateOrder, IOrderDetails, IOrderedProd } from '../type'
 
-const orderInitialState: {
-  order: ICreateOrder | null
-  orderItem: IOrderDetails | null
-  orderedProds: any // TEMP
-  shippingAddress: IShippingAddress | {}
-  orderPay: any
-} = {
-  order: null,
-  orderItem: null,
-  orderedProds: [],
-  shippingAddress: {},
-  orderPay: {},
-}
-
+const orderCreateInitSt: { order: ICreateOrder | null } = { order: null }
 export const orderCreateReducer = (
-  state = orderInitialState,
+  state = orderCreateInitSt,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -27,20 +14,25 @@ export const orderCreateReducer = (
       return { loading: false, success: true, order: action.payload }
     case orderActions.ORDER_CREATE_FAIL:
       return { loading: false, success: false, error: action.payload }
+    case orderActions.ORDER_CREATE_RESET:
+      return null
     default:
       return state
   }
 }
 
+const orderedProdsCreateInitSt: { orderedProd: IOrderedProd | null } = {
+  orderedProd: null,
+}
 export const orderedProdsCreateReducer = (
-  state = orderInitialState,
+  state = orderedProdsCreateInitSt,
   action: AnyAction
 ) => {
   switch (action.type) {
     case orderActions.ORDERED_PRODS_CREATE_REQUEST:
       return { loading: true }
     case orderActions.ORDERED_PRODS_CREATE_SUCCESS:
-      return { loading: false, success: true, order: action.payload }
+      return { loading: false, success: true, orderedProd: action.payload }
     case orderActions.ORDERED_PRODS_CREATE_FAIL:
       return { loading: false, success: false, error: action.payload }
     default:
@@ -48,8 +40,11 @@ export const orderedProdsCreateReducer = (
   }
 }
 
+const orderDetailsInitSt: { orderItem: IOrderDetails | null } = {
+  orderItem: null,
+}
 export const orderDetailsReducer = (
-  state = orderInitialState,
+  state = orderDetailsInitSt,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -59,33 +54,33 @@ export const orderDetailsReducer = (
       return { loading: false, orderItem: action.payload }
     case orderActions.ORDER_DETAILS_FAIL:
       return { loading: false, error: action.payload }
+    case orderActions.ORDER_DETAILS_RESET:
+      return null
     default:
       return state
   }
 }
 
-export const orderedProdsDetailsReducer = (
-  state = orderInitialState,
+const orderedProdsListInitSt: { orderedProds: IOrderedProd[] } = {
+  orderedProds: [],
+}
+export const orderedProdsListReducer = (
+  state = orderedProdsListInitSt,
   action: AnyAction
 ) => {
   switch (action.type) {
-    case orderActions.ORDERED_PRODS_DETAILS_REQUEST:
+    case orderActions.ORDERED_PRODS_LIST_REQUEST:
       return { ...state, loading: true }
-    case orderActions.ORDERED_PRODS_DETAILS_SUCCESS:
+    case orderActions.ORDERED_PRODS_LIST_SUCCESS:
       return { loading: false, orderedProds: action.payload }
-    case orderActions.ORDERED_PRODS_DETAILS_FAIL:
+    case orderActions.ORDERED_PRODS_LIST_FAIL:
       return { loading: false, error: action.payload }
     default:
       return state
   }
 }
 
-const orderPayInitialState: { orderPay: any } = { orderPay: {} }
-
-export const orderPayReducer = (
-  state = orderPayInitialState,
-  action: AnyAction
-) => {
+export const orderPayReducer = (state = {}, action: AnyAction) => {
   switch (action.type) {
     case orderActions.ORDER_PAY_REQUEST:
       return { loading: true }

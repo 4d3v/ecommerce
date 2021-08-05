@@ -43,6 +43,12 @@ export const cartReducer = (state = initialState, action: AnyAction) => {
         ),
       }
 
+    case cartActions.CART_REMOVE_ALL_ITEMS:
+      return {
+        ...state,
+        cartItems: [],
+      }
+
     case cartActions.CART_ADD_SHIPPING_ADDRESS:
       return {
         ...state,
