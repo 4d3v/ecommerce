@@ -16,12 +16,14 @@ const ShippingScreen = () => {
 
   const [address, setAddress] = useState(shippingAddress.address)
   const [city, setCity] = useState(shippingAddress.city)
-  const [postalCode, setPostalCode] = useState(shippingAddress.postalCode)
+  const [postalCode, setPostalCode] = useState(shippingAddress.postal_code)
   const [country, setCountry] = useState(shippingAddress.country)
 
   const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
     e.preventDefault()
-    dispatch(addShippingAddress({ address, city, postalCode, country }))
+    dispatch(
+      addShippingAddress({ address, city, postal_code: postalCode, country })
+    )
     history.push('/payment')
   }
 

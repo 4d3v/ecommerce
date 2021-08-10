@@ -54,6 +54,7 @@ func Auth(next http.Handler) http.Handler {
 				helpers.ServerError(w, err)
 			}
 
+			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(out)
 			return
 		}

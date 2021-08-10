@@ -123,10 +123,6 @@ export const getUser =
         userLogin: { userInfo },
       } = getState()
 
-      // const {
-      //   data,
-      //   config: { headers },
-      // } = await axios.get(`${BASE_URL}/user`, {
       const { data } = await axios.get(`${BASE_URL}/user`, {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
@@ -140,10 +136,18 @@ export const getUser =
       })
     } catch (error) {
       const customError = getFormErrors(error)
+
       dispatch({
         type: userActions.USER_DETAILS_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
+
+      // If we get the errror probably the jwt expired
+      dispatch({
+        type: userActions.USER_LOGOUT,
+      })
+
+      localStorage.removeItem('userInfo')
     }
   }
 

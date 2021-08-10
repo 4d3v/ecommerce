@@ -3,7 +3,7 @@ import { BASE_URL } from '../constants/endPoints'
 import { orderActions } from '../constants/orderConstants'
 import { AppDispatch } from '../store'
 import { ICreateOrder, IPaypalPaymentResult } from '../type'
-import { getFormErrors } from './actionsUtils'
+import { getAuthError, getFormErrors } from './actionsUtils'
 
 export const createOrder =
   (order: ICreateOrder) => async (dispatch: AppDispatch) => {
@@ -12,13 +12,19 @@ export const createOrder =
         type: orderActions.ORDER_CREATE_REQUEST,
       })
 
-      const { postalCode, address, country, city, paymentMethod, totalPrice } =
-        order
+      const {
+        postal_code,
+        address,
+        country,
+        city,
+        payment_method,
+        total_price,
+      } = order
 
       const { data } = await axios.post(
         `${BASE_URL}/orders`,
-        `postal_code=${postalCode}&address=${address}&country=${country}
-         &city=${city}&payment_method=${paymentMethod}&total_price=${totalPrice}`,
+        `postal_code=${postal_code}&address=${address}&country=${country}
+         &city=${city}&payment_method=${payment_method}&total_price=${total_price}`,
         { withCredentials: true }
       )
 
@@ -80,10 +86,10 @@ export const getOrderDetails =
         payload: data,
       })
     } catch (error) {
-      const customError = getFormErrors(error)
+      const customError = getAuthError(error)
       dispatch({
         type: orderActions.ORDER_DETAILS_FAIL,
-        payload: customError.length > 0 ? customError : error.message,
+        payload: customError ? customError : error.message,
       })
       console.log(error.response)
     }
@@ -106,6 +112,7 @@ export const getOrderedProds =
       })
     } catch (error) {
       const customError = getFormErrors(error)
+
       dispatch({
         type: orderActions.ORDERED_PRODS_LIST_FAIL,
         payload: customError.length > 0 ? customError : error.message,

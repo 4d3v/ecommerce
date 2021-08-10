@@ -19,9 +19,8 @@ const (
 )
 
 const (
-	cash   = iota + 1 // 1
-	credit            // 2
-	debit             // 3
+	paypal = iota + 1 // 1
+	stripe            // 2
 )
 
 const (
@@ -58,25 +57,25 @@ type productJson struct {
 }
 
 type orderJson struct {
-	Id                        int         `json:"id"`
-	PostalCode                string      `json:"postal_code"`
-	Address                   string      `json:"address"`
-	Country                   string      `json:"country"`
-	City                      string      `json:"city"`
-	PaymentMethod             int         `json:"payment_method"`
-	PaymentResultId           string      `json:"payment_result_id"`
-	PaymentResultStatus       string      `json:"payment_result_status"`
-	PaymentResultUpdateTime   string      `json:"payment_result_update_time"`
-	PaymentResultEmailAddress string      `json:"payment_result_email_address "`
-	TotalPrice                float64     `json:"total_price"`
-	IsPaid                    bool        `json:"is_paid"`
-	PaidAt                    string      `json:"paid_at"`
-	IsDelivered               bool        `json:"is_delivered"`
-	DeliveredAt               string      `json:"delivered_at"`
-	UserId                    int         `json:"user_id"`
-	CreatedAt                 string      `json:"created_at"`
-	UpdatedAt                 string      `json:"updated_at"`
-	User                      models.User `json:"user"`
+	Id                        int      `json:"id"`
+	PostalCode                string   `json:"postal_code"`
+	Address                   string   `json:"address"`
+	Country                   string   `json:"country"`
+	City                      string   `json:"city"`
+	PaymentMethod             int      `json:"payment_method"`
+	PaymentResultId           string   `json:"payment_result_id"`
+	PaymentResultStatus       string   `json:"payment_result_status"`
+	PaymentResultUpdateTime   string   `json:"payment_result_update_time"`
+	PaymentResultEmailAddress string   `json:"payment_result_email_address "`
+	TotalPrice                float64  `json:"total_price"`
+	IsPaid                    bool     `json:"is_paid"`
+	PaidAt                    string   `json:"paid_at"`
+	IsDelivered               bool     `json:"is_delivered"`
+	DeliveredAt               string   `json:"delivered_at"`
+	UserId                    int      `json:"user_id"`
+	User                      userJson `json:"user"`
+	CreatedAt                 string   `json:"created_at"`
+	UpdatedAt                 string   `json:"updated_at"`
 	// Product models.Product
 }
 
@@ -244,6 +243,16 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(newJson)
 
 	case "orderjson":
+		usr := userJson{
+			Id:        opts.order.User.Id,
+			Name:      opts.order.User.Name,
+			Email:     opts.order.User.Email,
+			Role:      opts.order.User.Role,
+			Active:    opts.order.User.Active,
+			CreatedAt: opts.order.User.CreatedAt.Format(timeFormatStr),
+			UpdatedAt: opts.order.User.UpdatedAt.Format(timeFormatStr),
+		}
+
 		resp := orderJson{
 			Id:                        opts.order.Id,
 			PostalCode:                opts.order.PostalCode,
@@ -261,7 +270,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			IsDelivered:               opts.order.IsDelivered,
 			DeliveredAt:               opts.order.DeliveredAt.Format(timeFormatStr),
 			UserId:                    opts.order.UserId,
-			User:                      opts.order.User,
+			User:                      usr,
 			CreatedAt:                 opts.order.CreatedAt.Format(timeFormatStr),
 			UpdatedAt:                 opts.order.UpdatedAt.Format(timeFormatStr),
 			// Product: opts.order.Product
@@ -489,14 +498,12 @@ func checkPaymentMethod(f *forms.Form) int {
 	var payMethod int
 
 	switch f.Get("payment_method") {
-	case "cash":
-		payMethod = cash
-	case "credit":
-		payMethod = credit
-	case "debit":
-		payMethod = debit
+	case "paypal":
+		payMethod = paypal
+	case "stripe":
+		payMethod = stripe
 	default:
-		payMethod = cash
+		payMethod = paypal
 	}
 
 	return payMethod

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { removeAllFromCart } from '../actions/cartActions'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
@@ -58,6 +59,7 @@ const PlaceOrderScreen = () => {
 
       if (orderedProdsCreated === cart.cartItems.length) {
         orderedProdsCreated = 0
+        dispatch(removeAllFromCart())
         history.push(`/order/${orderCreatedId}`)
       }
     }
@@ -70,12 +72,12 @@ const PlaceOrderScreen = () => {
 
     dispatch(
       createOrder({
-        postalCode: cart.shippingAddress.postalCode,
+        postal_code: cart.shippingAddress.postal_code,
         address: cart.shippingAddress.address,
         country: cart.shippingAddress.country,
         city: cart.shippingAddress.city,
-        paymentMethod: cart.paymentMethod,
-        totalPrice: totalPrice,
+        payment_method: cart.paymentMethod,
+        total_price: totalPrice,
       })
     )
   }
@@ -92,7 +94,7 @@ const PlaceOrderScreen = () => {
             <h2>Shipping</h2>
             <p>
               <strong>Address: </strong>
-              {cart.shippingAddress.postalCode},{cart.shippingAddress.address},
+              {cart.shippingAddress.postal_code},{cart.shippingAddress.address},
               {cart.shippingAddress.country},{cart.shippingAddress.city}
             </p>
           </li>

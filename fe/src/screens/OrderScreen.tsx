@@ -19,13 +19,17 @@ import {
   OnApproveData,
   UnknownObject,
 } from '@paypal/paypal-js/types/components/buttons'
-import { removeAllFromCart } from '../actions/cartActions'
 
 interface HistoryParams {}
 
 interface RouteParams {
   orderid: string
 }
+
+const strconvPayMethod = new Map<number, string>([
+  [1, 'paypal'],
+  [2, 'stripe'],
+])
 
 const OrderScreen = () => {
   const dispatch = useDispatch()
@@ -47,6 +51,15 @@ const OrderScreen = () => {
 
   useEffect(() => {
     if (
+      orderDetails &&
+      orderDetails.error &&
+      !orderDetails.error.ok &&
+      orderDetails.error.errorMsg ===
+        'Unauthenticated! http: named cookie not present'
+    )
+      history.push('/login')
+
+    if (
       !orderDetails ||
       !orderDetails.orderItem ||
       (orderDetails.orderItem &&
@@ -58,7 +71,7 @@ const OrderScreen = () => {
       dispatch(getOrderDetails(Number(params.orderid)))
       dispatch(getOrderedProds(Number(params.orderid)))
     }
-  }, [dispatch, params.orderid, orderDetails, orderPay])
+  }, [dispatch, history, params.orderid, orderDetails, orderPay])
 
   const paypalCreateOrder = (
     data: UnknownObject,
@@ -90,23 +103,18 @@ const OrderScreen = () => {
         })
       )
 
-      dispatch(removeAllFromCart())
-
-      // alert('Transaction completed by ' + details.payer.name.given_name)
       console.log('Transaction completed by ' + details.payer.name.given_name)
-      if (details.status === 'COMPLETED')
-        history.push(`/order/${orderDetails.orderItem.id}`)
+      // if (details.status === 'COMPLETED')
+      //   history.push(`/order/${orderDetails.orderItem.id}`)
     })
   }
 
   return orderDetails && orderDetails.loading ? (
     <Loader />
   ) : orderDetails && orderDetails.error ? (
-    <Message error={orderDetails.error} />
+    <Message error={orderDetails.error.errorMsg} />
   ) : (
     orderDetails &&
-    !orderDetails.loading &&
-    !orderedProdsList.loading &&
     orderDetails.orderItem && (
       <div className='container'>
         <div className='order-wrapper u-my-s'>
@@ -115,18 +123,18 @@ const OrderScreen = () => {
             <li>
               <h2>Shipping</h2>
               <div>
-                <strong>Name: {orderDetails.orderItem.user.Name}</strong>
+                <strong>Name: {orderDetails.orderItem.user.name}</strong>
               </div>
               <div>
                 <strong>
-                  <a href={`mailto:${orderDetails.orderItem.user.Email}`}>
-                    Email: {orderDetails.orderItem.user.Email}
+                  <a href={`mailto:${orderDetails.orderItem.user.email}`}>
+                    Email: {orderDetails.orderItem.user.email}
                   </a>
                 </strong>
               </div>
               <div>
                 <strong>Address: </strong>
-                {orderDetails.orderItem.postalCode},{' '}
+                {orderDetails.orderItem.postal_code},{' '}
                 {orderDetails.orderItem.address},{' '}
                 {orderDetails.orderItem.country}, {orderDetails.orderItem.city}
               </div>
@@ -145,7 +153,7 @@ const OrderScreen = () => {
               <h2>Payment Method</h2>
               <div>
                 <strong>Method: </strong>
-                {orderDetails.orderItem.payment_method}
+                {strconvPayMethod.get(orderDetails.orderItem.payment_method)}
               </div>
               <div>
                 {orderDetails.orderItem.is_paid ? (
@@ -162,7 +170,6 @@ const OrderScreen = () => {
             </li>
           </ul>
 
-          {/* RIGHT COL */}
           <div className='order-summary'>
             <OrderSummary orderedProds={orderedProds} />
             {!orderDetails.orderItem.is_paid && (

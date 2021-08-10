@@ -6,7 +6,7 @@ const cart: ICart[] = []
 const shippingAddress: IShippingAddress = {
   address: '',
   city: '',
-  postalCode: '',
+  postal_code: '',
   country: '',
 }
 const initialState: { cartItems: ICart[]; shippingAddress: IShippingAddress } =

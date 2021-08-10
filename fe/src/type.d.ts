@@ -1,3 +1,13 @@
+export interface IUser {
+  id: number
+  name: string
+  email: string
+  role?: number
+  created_at?: Date
+  updated_at?: Date
+  token?: string
+}
+
 export interface IProduct {
   id: number
   name: string
@@ -10,7 +20,7 @@ export interface IProduct {
   price: number
   count_in_stock: number
   user_id: number
-  user: any // temp
+  user: IUser
   created_at: Date
   updated_at: Date
 }
@@ -24,32 +34,22 @@ export interface ICart {
   qty: number
 }
 
-export interface IUser {
-  id: number
-  name: string
-  email: string
-  role?: number
-  created_at?: Date
-  updated_at?: Date
-  token?: string
-}
-
 // TODO change to match backend
 export interface IShippingAddress {
   address: string
   city: string
-  postalCode: string
+  postal_code: string
   country: string
 }
 
 // TODO change to match backend
 export interface ICreateOrder {
-  postalCode: string
+  postal_code: string
   address: string
   country: string
   city: string
-  paymentMethod: int
-  totalPrice: int
+  payment_method: int
+  total_price: int
 }
 
 export interface IOrderDetails {
@@ -58,23 +58,23 @@ export interface IOrderDetails {
   city: string
   postal_code: string
   country: string
-  payment_method: int
   total_price: int
   is_delivered: boolean
   delivered_at: string
   is_paid: false
   paid_at: string
   payment_method: number
-  payment_result_status: number
+  payment_result_id: string
+  payment_result_status: string
   payment_result_update_time: string
-  user_id: number
+  payment_result_email_address: string
+  user_id?: number
+  user: IUser
   created_at: string
   updated_at: string
 }
 
 export type IPaymentMethod = string
-
-// type DispatchType = (args: ArticleAction) => ArticleAction
 
 // SCREENS
 export interface IProductListRdx {
@@ -129,8 +129,8 @@ export interface IOrderCreateRdx {
 
 export interface IOrderDetailsRdx {
   loading: boolean
-  error: string
-  orderItem: any // TEMP using any Should be IOrderDetails
+  error?: { ok: boolean; errorMsg: string }
+  orderItem: IOrderDetails
 }
 
 interface IOrderedProd {
@@ -149,7 +149,7 @@ interface IOrderedProd {
 export interface IOrderedProdsRdx {
   loading: boolean
   error: string
-  orderedProds: IOrderedProd[] // TEMP using any
+  orderedProds: IOrderedProd[]
 }
 
 export interface IOrderPayRdx {
@@ -164,3 +164,5 @@ export interface IPaypalPaymentResult {
   paymentResultUpdateTime: string
   paymentResultEmailAddress: string
 }
+
+// type DispatchType = (args: ArticleAction) => ArticleAction

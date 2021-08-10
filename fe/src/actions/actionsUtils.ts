@@ -15,3 +15,16 @@ export const getFormErrors = (error: any): any => {
     customError = error.response.data.error
   return customError
 }
+
+export const getAuthError = (
+  error: any
+): { ok: boolean; errorMsg: string } | void => {
+  const customError: { ok: boolean; errorMsg: string } = {
+    ok: false,
+    errorMsg: '',
+  }
+  if (error.response && error.response.data.error) {
+    customError.errorMsg = error.response.data.error
+    return customError
+  }
+}
