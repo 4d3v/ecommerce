@@ -112,3 +112,51 @@
   color: $base-font-light;
   cursor: pointer;
 }
+
+.prof--sep {
+  display: flex;
+  border: 1px solid #555;
+  min-height: 86vh;
+
+  &--r {
+    width: 100%;
+  }
+}
+
+.orderstable {
+  text-align: left;
+  overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
+  display: table;
+  padding: 0 0 1rem 0;
+
+  th {
+    font-weight: bold;
+    text-align: left;
+  }
+
+  td {
+    font-weight: normal;
+    -webkit-box-shadow: 0 2px 2px -2px #0e1119;
+    -moz-box-shadow: 0 2px 2px -2px #0e1119;
+    box-shadow: 0 2px 2px -2px #0e1119;
+  }
+
+  th,
+  td {
+    padding: 1rem;
+  }
+
+  tr:nth-child(odd) {
+    background-color: #404040;
+  }
+
+  tr:nth-child(even) {
+    background-color: #505050;
+  }
+
+  th {
+    background-color: $base-secondary-color;
+  }
+}

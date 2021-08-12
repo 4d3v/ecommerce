@@ -10,6 +10,7 @@ import {
   IUserUpdateProfileRdx,
 } from '../type'
 import { userActions } from '../constants/userConstants'
+import SideNav from '../components/SideNav'
 
 interface HistoryParams {}
 
@@ -70,7 +71,6 @@ const ProfileScreen = () => {
 
   return (
     <div className='container'>
-      <h1 className='u-txt-center u-my-s'>My Profile</h1>
       {error && (
         <div className='u-txt-center u-py-ss'>
           <Message error={error} />
@@ -96,61 +96,70 @@ const ProfileScreen = () => {
           <Message info={'User updated successfully'} />
         </div>
       )}
+
       {loading && <Loader />}
-      <form className='form' onSubmit={updateUserDetails}>
-        <label htmlFor='name'>Name</label>
-        <input
-          type='text'
-          placeholder='Enter name'
-          name='name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
 
-        <label htmlFor='email'>Email</label>
-        <input
-          type='email'
-          placeholder='Enter email'
-          name='email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <div className='prof--sep u-my-s'>
+        <SideNav />
 
-        <button type='submit'>Update user details</button>
-      </form>
+        <div className='prof--sep--r'>
+          <h1 className='u-txt-center u-my-s'>My Profile</h1>
+          <form className='form' onSubmit={updateUserDetails}>
+            <label htmlFor='name'>Name</label>
+            <input
+              type='text'
+              placeholder='Enter name'
+              name='name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
 
-      <form className='form' onSubmit={updateUserPassword}>
-        <label htmlFor='curpass'>Current password</label>
-        <input
-          type='password'
-          placeholder='Enter current password'
-          name='curpass'
-          onChange={(e) => setCurPassword(e.target.value)}
-          required
-        />
+            <label htmlFor='email'>Email</label>
+            <input
+              type='email'
+              placeholder='Enter email'
+              name='email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-        <label htmlFor='newpass'>New password</label>
-        <input
-          type='password'
-          placeholder='Enter new password'
-          name='newpass'
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
+            <button type='submit'>Update user details</button>
+          </form>
 
-        <label htmlFor='newpassconfirm'>Confirm New password</label>
-        <input
-          type='password'
-          placeholder='Confirm new password'
-          name='newpassconfirm'
-          onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          required
-        />
+          <form className='form' onSubmit={updateUserPassword}>
+            <label htmlFor='curpass'>Current password</label>
+            <input
+              type='password'
+              placeholder='Enter current password'
+              name='curpass'
+              onChange={(e) => setCurPassword(e.target.value)}
+              required
+            />
 
-        <button type='submit'>Update user password</button>
-      </form>
+            <label htmlFor='newpass'>New password</label>
+            <input
+              type='password'
+              placeholder='Enter new password'
+              name='newpass'
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+
+            <label htmlFor='newpassconfirm'>Confirm New password</label>
+            <input
+              type='password'
+              placeholder='Confirm new password'
+              name='newpassconfirm'
+              onChange={(e) => setNewPasswordConfirm(e.target.value)}
+              required
+            />
+
+            <button type='submit'>Update user password</button>
+          </form>
+        </div>
+      </div>
     </div>
   )
 }

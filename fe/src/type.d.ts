@@ -69,7 +69,7 @@ export interface IOrderDetails {
   payment_result_update_time: string
   payment_result_email_address: string
   user_id?: number
-  user: IUser
+  user?: IUser
   created_at: string
   updated_at: string
 }
@@ -131,6 +131,12 @@ export interface IOrderDetailsRdx {
   loading: boolean
   error?: { ok: boolean; errorMsg: string }
   orderItem: IOrderDetails
+}
+
+export interface IOrderListRdx {
+  loading: boolean
+  error: string
+  orders: IOrderDetails[]
 }
 
 interface IOrderedProd {

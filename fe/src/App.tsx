@@ -7,6 +7,7 @@ import {
   useRouteMatch,
   useParams,
 } from 'react-router-dom'
+import axios from 'axios'
 import Header from './components/Header'
 import HomeScreen from './screens/HomeScreen'
 import ProductScreen from './screens/ProductScreen'
@@ -14,13 +15,13 @@ import CartScreen from './screens/CartScreen'
 import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
 import ProfileScreen from './screens/ProfileScreen'
-import Footer from './components/Footer'
-import './styles/App.scss'
+import MyOrdersScreen from './screens/MyOrdersScreen'
 import ShippingScreen from './screens/ShippingScreen'
 import PaymentScreen from './screens/PaymentScreen'
 import PlaceOrderScreen from './screens/PlaceOrderScreen'
 import OrderScreen from './screens/OrderScreen'
-import axios from 'axios'
+import Footer from './components/Footer'
+import './styles/App.scss'
 import { BASE_URL } from './constants/endPoints'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 
@@ -64,6 +65,7 @@ const App = () => {
               <Route path='/signup' component={SignUpScreen} exact />
               <Route path='/login' component={LoginScreen} exact />
               <Route path='/profile' component={ProfileScreen} exact />
+              <Route path='/myorders' component={MyOrdersScreen} exact />
               <Route path='/order/:orderid' component={OrderScreen} exact />
               <Route path='/product/:id' component={ProductScreen} exact />
               <Route path='/topics' component={Topics} exact />

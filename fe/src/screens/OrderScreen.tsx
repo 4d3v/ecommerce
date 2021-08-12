@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import {
@@ -19,6 +19,7 @@ import {
   OnApproveData,
   UnknownObject,
 } from '@paypal/paypal-js/types/components/buttons'
+import Alert from '../components/Alert'
 
 interface HistoryParams {}
 
@@ -48,6 +49,10 @@ const OrderScreen = () => {
   const orderPay = useSelector(
     (state: { orderPay: IOrderPayRdx }) => state.orderPay
   ) // , { loading: loadingPaypal, success: successPaypal } = orderPay // renaming properties...
+
+  const [payerName, setPayerName] = useState<string>('')
+  const [transactionCompleted, setTransactionCompleted] =
+    useState<boolean>(false)
 
   useEffect(() => {
     if (
@@ -93,19 +98,34 @@ const OrderScreen = () => {
     actions: OnApproveActions
   ) => {
     return actions.order.capture().then(function (details) {
-      // This function shows a transaction success message to your buyer.
-      dispatch(
-        payOrder(orderDetails.orderItem.id, {
-          paymentResultId: details.id,
-          paymentResultStatus: details.status,
-          paymentResultEmailAddress: details.payer.email_address,
-          paymentResultUpdateTime: details.update_time,
-        })
-      )
+      const onApproval = () => {
+        return new Promise((resolve, reject) => {
+          dispatch(
+            payOrder(orderDetails.orderItem.id, {
+              paymentResultId: details.id,
+              paymentResultStatus: details.status,
+              paymentResultEmailAddress: details.payer.email_address,
+              paymentResultUpdateTime: details.update_time,
+            })
+          )
 
-      console.log('Transaction completed by ' + details.payer.name.given_name)
-      // if (details.status === 'COMPLETED')
-      //   history.push(`/order/${orderDetails.orderItem.id}`)
+          resolve('Transaction completed by ' + details.payer.name.given_name)
+
+          if (orderDetails && orderDetails.error) reject(orderDetails.error)
+        })
+      }
+
+      onApproval()
+        .then((data) => {
+          console.log(data)
+          setPayerName(details.payer.name.given_name)
+          setTransactionCompleted(true)
+          setTimeout(() => {
+            setTransactionCompleted(false)
+            dispatch(getOrderDetails(Number(params.orderid)))
+          }, 2000)
+        })
+        .catch((err) => console.error(err))
     })
   }
 
@@ -123,12 +143,12 @@ const OrderScreen = () => {
             <li>
               <h2>Shipping</h2>
               <div>
-                <strong>Name: {orderDetails.orderItem.user.name}</strong>
+                <strong>Name: {orderDetails.orderItem.user!.name}</strong>
               </div>
               <div>
                 <strong>
-                  <a href={`mailto:${orderDetails.orderItem.user.email}`}>
-                    Email: {orderDetails.orderItem.user.email}
+                  <a href={`mailto:${orderDetails.orderItem.user!.email}`}>
+                    Email: {orderDetails.orderItem.user!.email}
                   </a>
                 </strong>
               </div>
@@ -191,6 +211,10 @@ const OrderScreen = () => {
             )}
           </div>
         </div>
+
+        {transactionCompleted && (
+          <Alert type='success' msg={`Transaction completed by ${payerName}`} />
+        )}
       </div>
     )
   )
