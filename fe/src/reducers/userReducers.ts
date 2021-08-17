@@ -107,3 +107,58 @@ export const userUpdatePasswordReducer = (
       return state
   }
 }
+
+const userListInitialState: { users: IUser[] | null } = {
+  users: null,
+}
+export const userListReducer = (
+  state = userListInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_LIST_REQUEST:
+      return { loading: true }
+    case userActions.USER_LIST_SUCCESS:
+      return { loading: false, users: action.payload }
+    case userActions.USER_LIST_FAIL:
+      return { loading: false, error: action.payload }
+    case userActions.USER_LIST_RESET:
+      return { users: null }
+    default:
+      return state
+  }
+}
+
+export const userDeleteReducer = (state = {}, action: AnyAction) => {
+  switch (action.type) {
+    case userActions.USER_DELETE_REQUEST:
+      return { loading: true }
+    case userActions.USER_DELETE_SUCCESS:
+      return { loading: false, success: true }
+    case userActions.USER_DELETE_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+const adminUpdateUserInitState: {
+  result: { ok: boolean; message: string } | null
+} = {
+  result: null,
+}
+export const adminUserUpdateProfileReducer = (
+  state = adminUpdateUserInitState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.ADMIN_USER_UPDATE_PROFILE_REQUEST:
+      return { loading: true }
+    case userActions.ADMIN_USER_UPDATE_PROFILE_SUCCESS:
+      return { loading: false, result: action.payload }
+    case userActions.ADMIN_USER_UPDATE_PROFILE_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}

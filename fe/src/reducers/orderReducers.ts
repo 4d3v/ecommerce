@@ -98,7 +98,10 @@ export const orderPayReducer = (state = {}, action: AnyAction) => {
 const orderListUserInitSt: { orders: IOrderDetails[] } = {
   orders: [],
 }
-export const orderListUserReducer = (state = {}, action: AnyAction) => {
+export const orderListUserReducer = (
+  state = orderListUserInitSt,
+  action: AnyAction
+) => {
   switch (action.type) {
     case orderActions.ORDER_LIST_USER_REQUEST:
       return { loading: true }
@@ -106,6 +109,8 @@ export const orderListUserReducer = (state = {}, action: AnyAction) => {
       return { loading: false, orders: action.payload }
     case orderActions.ORDER_LIST_USER_FAIL:
       return { loading: false, error: action.payload }
+    case orderActions.ORDER_LIST_USER_RESET:
+      return { orders: [] }
     default:
       return state
   }

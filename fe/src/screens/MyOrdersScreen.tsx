@@ -5,10 +5,15 @@ import { listMyOrders } from '../actions/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
-import { IOrderDetails, IOrderListRdx } from '../type'
+import { UserRole } from '../enums'
+import { IOrderDetails, IOrderListRdx, IUserInfoRdx } from '../type'
 
 const MyOrdersScreen = () => {
   const dispatch = useDispatch()
+
+  const userLogin = useSelector(
+    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+  )
 
   const orderListUser = useSelector(
     (state: { orderListUser: IOrderListRdx }) => state.orderListUser
@@ -21,7 +26,11 @@ const MyOrdersScreen = () => {
   return (
     <div className='container'>
       <div className='prof--sep u-my-s'>
-        <SideNav />
+        <SideNav
+          isAdmin={
+            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+          }
+        />
 
         <div className='prof--sep--r'>
           <h1 className='u-txt-center u-my-s'>My Orders</h1>

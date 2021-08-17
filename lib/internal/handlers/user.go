@@ -128,21 +128,30 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 	if len(r.Form.Get("name")) > 0 {
 		user.Name = r.Form.Get("name")
 	}
+
 	if len(r.Form.Get("email")) > 0 {
 		user.Email = r.Form.Get("email")
 	}
-	if len(r.Form.Get("role")) > 0 {
-		switch r.Form.Get("role") {
-		case "owner":
+
+	role, err := strconv.Atoi(r.Form.Get("role"))
+	if err != nil {
+		sendError(w, "invalid role parameter", http.StatusBadRequest)
+		return
+	}
+
+	if role > 0 {
+		switch role {
+		case 1:
 			user.Role = owner
-		case "admin":
+		case 2:
 			user.Role = admin
-		case "normal":
+		case 3:
 			user.Role = normal
 		default:
 			break
 		}
 	}
+
 	if len(r.Form.Get("active")) > 0 {
 		tmp, err := strconv.ParseBool(r.Form.Get("active"))
 		if err != nil {
@@ -157,6 +166,9 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
+
+	fmt.Println(r.Form.Get("role"))
+	fmt.Println(user)
 
 	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }

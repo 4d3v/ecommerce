@@ -7,7 +7,10 @@ import {
 } from './reducers/productReducers'
 import { cartReducer } from './reducers/cartReducers'
 import {
+  adminUserUpdateProfileReducer,
+  userDeleteReducer,
   userDetailsReducer,
+  userListReducer,
   userLoginReducer,
   userLogoutReducer,
   userSignUpReducer,
@@ -42,12 +45,15 @@ const reducer = combineReducers({
     userDetails: userDetailsReducer,
     userUpdateProfile: userUpdateProfileReducer,
     userUpdatePassword: userUpdatePasswordReducer,
+    userList: userListReducer,
+    userDelete: userDeleteReducer,
     orderCreate: orderCreateReducer,
     orderedProdsCreate: orderedProdsCreateReducer,
     orderDetails: orderDetailsReducer,
     orderedProdsList: orderedProdsListReducer,
     orderpay: orderPayReducer,
     orderListUser: orderListUserReducer,
+    adminUserUpdateProfile: adminUserUpdateProfileReducer,
     cart: cartReducer,
   }),
   initialState = {

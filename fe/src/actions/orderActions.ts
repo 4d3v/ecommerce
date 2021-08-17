@@ -2,7 +2,7 @@ import axios from 'axios'
 import { BASE_URL } from '../constants/endPoints'
 import { orderActions } from '../constants/orderConstants'
 import { AppDispatch } from '../store'
-import { ICreateOrder, IOrderDetails, IPaypalPaymentResult } from '../type'
+import { ICreateOrder, IPaypalPaymentResult } from '../type'
 import { getAuthError, getFormErrors } from './actionsUtils'
 
 export const createOrder =

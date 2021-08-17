@@ -108,6 +108,18 @@ export interface IUserUpdatePasswordRdx {
   error: string
 }
 
+export interface IUserListRdx {
+  loading: boolean
+  users: IUser[]
+  error?: { ok: boolean; errorMsg: string }
+}
+
+export interface IUserDeleteRdx {
+  loading: boolean
+  success: boolean
+  error?: { ok: boolean; errorMsg: string }
+}
+
 export interface ICartItemsRdx {
   cartItems: ICart[]
   shippingAddress: IShippingAddress
@@ -169,6 +181,12 @@ export interface IPaypalPaymentResult {
   paymentResultStatus: string
   paymentResultUpdateTime: string
   paymentResultEmailAddress: string
+}
+
+export interface IAdminUserUpdateProfileRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
 }
 
 // type DispatchType = (args: ArticleAction) => ArticleAction

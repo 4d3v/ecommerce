@@ -1,10 +1,14 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { logout } from '../actions/userActions'
 import { IUserInfoRdx } from '../type'
 
+interface HistoryParams {}
+
 const Header = () => {
+  const history = useHistory<HistoryParams>()
+
   const dispatch = useDispatch()
   const userLogin = useSelector(
     (state: { userLogin: IUserInfoRdx }) => state.userLogin
@@ -13,6 +17,7 @@ const Header = () => {
 
   const logoutHandler = () => {
     dispatch(logout())
+    history.push('/')
   }
 
   return (

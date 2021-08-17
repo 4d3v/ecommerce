@@ -26,5 +26,9 @@ export const getAuthError = (
   if (error.response && error.response.data.error) {
     customError.errorMsg = error.response.data.error
     return customError
+  } else if (error.response && error.response.data.message) {
+    // TEMP Maybe ??? (that means user is not allowed)
+    customError.errorMsg = error.response.data.message
+    return customError
   }
 }

@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { BASE_URL } from '../constants/endPoints'
+import { orderActions } from '../constants/orderConstants'
 import { userActions } from '../constants/userConstants'
 import { AppDispatch } from '../store'
 import { IUser } from '../type'
-import { getFormErrors } from './actionsUtils'
+import { getAuthError, getFormErrors } from './actionsUtils'
 
 export const login =
   (email: string, password: string) => async (dispatch: AppDispatch) => {
@@ -63,6 +64,14 @@ export const logout = () => async (dispatch: AppDispatch) => {
       payload: data,
     })
 
+    dispatch({
+      type: orderActions.ORDER_LIST_USER_RESET,
+    })
+
+    dispatch({
+      type: userActions.USER_LIST_RESET,
+    })
+
     localStorage.removeItem('userInfo')
   } catch (error) {
     const customError = getFormErrors(error)
@@ -112,94 +121,84 @@ export const signup =
     }
   }
 
-export const getUser =
-  (id: number) => async (dispatch: AppDispatch, getState: any) => {
-    try {
-      dispatch({
-        type: userActions.USER_DETAILS_REQUEST,
-      })
+export const getUser = () => async (dispatch: AppDispatch, getState: any) => {
+  try {
+    dispatch({
+      type: userActions.USER_DETAILS_REQUEST,
+    })
 
-      const {
-        userLogin: { userInfo },
-      } = getState()
+    const {
+      userLogin: { userInfo },
+    } = getState()
 
-      const { data } = await axios.get(`${BASE_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
+    const { data } = await axios.get(`${BASE_URL}/user`, {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+      withCredentials: true,
+    })
+
+    dispatch({
+      type: userActions.USER_DETAILS_SUCCESS,
+      payload: data,
+    })
+  } catch (error) {
+    const customError = getFormErrors(error)
+
+    dispatch({
+      type: userActions.USER_DETAILS_FAIL,
+      payload: customError.length > 0 ? customError : error.message,
+    })
+
+    // If we get the errror probably the jwt expired
+    dispatch({
+      type: userActions.USER_LOGOUT,
+    })
+
+    localStorage.removeItem('userInfo')
+  }
+}
+
+export const updateUser = (user: IUser) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({
+      type: userActions.USER_UPDATE_PROFILE_REQUEST,
+    })
+
+    const { data } = await axios.patch(
+      `${BASE_URL}/updateme`,
+      `name=${user.name}&email=${user.email}`,
+      {
         withCredentials: true,
-      })
+      }
+    )
 
-      dispatch({
-        type: userActions.USER_DETAILS_SUCCESS,
-        payload: data,
-      })
-    } catch (error) {
-      const customError = getFormErrors(error)
+    dispatch({
+      type: userActions.USER_UPDATE_PROFILE_SUCCESS,
+      payload: data,
+    })
 
-      dispatch({
-        type: userActions.USER_DETAILS_FAIL,
-        payload: customError.length > 0 ? customError : error.message,
+    localStorage.setItem(
+      'userInfo',
+      JSON.stringify({
+        userInfo: {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+        },
       })
-
-      // If we get the errror probably the jwt expired
-      dispatch({
-        type: userActions.USER_LOGOUT,
-      })
-
-      localStorage.removeItem('userInfo')
-    }
+    )
+  } catch (error) {
+    const customError = getFormErrors(error)
+    dispatch({
+      type: userActions.USER_UPDATE_PROFILE_FAIL,
+      payload: customError.length > 0 ? customError : error.message,
+    })
   }
-
-export const updateUser =
-  (user: IUser) => async (dispatch: AppDispatch, getState: any) => {
-    try {
-      dispatch({
-        type: userActions.USER_UPDATE_PROFILE_REQUEST,
-      })
-
-      // const {
-      //   userLogin: { userInfo },
-      // } = getState()
-      // console.log(userInfo)
-
-      const { data } = await axios.patch(
-        `${BASE_URL}/updateme`,
-        `name=${user.name}&email=${user.email}`,
-        {
-          // headers: {
-          //   Authorization: `Bearer ${userInfo.token}`,
-          // },
-          withCredentials: true,
-        }
-      )
-
-      dispatch({
-        type: userActions.USER_UPDATE_PROFILE_SUCCESS,
-        payload: data,
-      })
-
-      localStorage.setItem(
-        'userInfo',
-        JSON.stringify({
-          userInfo: {
-            id: data.id,
-            name: data.name,
-            email: data.email,
-            role: data.role,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
-          },
-        })
-      )
-    } catch (error) {
-      const customError = getFormErrors(error)
-      dispatch({
-        type: userActions.USER_UPDATE_PROFILE_FAIL,
-        payload: customError.length > 0 ? customError : error.message,
-      })
-    }
-  }
+}
 
 export const updateUserPass =
   (curPassword: string, newPassword: string, newPasswordConfirm: string) =>
@@ -231,5 +230,111 @@ export const updateUserPass =
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(customError)
+    }
+  }
+
+export const listUsers = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({
+      type: userActions.USER_LIST_REQUEST,
+    })
+
+    const { data } = await axios.get(`${BASE_URL}/users`, {
+      withCredentials: true,
+    })
+
+    dispatch({
+      type: userActions.USER_LIST_SUCCESS,
+      payload: data,
+    })
+  } catch (error) {
+    // TEMP maybe change getAuthError name or make another function in that case
+    const customError = getAuthError(error)
+    dispatch({
+      type: userActions.USER_LIST_FAIL,
+      payload: customError ? customError : error.message,
+    })
+
+    console.log(customError)
+  }
+}
+
+export const deleteUser = (userId: number) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({
+      type: userActions.USER_DELETE_REQUEST,
+    })
+
+    await axios.delete(`${BASE_URL}/users/${userId}`, {
+      withCredentials: true,
+    })
+
+    dispatch({
+      type: userActions.USER_DELETE_SUCCESS,
+    })
+  } catch (error) {
+    // TEMP maybe change getAuthError name or make another function in that case
+    const customError = getAuthError(error)
+    dispatch({
+      type: userActions.USER_DELETE_FAIL,
+      payload: customError ? customError : error.message,
+    })
+
+    console.log(customError)
+  }
+}
+
+export const getUserById =
+  (userId: number) => async (dispatch: AppDispatch, getState: any) => {
+    try {
+      dispatch({
+        type: userActions.USER_DETAILS_REQUEST,
+      })
+
+      const { data } = await axios.get(`${BASE_URL}/me/${userId}`, {
+        withCredentials: true,
+      })
+
+      dispatch({
+        type: userActions.USER_DETAILS_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+
+      dispatch({
+        type: userActions.USER_DETAILS_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+
+      localStorage.removeItem('userInfo')
+    }
+  }
+
+export const adminUpdateUser =
+  (user: IUser) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: userActions.ADMIN_USER_UPDATE_PROFILE_REQUEST,
+      })
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/users/${user.id}`,
+        `name=${user.name}&email=${user.email}&role=${user.role}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: userActions.ADMIN_USER_UPDATE_PROFILE_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: userActions.ADMIN_USER_UPDATE_PROFILE_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
     }
   }

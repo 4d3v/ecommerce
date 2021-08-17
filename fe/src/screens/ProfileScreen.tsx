@@ -11,6 +11,7 @@ import {
 } from '../type'
 import { userActions } from '../constants/userConstants'
 import SideNav from '../components/SideNav'
+import { UserRole } from '../enums'
 
 interface HistoryParams {}
 
@@ -48,7 +49,7 @@ const ProfileScreen = () => {
       history.push('/login')
     } else if (!userInfo || !userInfo.name || userUpdateProfile.success) {
       dispatch({ type: userActions.USER_UPDATE_PROFILE_RESET })
-      dispatch(getUser(userLogin.userInfo.id))
+      dispatch(getUser())
     } else {
       setName(userInfo.name)
       setEmail(userInfo.email)
@@ -100,7 +101,11 @@ const ProfileScreen = () => {
       {loading && <Loader />}
 
       <div className='prof--sep u-my-s'>
-        <SideNav />
+        <SideNav
+          isAdmin={
+            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+          }
+        />
 
         <div className='prof--sep--r'>
           <h1 className='u-txt-center u-my-s'>My Profile</h1>

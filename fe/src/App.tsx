@@ -24,6 +24,8 @@ import Footer from './components/Footer'
 import './styles/App.scss'
 import { BASE_URL } from './constants/endPoints'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
+import UserListScreen from './screens/UserListScreen'
+import UserEditScreen from './screens/UserEditScreen'
 
 declare global {
   interface Window {
@@ -70,6 +72,12 @@ const App = () => {
               <Route path='/product/:id' component={ProductScreen} exact />
               <Route path='/topics' component={Topics} exact />
               <Route path='/cart/:id?' component={CartScreen} exact />
+              <Route path='/admin/users' component={UserListScreen} exact />
+              <Route
+                path='/admin/user/:userid'
+                component={UserEditScreen}
+                exact
+              />
               <Route path='/' component={HomeScreen} exact />
             </Switch>
           </main>
