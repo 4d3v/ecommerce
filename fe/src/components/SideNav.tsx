@@ -18,7 +18,10 @@ const SideNav = ({ isAdmin }: IProps) => {
       ))}
 
       {isAdmin &&
-        [['Admin Users', '/admin/users']].map((el, idx) => (
+        [
+          ['Admin Users', '/admin/users'],
+          ['Admin Products', '/admin/products'],
+        ].map((el, idx) => (
           <li key={idx} className='side__nav--li'>
             <Link to={el[1]}>{el[0]}</Link>
           </li>

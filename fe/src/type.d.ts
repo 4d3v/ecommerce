@@ -6,6 +6,7 @@ export interface IUser {
   created_at?: Date
   updated_at?: Date
   token?: string
+  active?: boolean
 }
 
 export interface IProduct {

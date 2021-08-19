@@ -26,6 +26,7 @@ import { BASE_URL } from './constants/endPoints'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
+import ProductListScreen from './screens/ProductListScreen'
 
 declare global {
   interface Window {
@@ -73,6 +74,11 @@ const App = () => {
               <Route path='/topics' component={Topics} exact />
               <Route path='/cart/:id?' component={CartScreen} exact />
               <Route path='/admin/users' component={UserListScreen} exact />
+              <Route
+                path='/admin/products'
+                component={ProductListScreen}
+                exact
+              />
               <Route
                 path='/admin/user/:userid'
                 component={UserEditScreen}

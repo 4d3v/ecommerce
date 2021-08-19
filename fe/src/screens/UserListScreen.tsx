@@ -83,11 +83,14 @@ const UserListScreen = () => {
                           : 'No'}
                       </td>
                       <td>
-                        <Link to={`/admin/user/${user.id}`} className='u-mx-ss'>
+                        <Link
+                          to={`/admin/user/${user.id}`}
+                          className='u-mx-ss u-mk-cursor-ptr'
+                        >
                           <i className='fas fa-edit'></i>
                         </Link>
                         <button
-                          className='u-mx-ss'
+                          className='u-mx-ss u-mk-cursor-ptr'
                           onClick={() => deleteUserHandler(user.id)}
                         >
                           <i className='fas fa-trash'></i>

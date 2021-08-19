@@ -23,6 +23,7 @@ const UserEditScreen = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState(0)
+  const [active, setActive] = useState(true)
   const [userProfileUpdated, setUserProfileUpdated] = useState(false)
 
   const dispatch = useDispatch()
@@ -56,6 +57,7 @@ const UserEditScreen = () => {
       setName(userDetails.userInfo.name)
       setEmail(userDetails.userInfo.email)
       setRole(userDetails.userInfo.role!)
+      setActive(userDetails.userInfo.active!)
     }
   }, [
     dispatch,
@@ -75,6 +77,7 @@ const UserEditScreen = () => {
         name: name,
         email: email,
         role: role,
+        active: active,
       })
     )
 
@@ -162,6 +165,20 @@ const UserEditScreen = () => {
                     checked={role === UserRole.NORMAL}
                   />
                   <label htmlFor='roleNormal'>Normal</label>
+
+                  <div>
+                    <label htmlFor='isactive'>Is Active</label>
+                    <input
+                      type='checkbox'
+                      name='isactive'
+                      checked={active}
+                      onChange={(e) => {
+                        console.log(e.target.checked)
+                        setActive(!active)
+                      }}
+                      className='form__checkbox'
+                    />
+                  </div>
 
                   <button type='submit'>Update user details</button>
                 </form>

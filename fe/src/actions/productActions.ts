@@ -42,3 +42,31 @@ export const listProductDetails =
       })
     }
   }
+
+export const deleteProduct =
+  (productId: number) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: productActions.PRODUCT_DELETE_REQUEST,
+      })
+
+      const { data } = await axios.delete(
+        `${BASE_URL}/admproducts/${productId}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: productActions.PRODUCT_DELETE_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.PRODUCT_DELETE_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }

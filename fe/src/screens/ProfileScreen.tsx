@@ -47,14 +47,21 @@ const ProfileScreen = () => {
   useEffect(() => {
     if (!userLogin.userInfo) {
       history.push('/login')
-    } else if (!userInfo || !userInfo.name || userUpdateProfile.success) {
+    } else if (
+      !userDetails.userInfo ||
+      !userDetails.userInfo.name ||
+      userUpdateProfile.success ||
+      (userLogin.userInfo &&
+        userDetails.userInfo &&
+        userDetails.userInfo.id !== userLogin.userInfo.id)
+    ) {
       dispatch({ type: userActions.USER_UPDATE_PROFILE_RESET })
       dispatch(getUser())
     } else {
-      setName(userInfo.name)
-      setEmail(userInfo.email)
+      setName(userDetails.userInfo.name)
+      setEmail(userDetails.userInfo.email)
     }
-  }, [dispatch, history, userInfo, userLogin, userUpdateProfile.success])
+  }, [dispatch, history, userDetails, userLogin, userUpdateProfile.success])
 
   const updateUserDetails = (
     e: React.MouseEvent<HTMLFormElement, MouseEvent>
