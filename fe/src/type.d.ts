@@ -26,6 +26,27 @@ export interface IProduct {
   updated_at: Date
 }
 
+export interface ICreateProduct {
+  name: string
+  brand: string
+  category: string
+  description: string
+  price: number
+  count_in_stock: number
+  image?: string
+}
+
+export interface IUpdateProduct {
+  id: number
+  name: string
+  brand: string
+  category: string
+  description: string
+  price: number
+  count_in_stock: number
+  image?: string
+}
+
 export interface ICart {
   productId: number
   name: string
@@ -185,6 +206,18 @@ export interface IPaypalPaymentResult {
 }
 
 export interface IAdminUserUpdateProfileRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
+}
+
+export interface IAdminProductCreateRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
+}
+
+export interface IAdminProductUpdateRdx {
   loading: boolean
   result: { ok: boolean; message: string }
   error: string

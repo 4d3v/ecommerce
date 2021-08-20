@@ -60,7 +60,7 @@ const ProductListScreen = () => {
         <div className='prof--sep--r'>
           <h1 className='u-txt-center u-my-s'>Users</h1>
 
-          <Link to='#' className='btn u-txt-center'>
+          <Link to='/admin/product/create' className='btn u-txt-center'>
             Create Product
           </Link>
 

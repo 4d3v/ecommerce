@@ -27,6 +27,8 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
+import ProductCreateScreen from './screens/ProductCreateScreen'
+import ProductEditScreen from './screens/ProductEditScreen'
 
 declare global {
   interface Window {
@@ -77,6 +79,16 @@ const App = () => {
               <Route
                 path='/admin/products'
                 component={ProductListScreen}
+                exact
+              />
+              <Route
+                path='/admin/product/create'
+                component={ProductCreateScreen}
+                exact
+              />
+              <Route
+                path='/admin/product/:productid'
+                component={ProductEditScreen}
                 exact
               />
               <Route

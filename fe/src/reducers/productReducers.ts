@@ -9,7 +9,7 @@ const prodListInitialState: { products: IProduct[] } = {
   prodDetailsInitialState: { product: IProduct | {} } = {
     product: {},
   },
-  prodDeleteInitialState: { ok: boolean; msg: string } | null = null
+  prodCreateUpdateDeleteInitialState: { ok: boolean; msg: string } | null = null
 
 export const productListReducer = (
   state = prodListInitialState,
@@ -38,13 +38,51 @@ export const productDetailsReducer = (
       return { loading: false, product: action.payload }
     case productActions.PRODUCT_DETAILS_FAIL:
       return { loading: false, error: action.payload }
+    case productActions.PRODUCT_DETAILS_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const adminProductCreateReducer = (
+  state = prodCreateUpdateDeleteInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.PRODUCT_CREATE_REQUEST:
+      return { loading: true }
+    case productActions.PRODUCT_CREATE_SUCCESS:
+      return { loading: false, result: action.payload }
+    case productActions.PRODUCT_CREATE_FAIL:
+      return { loading: false, error: action.payload }
+    case productActions.PRODUCT_CREATE_RESET:
+      return null
+    default:
+      return state
+  }
+}
+
+export const adminProductUpdateReducer = (
+  state = prodCreateUpdateDeleteInitialState,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.PRODUCT_UPDATE_REQUEST:
+      return { loading: true }
+    case productActions.PRODUCT_UPDATE_SUCCESS:
+      return { loading: false, result: action.payload }
+    case productActions.PRODUCT_UPDATE_FAIL:
+      return { loading: false, error: action.payload }
+    case productActions.PRODUCT_UPDATE_RESET:
+      return null
     default:
       return state
   }
 }
 
 export const adminProductDeleteReducer = (
-  state = prodDeleteInitialState,
+  state = prodCreateUpdateDeleteInitialState,
   action: AnyAction
 ) => {
   switch (action.type) {

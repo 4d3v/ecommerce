@@ -108,7 +108,7 @@ const UserEditScreen = () => {
           ) : userDetails.error ? (
             <Message error={userDetails.error} />
           ) : userLogin.error ? (
-            <Message error={userDetails.error} />
+            <Message error={userLogin.error} />
           ) : (
             userDetails.userInfo && (
               <>
