@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/4d3v/ecommerce/internal/forms"
 	"github.com/4d3v/ecommerce/internal/helpers"
@@ -209,13 +212,89 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 
-// func removeElement(prods []models.Product, id int) ([]models.Product, error) {
-// 	for i, prop := range tempDb {
-// 		if prop.Id == id {
-// 			prods[i] = prods[len(prods)-1]
-// 			return prods[:len(prods)-1], nil
-// 		}
-// 	}
+func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PATCH" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-// 	return nil, fmt.Errorf("did not find item with id %d", id)
-// }
+	r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
+	if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
+		http.Error(w, "Please choose an file that's less than 1MB", http.StatusBadRequest)
+		return
+	}
+
+	// The argument to FormFile must match the name attribute
+	// of the file input on the frontend
+	file, fileHeader, err := r.FormFile("image")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	buff := make([]byte, 512)
+	_, err = file.Read(buff)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	filetype := http.DetectContentType(buff)
+	if filetype != "image/jpeg" && filetype != "image/png" {
+		http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG image", http.StatusBadRequest)
+		return
+	}
+
+	_, err = file.Seek(0, io.SeekStart)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create the uploads folder if it doesn't already exist
+	err = os.MkdirAll("./../fe/public/images", os.ModePerm)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	// Create a new file in the uploads directory
+	// dst, err := os.Create(fmt.Sprintf("./uploads/%d%s", time.Now().UnixNano(), filepath.Ext(fileHeader.Filename)))
+	timeNow := time.Now().UnixNano()
+	dst, err := os.Create(fmt.Sprintf("./../fe/public/images/%d-%s", timeNow, fileHeader.Filename))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	// Copy the uploaded file to the filesystem at the specified destination
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	productId, err := strconv.Atoi(chi.URLParam(r, "productid"))
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	prod, err := repo.DB.GetProductById(productId)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	prod.Image = fmt.Sprintf("%d-%s", timeNow, fileHeader.Filename)
+
+	err = repo.DB.UpdateProductById(prod)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("msgjson", w, &options{ok: true, msg: "Image uploaded with success", stCode: http.StatusOK})
+}

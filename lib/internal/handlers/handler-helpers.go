@@ -24,7 +24,8 @@ const (
 )
 
 const (
-	timeFormatStr = "2006-01-02 15:04:05"
+	timeFormatStr   = "2006-01-02 15:04:05"
+	MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
 )
 
 type userJson struct {

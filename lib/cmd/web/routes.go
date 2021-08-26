@@ -43,6 +43,7 @@ func routes() http.Handler {
 	mux.Route("/products", func(mux chi.Router) {
 		mux.Get("/", handlers.Repo.GetProducts)
 		mux.Get("/{id}", handlers.Repo.GetProductById)
+		mux.Patch("/uploadimage/{productid}", handlers.Repo.UploadProductImg)
 	})
 
 	mux.Route("/admproducts", func(mux chi.Router) {

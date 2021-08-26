@@ -21,7 +21,6 @@ const ProductCreateScreen = () => {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState(1)
   const [countInStock, setCountInStock] = useState(1)
-  //   const [image, setImage] = useState()
   const [productCreated, setProductCreated] = useState(false)
 
   const userLogin = useSelector(
@@ -48,6 +47,7 @@ const ProductCreateScreen = () => {
 
     const product: ICreateProduct = {
       name: name,
+      image: 'default-thumb.png',
       brand: brand,
       category: category,
       description: description,
@@ -151,10 +151,6 @@ const ProductCreateScreen = () => {
               onChange={(e) => setCountInStock(Number(e.target.value))}
               required
             />
-
-            <label htmlFor='image'>
-              TODO: need to implement image upload (input type file)
-            </label>
 
             <button type='submit'>Create Product</button>
           </form>
