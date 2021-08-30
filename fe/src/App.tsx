@@ -29,6 +29,7 @@ import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import ProductCreateScreen from './screens/ProductCreateScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
+import OrderListScreen from './screens/OrderListScreen'
 
 declare global {
   interface Window {
@@ -81,6 +82,7 @@ const App = () => {
                 component={ProductListScreen}
                 exact
               />
+              <Route path='/admin/orders' component={OrderListScreen} exact />
               <Route
                 path='/admin/product/create'
                 component={ProductCreateScreen}

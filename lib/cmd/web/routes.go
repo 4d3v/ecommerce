@@ -79,9 +79,15 @@ func routes() http.Handler {
 
 	mux.Route("/adminorders", func(mux chi.Router) {
 		mux.Use(Auth)
-		mux.Get("/", handlers.Repo.AdminGetOpenedOrders)
+		mux.Get("/", handlers.Repo.AdminGetOrders)
+		mux.Get("/{orderid}", handlers.Repo.AdminGetOrderById)
 		mux.Patch("/paid/{id}", handlers.Repo.AdminUpdateOrderToPaid)
 		mux.Patch("/delivered/{id}", handlers.Repo.AdminUpdateIsDelivered)
+	})
+
+	mux.Route("/adminorderedprods", func(mux chi.Router) {
+		mux.Use(Auth)
+		mux.Get("/{orderid}", handlers.Repo.AdminGetOrderedProds)
 	})
 
 	return mux

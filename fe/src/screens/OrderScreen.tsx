@@ -2,13 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import {
+  adminGetOrderDetails,
+  adminGetOrderedProds,
   getOrderDetails,
   getOrderedProds,
   payOrder,
 } from '../actions/orderActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { IOrderDetailsRdx, IOrderedProdsRdx, IOrderPayRdx } from '../type'
+import {
+  IOrderDetailsRdx,
+  IOrderedProdsRdx,
+  IOrderPayRdx,
+  IUserInfoRdx,
+} from '../type'
 import OrderSummary from '../components/OrderSummary'
 import OrderItemsInfo from '../components/OrderItemsInfo'
 import { orderActions } from '../constants/orderConstants'
@@ -20,6 +27,7 @@ import {
   UnknownObject,
 } from '@paypal/paypal-js/types/components/buttons'
 import Alert from '../components/Alert'
+import { UserRole } from '../enums'
 
 interface HistoryParams {}
 
@@ -50,6 +58,10 @@ const OrderScreen = () => {
     (state: { orderPay: IOrderPayRdx }) => state.orderPay
   ) // , { loading: loadingPaypal, success: successPaypal } = orderPay // renaming properties...
 
+  const userLogin = useSelector(
+    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+  )
+
   const [payerName, setPayerName] = useState<string>('')
   const [transactionCompleted, setTransactionCompleted] =
     useState<boolean>(false)
@@ -73,8 +85,13 @@ const OrderScreen = () => {
       (orderPay && orderPay.success)
     ) {
       dispatch({ type: orderActions.ORDER_PAY_RESET })
-      dispatch(getOrderDetails(Number(params.orderid)))
-      dispatch(getOrderedProds(Number(params.orderid)))
+      if (userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL) {
+        dispatch(adminGetOrderDetails(Number(params.orderid)))
+        dispatch(adminGetOrderedProds(Number(params.orderid)))
+      } else {
+        dispatch(getOrderDetails(Number(params.orderid)))
+        dispatch(getOrderedProds(Number(params.orderid)))
+      }
     }
   }, [dispatch, history, params.orderid, orderDetails, orderPay])
 

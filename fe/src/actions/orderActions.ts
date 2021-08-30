@@ -163,7 +163,7 @@ export const listMyOrders = () => async (dispatch: AppDispatch) => {
       type: orderActions.ORDER_LIST_USER_REQUEST,
     })
 
-    const { data } = await axios.get(`${BASE_URL}/orders/`, {
+    const { data } = await axios.get(`${BASE_URL}/orders`, {
       withCredentials: true,
     })
 
@@ -180,3 +180,81 @@ export const listMyOrders = () => async (dispatch: AppDispatch) => {
     console.log(error.response)
   }
 }
+
+export const adminListOrders = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({
+      type: orderActions.ORDER_LIST_REQUEST,
+    })
+
+    const { data } = await axios.get(`${BASE_URL}/adminorders`, {
+      withCredentials: true,
+    })
+
+    dispatch({
+      type: orderActions.ORDER_LIST_SUCCESS,
+      payload: data,
+    })
+  } catch (error) {
+    const customError = getFormErrors(error)
+    dispatch({
+      type: orderActions.ORDER_LIST_FAIL,
+      payload: customError.length > 0 ? customError : error.message,
+    })
+    console.log(error.response)
+  }
+}
+
+export const adminGetOrderDetails =
+  (orderId: number) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: orderActions.ORDER_DETAILS_REQUEST,
+      })
+
+      const { data } = await axios.get(`${BASE_URL}/adminorders/${orderId}`, {
+        withCredentials: true,
+      })
+
+      dispatch({
+        type: orderActions.ORDER_DETAILS_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getAuthError(error)
+      dispatch({
+        type: orderActions.ORDER_DETAILS_FAIL,
+        payload: customError ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
+export const adminGetOrderedProds =
+  (orderId: number) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: orderActions.ORDERED_PRODS_LIST_REQUEST,
+      })
+
+      const { data } = await axios.get(
+        `${BASE_URL}/adminorderedprods/${orderId}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: orderActions.ORDERED_PRODS_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+
+      dispatch({
+        type: orderActions.ORDERED_PRODS_LIST_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }

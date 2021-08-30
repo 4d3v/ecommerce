@@ -26,7 +26,8 @@ type DatabaseRepo interface {
 	ResetPassword(id int, password string) error
 	ActivateDisableUser(id int, active bool) error
 
-	AdminGetOpenedOrders() ([]models.Order, error)
+	AdminGetOrders() ([]models.Order, error)
+	AdminGetOrderById(orderId int) (models.Order, error)
 	AdminUpdateOrderToPaid(id int) error
 	AdminUpdateIsDelivered(id int) error
 
@@ -36,6 +37,8 @@ type DatabaseRepo interface {
 	UpdateOrder(order models.Order) error
 	SetOrderToPaid(order models.Order) error
 	DeleteOrder(id int) error
+
+	AdminGetOrderedProds(orderId int) ([]models.CustomOrderedProd, error)
 
 	InsertOrderedProd(orderedProd models.OrderedProd) error
 	GetOrderedProds(userId int, orderId int) ([]models.CustomOrderedProd, error)

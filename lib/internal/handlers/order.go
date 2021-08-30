@@ -13,14 +13,14 @@ import (
 )
 
 // AdminGetOpenedOrders gets all the opened orders should be used only by owners and admins
-func (repo *Repository) AdminGetOpenedOrders(w http.ResponseWriter, r *http.Request) {
+func (repo *Repository) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
 	user, _ := repo.getUserByJwt(r)
 
 	if userOk := checkUserRestriction(w, user); !userOk {
 		return
 	}
 
-	orders, err := repo.DB.AdminGetOpenedOrders()
+	orders, err := repo.DB.AdminGetOrders()
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
@@ -31,6 +31,45 @@ func (repo *Repository) AdminGetOpenedOrders(w http.ResponseWriter, r *http.Requ
 		ok:     true,
 		msg:    "Success",
 		orders: orders,
+		stCode: http.StatusOK,
+	})
+}
+
+// AdminGetOrderById retrieves the order by id
+func (repo *Repository) AdminGetOrderById(w http.ResponseWriter, r *http.Request) {
+	userAdmin, _ := repo.getUserByJwt(r)
+
+	if userOk := checkUserRestriction(w, userAdmin); !userOk {
+		return
+	}
+
+	orderId, err := strconv.Atoi(chi.URLParam(r, "orderid"))
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	order, err := repo.DB.AdminGetOrderById(orderId)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	user, err := repo.DB.GetUserById(order.UserId)
+	if err != nil {
+		fmt.Println(err)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+
+	}
+
+	order.User = user
+
+	sendJson("orderjson", w, &options{
+		ok:     true,
+		order:  order,
 		stCode: http.StatusOK,
 	})
 }

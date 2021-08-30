@@ -223,4 +223,10 @@ export interface IAdminProductUpdateRdx {
   error: string
 }
 
+export interface IAdminOrderListRdx {
+  loading: boolean
+  error: string
+  orders: IOrderDetails[]
+}
+
 // type DispatchType = (args: ArticleAction) => ArticleAction

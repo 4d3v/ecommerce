@@ -8,7 +8,7 @@ import (
 	"github.com/4d3v/ecommerce/internal/models"
 )
 
-func (dbrepo *postgresDbRepo) AdminGetOpenedOrders() ([]models.Order, error) {
+func (dbrepo *postgresDbRepo) AdminGetOrders() ([]models.Order, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -17,10 +17,15 @@ func (dbrepo *postgresDbRepo) AdminGetOpenedOrders() ([]models.Order, error) {
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_status, total_price, is_paid, is_delivered, 
-		user_id FROM orders WHERE is_delivered = $1
+		user_id FROM orders 
 	` // ORDER BY id ASC
 
-	rows, err := dbrepo.DB.QueryContext(ctx, query, false)
+	// JOIN products AS p ON p.id = op.product_id
+	// 	JOIN users AS u ON u.id = op.user_id
+	// 	JOIN orders AS o ON o.id = op.order_id
+	// 	WHERE op.user_id = $1 AND op.order_id = $2
+
+	rows, err := dbrepo.DB.QueryContext(ctx, query)
 	if err != nil {
 		return orders, err
 	}
@@ -103,6 +108,48 @@ func (dbrepo *postgresDbRepo) AdminUpdateIsDelivered(id int) error {
 	}
 
 	return nil
+}
+
+func (dbrepo *postgresDbRepo) AdminGetOrderById(orderId int) (models.Order, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT id, postal_code, address, country, city, payment_method,
+		payment_result_id, payment_result_status, payment_result_update_time,
+		payment_result_email_address, total_price, is_paid, paid_at,
+		is_delivered, delivered_at, user_id, created_at, updated_at
+		FROM orders WHERE id = $1
+	` // ORDER BY id ASC
+
+	var order models.Order
+	row := dbrepo.DB.QueryRowContext(ctx, query, orderId)
+	err := row.Scan(
+		&order.Id,
+		&order.PostalCode,
+		&order.Address,
+		&order.Country,
+		&order.City,
+		&order.PaymentMethod,
+		&order.PaymentResultId,
+		&order.PaymentResultStatus,
+		&order.PaymentResultUpdateTime,
+		&order.PaymentResultEmailAddress,
+		&order.TotalPrice,
+		&order.IsPaid,
+		&order.PaidAt,
+		&order.IsDelivered,
+		&order.DeliveredAt,
+		&order.UserId,
+		&order.CreatedAt,
+		&order.UpdatedAt,
+	)
+
+	if err != nil {
+		return order, err
+	}
+
+	return order, nil
 }
 
 func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
