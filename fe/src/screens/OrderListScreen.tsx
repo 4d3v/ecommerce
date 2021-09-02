@@ -2,18 +2,15 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { adminListOrders } from '../actions/orderActions'
-import { deleteUser, listUsers } from '../actions/userActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
 import {
-  IAdminOrderListRdx,
   IOrderDetails,
   IOrderListRdx,
-  IUser,
-  IUserDeleteRdx,
   IUserInfoRdx,
+  IUserLoginRdx,
 } from '../type'
 
 interface HistoryParams {}
@@ -27,12 +24,13 @@ const OrderListScreen = () => {
   )
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   useEffect(() => {
     if (
-      (userLogin.userInfo && userLogin.userInfo.role === UserRole.NORMAL) ||
+      (userLogin.userInfo &&
+        userLogin.userInfo.user.role === UserRole.NORMAL) ||
       !userLogin.userInfo
     )
       history.push('/')
@@ -44,7 +42,8 @@ const OrderListScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

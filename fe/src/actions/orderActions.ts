@@ -157,6 +157,33 @@ export const payOrder =
     }
   }
 
+export const adminSetOrderAsDelivered =
+  (orderId: number) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: orderActions.ORDER_DELIVER_REQUEST,
+      })
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/adminorders/delivered/${orderId}`,
+        {},
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: orderActions.ORDER_DELIVER_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: orderActions.ORDER_DELIVER_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
 export const listMyOrders = () => async (dispatch: AppDispatch) => {
   try {
     dispatch({

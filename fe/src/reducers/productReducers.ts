@@ -2,22 +2,13 @@ import { AnyAction } from 'redux'
 import { productActions } from '../constants/productConstants'
 import { IProduct } from '../type'
 
-const products: IProduct[] = []
-const prodListInitialState: { products: IProduct[] } = {
-    products,
-  },
-  prodDetailsInitialState: { product: IProduct | {} } = {
-    product: {},
-  },
-  prodCreateUpdateDeleteInitialState: { ok: boolean; msg: string } | null = null
-
 export const productListReducer = (
-  state = prodListInitialState,
+  state: { products: IProduct[] } = { products: [] },
   action: AnyAction
 ) => {
   switch (action.type) {
     case productActions.PRODUCT_LIST_REQUEST:
-      return { loading: true, products }
+      return { loading: true, products: [] }
     case productActions.PRODUCT_LIST_SUCCESS:
       return { loading: false, products: action.payload }
     case productActions.PRODUCT_LIST_FAIL:
@@ -28,7 +19,7 @@ export const productListReducer = (
 }
 
 export const productDetailsReducer = (
-  state = prodDetailsInitialState,
+  state: { product: IProduct } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -46,7 +37,7 @@ export const productDetailsReducer = (
 }
 
 export const adminProductCreateReducer = (
-  state = prodCreateUpdateDeleteInitialState,
+  state: { ok: boolean; message: string } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -64,7 +55,7 @@ export const adminProductCreateReducer = (
 }
 
 export const adminProductUpdateReducer = (
-  state = prodCreateUpdateDeleteInitialState,
+  state: { ok: boolean; message: string } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -82,7 +73,7 @@ export const adminProductUpdateReducer = (
 }
 
 export const adminProductDeleteReducer = (
-  state = prodCreateUpdateDeleteInitialState,
+  state: { ok: boolean; message: string } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {

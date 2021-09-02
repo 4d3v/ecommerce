@@ -111,6 +111,18 @@ export interface IProductDetailsRdx {
   error: string
 }
 
+export interface IUserLoginRdx {
+  loading: boolean
+  userInfo: { ok: boolean; message: string; user: IUser }
+  error: string
+}
+
+export interface IUserSignUpRdx {
+  loading: boolean
+  result: { ok: boolean; message: string; user: IUser }
+  error: string
+}
+
 export interface IUserInfoRdx {
   loading: boolean
   userInfo: IUser
@@ -120,13 +132,14 @@ export interface IUserInfoRdx {
 export interface IUserUpdateProfileRdx {
   loading: boolean
   success: boolean
-  userInfo: IUser
+  result: { ok: boolean; message: string; user: IUser }
   error: string
 }
 
 export interface IUserUpdatePasswordRdx {
   loading: boolean
   success: boolean
+  result: { ok: boolean; message: string; user: IUser }
   error: string
 }
 
@@ -139,6 +152,7 @@ export interface IUserListRdx {
 export interface IUserDeleteRdx {
   loading: boolean
   success: boolean
+  result: { ok: boolean; message: string }
   error?: { ok: boolean; errorMsg: string }
 }
 
@@ -227,6 +241,12 @@ export interface IAdminOrderListRdx {
   loading: boolean
   error: string
   orders: IOrderDetails[]
+}
+
+export interface IAdminOrderDeliverRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
 }
 
 // type DispatchType = (args: ArticleAction) => ArticleAction

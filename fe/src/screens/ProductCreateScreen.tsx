@@ -7,7 +7,12 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import { IAdminProductCreateRdx, ICreateProduct, IUserInfoRdx } from '../type'
+import {
+  IAdminProductCreateRdx,
+  ICreateProduct,
+  IUserInfoRdx,
+  IUserLoginRdx,
+} from '../type'
 
 interface HistoryParams {}
 
@@ -24,7 +29,7 @@ const ProductCreateScreen = () => {
   const [productCreated, setProductCreated] = useState(false)
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   const adminProductCreate = useSelector(
@@ -34,7 +39,8 @@ const ProductCreateScreen = () => {
 
   useEffect(() => {
     if (
-      (userLogin.userInfo && userLogin.userInfo.role === UserRole.NORMAL) ||
+      (userLogin.userInfo &&
+        userLogin.userInfo.user.role === UserRole.NORMAL) ||
       !userLogin.userInfo
     )
       history.push('/')
@@ -69,7 +75,8 @@ const ProductCreateScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

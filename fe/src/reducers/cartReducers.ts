@@ -1,19 +1,16 @@
 import { AnyAction } from 'redux'
 import { cartActions } from '../constants/cartConstants'
-import { ICart, IShippingAddress } from '../type'
+import { ICart, IShippingAddress, IPaymentMethod } from '../type'
 
-const cart: ICart[] = []
-const shippingAddress: IShippingAddress = {
-  address: '',
-  city: '',
-  postal_code: '',
-  country: '',
+const initialState: {
+  cartItems: ICart[]
+  shippingAddress: IShippingAddress
+  paymentMethod: IPaymentMethod
+} = {
+  cartItems: [],
+  shippingAddress: { address: '', city: '', postal_code: '', country: '' },
+  paymentMethod: '',
 }
-const initialState: { cartItems: ICart[]; shippingAddress: IShippingAddress } =
-  {
-    cartItems: cart,
-    shippingAddress: shippingAddress,
-  }
 
 export const cartReducer = (state = initialState, action: AnyAction) => {
   switch (action.type) {

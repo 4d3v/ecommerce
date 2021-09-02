@@ -4,7 +4,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { signup } from '../actions/userActions'
-import { IUserInfoRdx } from '../type'
+import { IUserSignUpRdx } from '../type'
 
 interface LocationParams {
   search: string
@@ -23,22 +23,16 @@ const SignUpScreen = () => {
 
   const dispatch = useDispatch()
   const userSignUp = useSelector(
-    (state: { userSignUp: IUserInfoRdx }) => state.userSignUp
+    (state: { userSignUp: IUserSignUpRdx }) => state.userSignUp
   )
-  const { loading, userInfo, error } = userSignUp
-
-  const userDetails = useSelector(
-    (state: { userDetails: IUserInfoRdx }) => state.userDetails
-  )
-  console.log(userDetails)
 
   const redirect = location.search ? location.search.split('=')[1] : '/'
 
   useEffect(() => {
-    if (userInfo) {
+    if (userSignUp && userSignUp.result && userSignUp.result.ok) {
       history.push(redirect)
     }
-  }, [history, userInfo, redirect])
+  }, [history, userSignUp.result, redirect])
 
   const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
     e.preventDefault()
@@ -48,12 +42,12 @@ const SignUpScreen = () => {
   return (
     <div className='container'>
       <h1 className='u-txt-center u-py-ss'>Sign Up</h1>
-      {error && (
+      {userSignUp.error && (
         <div className='u-txt-center u-py-ss'>
-          <Message error={error} />
+          <Message error={userSignUp.error} />
         </div>
       )}
-      {loading && <Loader />}
+      {userSignUp.loading && <Loader />}
       <form className='form' onSubmit={submitHandler}>
         <label htmlFor='name'>Name</label>
         <input

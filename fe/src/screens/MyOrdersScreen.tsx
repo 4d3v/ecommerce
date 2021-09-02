@@ -6,13 +6,18 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import { IOrderDetails, IOrderListRdx, IUserInfoRdx } from '../type'
+import {
+  IOrderDetails,
+  IOrderListRdx,
+  IUserInfoRdx,
+  IUserLoginRdx,
+} from '../type'
 
 const MyOrdersScreen = () => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   const orderListUser = useSelector(
@@ -28,7 +33,8 @@ const MyOrdersScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

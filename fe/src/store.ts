@@ -21,6 +21,7 @@ import {
   userUpdateProfileReducer,
 } from './reducers/userReducers'
 import {
+  adminOrderDeliverReducer,
   adminOrderListReducer,
   orderCreateReducer,
   orderDetailsReducer,
@@ -36,6 +37,10 @@ const cartItemsJson = localStorage.getItem('cartItems'),
 const shippingAddressJson = localStorage.getItem('shippingAddress'),
   shippingAddressFromStorage =
     shippingAddressJson !== null ? JSON.parse(shippingAddressJson) : {}
+
+const paymentMethodJson = localStorage.getItem('paymentMethod'),
+  paymentMethodFromStorage =
+    paymentMethodJson !== null ? JSON.parse(paymentMethodJson) : ''
 
 const userInfoJson = localStorage.getItem('userInfo'),
   userInfoFromStorage = userInfoJson !== null ? JSON.parse(userInfoJson) : {}
@@ -62,14 +67,15 @@ const reducer = combineReducers({
     adminProductUpdate: adminProductUpdateReducer,
     adminProductDelete: adminProductDeleteReducer,
     adminOrderList: adminOrderListReducer,
+    adminOrderDeliver: adminOrderDeliverReducer,
     cart: cartReducer,
   }),
   initialState = {
     cart: {
       cartItems: cartItemsFromStorage,
       shippingAddress: shippingAddressFromStorage,
+      paymentMethod: paymentMethodFromStorage,
     },
-    // shippingAddress: shippingAddressFromStorage,
     userLogin: userInfoFromStorage,
   },
   middleware = [thunk],

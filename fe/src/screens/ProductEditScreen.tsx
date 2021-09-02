@@ -10,6 +10,7 @@ import {
   IAdminProductUpdateRdx,
   IProductDetailsRdx,
   IUserInfoRdx,
+  IUserLoginRdx,
 } from '../type'
 import { listProductDetails, updateProduct } from '../actions/productActions'
 import { productActions } from '../constants/productConstants'
@@ -47,7 +48,7 @@ const ProductEditScreen = () => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   const productDetails = useSelector(
@@ -72,7 +73,7 @@ const ProductEditScreen = () => {
 
     if (
       !userLogin.userInfo ||
-      (userLogin.userInfo && userLogin.userInfo.role === UserRole.NORMAL)
+      (userLogin.userInfo && userLogin.userInfo.user.role === UserRole.NORMAL)
     ) {
       history.push('/login')
     } else if (
@@ -167,7 +168,8 @@ const ProductEditScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

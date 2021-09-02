@@ -4,6 +4,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import {
   adminGetOrderDetails,
   adminGetOrderedProds,
+  adminSetOrderAsDelivered,
   getOrderDetails,
   getOrderedProds,
   payOrder,
@@ -11,10 +12,12 @@ import {
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import {
+  IAdminOrderDeliverRdx,
   IOrderDetailsRdx,
   IOrderedProdsRdx,
   IOrderPayRdx,
   IUserInfoRdx,
+  IUserLoginRdx,
 } from '../type'
 import OrderSummary from '../components/OrderSummary'
 import OrderItemsInfo from '../components/OrderItemsInfo'
@@ -59,7 +62,12 @@ const OrderScreen = () => {
   ) // , { loading: loadingPaypal, success: successPaypal } = orderPay // renaming properties...
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
+  )
+
+  const adminOrderDeliver = useSelector(
+    (state: { adminOrderDeliver: IAdminOrderDeliverRdx }) =>
+      state.adminOrderDeliver
   )
 
   const [payerName, setPayerName] = useState<string>('')
@@ -82,10 +90,18 @@ const OrderScreen = () => {
       (orderDetails.orderItem &&
         orderDetails.orderItem.id > 0 &&
         orderDetails.orderItem.id !== Number(params.orderid)) ||
-      (orderPay && orderPay.success)
+      (orderPay && orderPay.success) ||
+      (adminOrderDeliver &&
+        adminOrderDeliver.result &&
+        adminOrderDeliver.result.ok)
     ) {
       dispatch({ type: orderActions.ORDER_PAY_RESET })
-      if (userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL) {
+      dispatch({ type: orderActions.ORDER_DELIVER_RESET })
+
+      if (
+        userLogin.userInfo &&
+        userLogin.userInfo.user.role !== UserRole.NORMAL
+      ) {
         dispatch(adminGetOrderDetails(Number(params.orderid)))
         dispatch(adminGetOrderedProds(Number(params.orderid)))
       } else {
@@ -93,7 +109,15 @@ const OrderScreen = () => {
         dispatch(getOrderedProds(Number(params.orderid)))
       }
     }
-  }, [dispatch, history, params.orderid, orderDetails, orderPay])
+  }, [
+    dispatch,
+    history,
+    params.orderid,
+    orderDetails,
+    orderPay,
+    userLogin.userInfo,
+    adminOrderDeliver,
+  ])
 
   const paypalCreateOrder = (
     data: UnknownObject,
@@ -144,6 +168,12 @@ const OrderScreen = () => {
         })
         .catch((err) => console.error(err))
     })
+  }
+
+  const setOrderAsDelivered = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    dispatch(adminSetOrderAsDelivered(Number(params.orderid)))
   }
 
   return orderDetails && orderDetails.loading ? (
@@ -226,6 +256,21 @@ const OrderScreen = () => {
                 )}
               </div>
             )}
+
+            {userLogin.userInfo &&
+              userLogin.userInfo.user.role !== UserRole.NORMAL &&
+              orderDetails.orderItem.is_paid &&
+              !orderDetails.orderItem.is_delivered && (
+                <div>
+                  {adminOrderDeliver.loading && <Loader />}
+                  <button
+                    className='btn u-txt-center btn-set-delivered'
+                    onClick={setOrderAsDelivered}
+                  >
+                    Mark As Delivered
+                  </button>
+                </div>
+              )}
           </div>
         </div>
 

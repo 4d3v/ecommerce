@@ -7,7 +7,11 @@ import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import Alert from '../components/Alert'
 import { UserRole } from '../enums'
-import { IAdminUserUpdateProfileRdx, IUserInfoRdx } from '../type'
+import {
+  IAdminUserUpdateProfileRdx,
+  IUserInfoRdx,
+  IUserLoginRdx,
+} from '../type'
 import { userActions } from '../constants/userConstants'
 
 interface HistoryParams {}
@@ -29,11 +33,12 @@ const UserEditScreen = () => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
+  console.log(userLogin.userInfo.user)
 
   const userDetails = useSelector(
-    (state: { userDetails: IUserInfoRdx }) => state.userDetails
+    (state: { userDetails: IUserLoginRdx }) => state.userDetails
   )
 
   const adminUserUpdateProfile = useSelector(
@@ -44,20 +49,20 @@ const UserEditScreen = () => {
   useEffect(() => {
     if (
       !userLogin.userInfo ||
-      (userLogin.userInfo && userLogin.userInfo.role === UserRole.NORMAL)
+      (userLogin.userInfo && userLogin.userInfo.user.role === UserRole.NORMAL)
     ) {
       history.push('/login')
     } else if (
       !userDetails.userInfo ||
       (userDetails.userInfo &&
-        userDetails.userInfo.id !== Number(params.userid))
+        userDetails.userInfo.user.id !== Number(params.userid))
     ) {
       dispatch(getUserById(Number(params.userid)))
     } else {
-      setName(userDetails.userInfo.name)
-      setEmail(userDetails.userInfo.email)
-      setRole(userDetails.userInfo.role!)
-      setActive(userDetails.userInfo.active!)
+      setName(userDetails.userInfo.user.name)
+      setEmail(userDetails.userInfo.user.email)
+      setRole(userDetails.userInfo.user.role!)
+      setActive(userDetails.userInfo.user.active!)
     }
   }, [
     dispatch,
@@ -73,7 +78,7 @@ const UserEditScreen = () => {
     e.preventDefault()
     dispatch(
       adminUpdateUser({
-        id: userDetails.userInfo.id,
+        id: userDetails.userInfo.user.id,
         name: name,
         email: email,
         role: role,
@@ -97,7 +102,8 @@ const UserEditScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

@@ -6,7 +6,13 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import { IUser, IUserDeleteRdx, IUserInfoRdx, IUserListRdx } from '../type'
+import {
+  IUser,
+  IUserDeleteRdx,
+  IUserInfoRdx,
+  IUserListRdx,
+  IUserLoginRdx,
+} from '../type'
 
 interface HistoryParams {}
 
@@ -19,16 +25,18 @@ const UserListScreen = () => {
   )
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   const userDelete = useSelector(
     (state: { userDelete: IUserDeleteRdx }) => state.userDelete
   )
+  console.log(userDelete)
 
   useEffect(() => {
     if (
-      (userLogin.userInfo && userLogin.userInfo.role === UserRole.NORMAL) ||
+      (userLogin.userInfo &&
+        userLogin.userInfo.user.role === UserRole.NORMAL) ||
       !userLogin.userInfo
     )
       history.push('/')
@@ -45,7 +53,8 @@ const UserListScreen = () => {
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

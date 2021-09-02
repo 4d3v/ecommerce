@@ -2,12 +2,8 @@ import { AnyAction } from 'redux'
 import { userActions } from '../constants/userConstants'
 import { IUser } from '../type'
 
-const userInitialState: { userInfo: IUser | null } = {
-  userInfo: null,
-}
-
 export const userLoginReducer = (
-  state = userInitialState,
+  state: { ok: boolean; message: string; user: IUser } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -25,14 +21,14 @@ export const userLoginReducer = (
 }
 
 export const userLogoutReducer = (
-  state = userInitialState,
+  state: { ok: boolean; message: string } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {
     case userActions.USER_LOGOUT_REQUEST:
       return { loading: true }
     case userActions.USER_LOGOUT_SUCCESS:
-      return { loading: false, userInfo: {} }
+      return { loading: false, result: action.payload }
     case userActions.USER_LOGOUT_FAIL:
       return { loading: false, error: action.payload }
     default:
@@ -41,23 +37,25 @@ export const userLogoutReducer = (
 }
 
 export const userSignUpReducer = (
-  state = userInitialState,
+  state: { ok: boolean; message: string; user: IUser } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {
     case userActions.USER_SIGNUP_REQUEST:
       return { loading: true }
     case userActions.USER_SIGNUP_SUCCESS:
-      return { loading: false, userInfo: action.payload }
+      return { loading: false, result: action.payload }
     case userActions.USER_SIGNUP_FAIL:
       return { loading: false, error: action.payload }
+    case userActions.USER_SIGNUP_RESET:
+      return {}
     default:
       return state
   }
 }
 
 export const userDetailsReducer = (
-  state = userInitialState,
+  state: { userInfo: IUser | null } = { userInfo: null },
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -75,14 +73,14 @@ export const userDetailsReducer = (
 }
 
 export const userUpdateProfileReducer = (
-  state = userInitialState,
+  state: { ok: boolean; message: string; user: IUser } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {
     case userActions.USER_UPDATE_PROFILE_REQUEST:
       return { loading: true }
     case userActions.USER_UPDATE_PROFILE_SUCCESS:
-      return { loading: false, success: true, userInfo: action.payload }
+      return { loading: false, success: true, result: action.payload }
     case userActions.USER_UPDATE_PROFILE_FAIL:
       return { loading: false, error: action.payload }
     case userActions.USER_UPDATE_PROFILE_RESET:
@@ -93,26 +91,25 @@ export const userUpdateProfileReducer = (
 }
 
 export const userUpdatePasswordReducer = (
-  state = userInitialState,
+  state: { ok: boolean; message: string; user: IUser } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {
     case userActions.USER_UPDATE_PASSWORD_REQUEST:
       return { loading: true }
     case userActions.USER_UPDATE_PASSWORD_SUCCESS:
-      return { loading: false, success: true }
+      return { loading: false, success: true, result: action.payload }
     case userActions.USER_UPDATE_PASSWORD_FAIL:
       return { loading: false, error: action.payload }
+    case userActions.USER_UPDATE_PASSWORD_RESET:
+      return {}
     default:
       return state
   }
 }
 
-const userListInitialState: { users: IUser[] | null } = {
-  users: null,
-}
 export const userListReducer = (
-  state = userListInitialState,
+  state: { users: IUser[] } = { users: [] },
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -129,12 +126,15 @@ export const userListReducer = (
   }
 }
 
-export const userDeleteReducer = (state = {}, action: AnyAction) => {
+export const userDeleteReducer = (
+  state: { ok: boolean; message: string } | {} = {},
+  action: AnyAction
+) => {
   switch (action.type) {
     case userActions.USER_DELETE_REQUEST:
       return { loading: true }
     case userActions.USER_DELETE_SUCCESS:
-      return { loading: false, success: true }
+      return { loading: false, success: true, result: action.payload }
     case userActions.USER_DELETE_FAIL:
       return { loading: false, error: action.payload }
     default:

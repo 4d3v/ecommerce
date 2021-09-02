@@ -94,26 +94,10 @@ type customOrderedProdJson struct {
 	OpUpdatedAt      string `json:"op_updated_at"`
 }
 
-type logsignSuccess struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Role      int    `json:"role"` // ENUM
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Ok        bool   `json:"ok"`
-	Message   string `json:"message"`
-}
-
-type updateSuccess struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Role      int    `json:"role"` // ENUM
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Ok        bool   `json:"ok"`
-	Message   string `json:"message"`
+type logsignupdateSuccess struct {
+	User    userJson `json:"user"`
+	Ok      bool     `json:"ok"`
+	Message string   `json:"message"`
 }
 
 type msgJson struct {
@@ -351,15 +335,20 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(newJson)
 
 	case "loginsuccess":
-		resp := logsignSuccess{
+		user := userJson{
 			Id:        opts.user.Id,
 			Name:      opts.user.Name,
 			Email:     opts.user.Email,
 			Role:      opts.user.Role,
+			Active:    opts.user.Active,
 			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
 			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
-			Ok:        opts.ok,
-			Message:   opts.msg,
+		}
+
+		resp := logsignupdateSuccess{
+			User:    user,
+			Ok:      opts.ok,
+			Message: opts.msg,
 		}
 
 		out, err := json.Marshal(resp)
@@ -371,15 +360,20 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(out)
 
 	case "signupsuccess":
-		resp := logsignSuccess{
+		user := userJson{
 			Id:        opts.user.Id,
 			Name:      opts.user.Name,
 			Email:     opts.user.Email,
 			Role:      opts.user.Role,
+			Active:    opts.user.Active,
 			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
 			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
-			Ok:        opts.ok,
-			Message:   opts.msg,
+		}
+
+		resp := logsignupdateSuccess{
+			User:    user,
+			Ok:      opts.ok,
+			Message: opts.msg,
 		}
 
 		out, err := json.Marshal(resp)
@@ -391,15 +385,20 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		w.Write(out)
 
 	case "updatesuccess":
-		resp := updateSuccess{
+		user := userJson{
 			Id:        opts.user.Id,
 			Name:      opts.user.Name,
 			Email:     opts.user.Email,
 			Role:      opts.user.Role,
+			Active:    opts.user.Active,
 			CreatedAt: opts.user.CreatedAt.Format(timeFormatStr),
 			UpdatedAt: opts.user.UpdatedAt.Format(timeFormatStr),
-			Ok:        opts.ok,
-			Message:   opts.msg,
+		}
+
+		resp := logsignupdateSuccess{
+			User:    user,
+			Ok:      opts.ok,
+			Message: opts.msg,
 		}
 
 		out, err := json.Marshal(resp)

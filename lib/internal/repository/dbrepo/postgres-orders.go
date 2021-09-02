@@ -91,9 +91,10 @@ func (dbrepo *postgresDbRepo) AdminUpdateIsDelivered(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `UPDATE orders SET is_delivered = $1 WHERE id = $2`
+	query := `UPDATE orders SET is_delivered = $1, delivered_at = $2, updated_at = $3 WHERE id = $4`
 
-	res, err := dbrepo.DB.ExecContext(ctx, query, true, id)
+	// TEMP TODO second parameter should come from frontend
+	res, err := dbrepo.DB.ExecContext(ctx, query, true, time.Now(), time.Now(), id)
 	if err != nil {
 		return err
 	}

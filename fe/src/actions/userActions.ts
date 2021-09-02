@@ -28,12 +28,14 @@ export const login =
         'userInfo',
         JSON.stringify({
           userInfo: {
-            id: data.id,
-            name: data.name,
-            email: data.email,
-            role: data.role,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
+            user: {
+              id: data.user.id,
+              name: data.user.name,
+              email: data.user.email,
+              role: data.user.role,
+              created_at: data.user.created_at,
+              updated_at: data.user.updated_at,
+            },
           },
         })
       )
@@ -59,18 +61,10 @@ export const logout = () => async (dispatch: AppDispatch) => {
       payload: data,
     })
 
-    dispatch({
-      type: userActions.USER_LOGOUT,
-      payload: data,
-    })
-
-    dispatch({
-      type: orderActions.ORDER_LIST_USER_RESET,
-    })
-
-    dispatch({
-      type: userActions.USER_LIST_RESET,
-    })
+    dispatch({ type: userActions.USER_LOGOUT })
+    dispatch({ type: userActions.USER_SIGNUP_RESET })
+    dispatch({ type: orderActions.ORDER_LIST_USER_RESET })
+    dispatch({ type: userActions.USER_LIST_RESET })
 
     localStorage.removeItem('userInfo')
   } catch (error) {
@@ -182,12 +176,14 @@ export const updateUser = (user: IUser) => async (dispatch: AppDispatch) => {
       'userInfo',
       JSON.stringify({
         userInfo: {
-          id: data.id,
-          name: data.name,
-          email: data.email,
-          role: data.role,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
+          user: {
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            role: data.user.role,
+            created_at: data.user.created_at,
+            updated_at: data.user.updated_at,
+          },
         },
       })
     )
@@ -265,12 +261,13 @@ export const deleteUser = (userId: number) => async (dispatch: AppDispatch) => {
       type: userActions.USER_DELETE_REQUEST,
     })
 
-    await axios.delete(`${BASE_URL}/users/${userId}`, {
+    const { data } = await axios.delete(`${BASE_URL}/users/${userId}`, {
       withCredentials: true,
     })
 
     dispatch({
       type: userActions.USER_DELETE_SUCCESS,
+      payload: data,
     })
   } catch (error) {
     // TEMP maybe change getAuthError name or make another function in that case

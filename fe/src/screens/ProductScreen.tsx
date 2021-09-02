@@ -20,7 +20,6 @@ const ProductScreen = () => {
   const productDetails = useSelector(
     (state: { productDetails: IProductDetailsRdx }) => state.productDetails
   )
-  const { product, loading, error } = productDetails
 
   useEffect(() => {
     dispatch(listProductDetails(params.id))
@@ -32,95 +31,118 @@ const ProductScreen = () => {
 
   return (
     <>
-      {loading ? (
+      {productDetails && productDetails.loading ? (
         <Loader />
-      ) : error ? (
-        <Message error={error} />
+      ) : productDetails && productDetails.error ? (
+        <Message error={productDetails.error} />
       ) : (
-        <div className='container u-txt-center'>
-          <div className='prod-wrapper u-my-s'>
-            <div className='prod-img-wrapper'>
-              <img
-                src={`/images/${product!.image}`}
-                alt={product!.name}
-                className='prod-img'
-              />
-            </div>
+        productDetails &&
+        productDetails.product && (
+          <div className='container u-txt-center'>
+            <div className='prod-wrapper u-my-s'>
+              <div className='prod-img-wrapper'>
+                <img
+                  src={`/images/${productDetails.product!.image}`}
+                  alt={productDetails.product!.name}
+                  className='prod-img'
+                />
+              </div>
 
-            <div className='prod-opts-wrapper'>
-              <ul className='prod-info'>
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  <h2>{product ? product.name : 'null'}</h2>
-                </li>
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  <Rating
-                    value={product?.rating ? product.rating : 0}
-                    text={`
-                ${product?.num_reviews ? product.num_reviews : 0}  reviews`}
-                  />
-                </li>
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  <strong>Price: </strong>$
-                  {product?.price ? product.price : -999}
-                </li>
+              <div className='prod-opts-wrapper'>
+                <ul className='prod-info'>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    <h2>
+                      {productDetails.product
+                        ? productDetails.product.name
+                        : 'null'}
+                    </h2>
+                  </li>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    <Rating
+                      value={
+                        productDetails.product?.rating
+                          ? productDetails.product.rating
+                          : 0
+                      }
+                      text={`
+                ${
+                  productDetails.product?.num_reviews
+                    ? productDetails.product.num_reviews
+                    : 0
+                }  reviews`}
+                    />
+                  </li>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    <strong>Price: </strong>$
+                    {productDetails.product?.price
+                      ? productDetails.product.price
+                      : -999}
+                  </li>
 
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  <strong>Description: </strong>
-                  {product?.description && product.description}
-                </li>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    <strong>Description: </strong>
+                    {productDetails.product?.description &&
+                      productDetails.product.description}
+                  </li>
 
-                <Link to='/' className='btn u-my-s'>
-                  Go Back
-                </Link>
-              </ul>
-            </div>
+                  <Link to='/' className='btn u-my-s'>
+                    Go Back
+                  </Link>
+                </ul>
+              </div>
 
-            <div className='prod-opts-wrapper'>
-              <ul>
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  Price: {product?.price ? product.price : -999}
-                </li>
-                <li className='prod-info__item u-my-t u-txt-left'>
-                  Status:{' '}
-                  {product?.count_in_stock !== undefined &&
-                  product.count_in_stock > 0
-                    ? 'In Stock'
-                    : 'Out Of Stock'}
-                </li>
-                {product.count_in_stock !== undefined &&
-                  product.count_in_stock > 0 && (
-                    <li>
-                      <div>Qty: {product.count_in_stock}</div>
-                      <select
-                        value={qty}
-                        onChange={(e) => setQty(Number(e.target.value))}
-                      >
-                        {[...Array(product.count_in_stock)].map((el, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                        ))}
-                      </select>
-                    </li>
-                  )}
-                <li className='prod-info__item u-my-t'>
-                  <button
-                    className='btn'
-                    onClick={addToCartHandler}
-                    disabled={
-                      product?.count_in_stock !== undefined &&
-                      product.count_in_stock > 0
-                        ? false
-                        : true
-                    }
-                  >
-                    Add To Cart
-                  </button>
-                </li>
-              </ul>
+              <div className='prod-opts-wrapper'>
+                <ul>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    Price:{' '}
+                    {productDetails.product?.price
+                      ? productDetails.product.price
+                      : -999}
+                  </li>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    Status:{' '}
+                    {productDetails.product?.count_in_stock !== undefined &&
+                    productDetails.product.count_in_stock > 0
+                      ? 'In Stock'
+                      : 'Out Of Stock'}
+                  </li>
+                  {productDetails.product.count_in_stock !== undefined &&
+                    productDetails.product.count_in_stock > 0 && (
+                      <li>
+                        <div>Qty: {productDetails.product.count_in_stock}</div>
+                        <select
+                          value={qty}
+                          onChange={(e) => setQty(Number(e.target.value))}
+                        >
+                          {[
+                            ...Array(productDetails.product.count_in_stock),
+                          ].map((el, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </li>
+                    )}
+                  <li className='prod-info__item u-my-t'>
+                    <button
+                      className='btn'
+                      onClick={addToCartHandler}
+                      disabled={
+                        productDetails.product?.count_in_stock !== undefined &&
+                        productDetails.product.count_in_stock > 0
+                          ? false
+                          : true
+                      }
+                    >
+                      Add To Cart
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        )
       )}
     </>
   )

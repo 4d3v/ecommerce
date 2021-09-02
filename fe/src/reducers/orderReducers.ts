@@ -1,10 +1,13 @@
 import { AnyAction } from 'redux'
 import { orderActions } from '../constants/orderConstants'
-import { ICreateOrder, IOrderDetails, IOrderedProd } from '../type'
+import { IOrderDetails, IOrderedProd } from '../type'
 
-const orderCreateInitSt: { order: ICreateOrder | null } = { order: null }
 export const orderCreateReducer = (
-  state = orderCreateInitSt,
+  state: {
+    ok: boolean
+    message: string
+    data: { order_id: number }
+  } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -21,11 +24,8 @@ export const orderCreateReducer = (
   }
 }
 
-const orderedProdsCreateInitSt: { orderedProd: IOrderedProd | null } = {
-  orderedProd: null,
-}
 export const orderedProdsCreateReducer = (
-  state = orderedProdsCreateInitSt,
+  state: { orderedProd: { ok: boolean; message: string } } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -40,11 +40,8 @@ export const orderedProdsCreateReducer = (
   }
 }
 
-const orderDetailsInitSt: { orderItem: IOrderDetails | null } = {
-  orderItem: null,
-}
 export const orderDetailsReducer = (
-  state = orderDetailsInitSt,
+  state: { orderItem: IOrderDetails } | null = null,
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -61,11 +58,8 @@ export const orderDetailsReducer = (
   }
 }
 
-const orderedProdsListInitSt: { orderedProds: IOrderedProd[] } = {
-  orderedProds: [],
-}
 export const orderedProdsListReducer = (
-  state = orderedProdsListInitSt,
+  state: { orderedProds: IOrderedProd[] } = { orderedProds: [] },
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -95,11 +89,8 @@ export const orderPayReducer = (state = {}, action: AnyAction) => {
   }
 }
 
-const orderListInitSt: { orders: IOrderDetails[] } = {
-  orders: [],
-}
 export const orderListUserReducer = (
-  state = orderListInitSt,
+  state: { orders: IOrderDetails[] } = { orders: [] },
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -117,7 +108,7 @@ export const orderListUserReducer = (
 }
 
 export const adminOrderListReducer = (
-  state = orderListInitSt,
+  state: { orders: IOrderDetails[] } = { orders: [] },
   action: AnyAction
 ) => {
   switch (action.type) {
@@ -127,6 +118,24 @@ export const adminOrderListReducer = (
       return { loading: false, orders: action.payload }
     case orderActions.ORDER_LIST_FAIL:
       return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export const adminOrderDeliverReducer = (
+  state: { ok: boolean; msg: string } | null = null,
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case orderActions.ORDER_DELIVER_REQUEST:
+      return { loading: true }
+    case orderActions.ORDER_DELIVER_SUCCESS:
+      return { loading: false, result: action.payload }
+    case orderActions.ORDER_DELIVER_FAIL:
+      return { loading: false, error: action.payload }
+    case orderActions.ORDER_DELIVER_RESET:
+      return {}
     default:
       return state
   }

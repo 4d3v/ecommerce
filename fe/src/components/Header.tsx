@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { logout } from '../actions/userActions'
-import { IUserInfoRdx } from '../type'
+import { IUserInfoRdx, IUserLoginRdx } from '../type'
 
 interface HistoryParams {}
 
@@ -11,9 +11,8 @@ const Header = () => {
 
   const dispatch = useDispatch()
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
-  const { userInfo } = userLogin
 
   const logoutHandler = () => {
     dispatch(logout())
@@ -33,9 +32,9 @@ const Header = () => {
             </Link>
           </li>
           <li className='userinfo-dropdown'>
-            {userInfo ? (
+            {userLogin && userLogin.userInfo && userLogin.userInfo.user ? (
               <>
-                <span>{userInfo.name}</span>
+                <span>{userLogin.userInfo.user.name}</span>
                 <ul className='dropdown'>
                   <li className='dropdown__li'>
                     <Link to='/profile' className='nav-link'>

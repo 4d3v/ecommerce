@@ -234,6 +234,10 @@ func (dbrepo *postgresDbRepo) SignUp(user models.User) (models.User, string, err
 		return user, "", err
 	}
 
+	user.Id = newId
+	user.Role = 3
+	user.Active = true
+
 	return user, token, err
 }
 
@@ -260,7 +264,7 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string
 	err := row.Scan(
 		&user.Id,
 		&hashedPassword,
-		&active,
+		&user.Active,
 		&user.Name,
 		&user.Email,
 		&user.Role,
@@ -272,11 +276,12 @@ func (dbrepo *postgresDbRepo) Login(email, password string) (models.User, string
 		return user, "", errors.New("incorrect email or password")
 	}
 
+	id = user.Id
+	active = user.Active
+
 	if !active {
 		return user, "", errors.New("user does not exist")
 	}
-
-	id = user.Id
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {

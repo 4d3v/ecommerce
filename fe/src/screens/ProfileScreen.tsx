@@ -6,12 +6,14 @@ import Loader from '../components/Loader'
 import { getUser, updateUser, updateUserPass } from '../actions/userActions'
 import {
   IUserInfoRdx,
+  IUserLoginRdx,
   IUserUpdatePasswordRdx,
   IUserUpdateProfileRdx,
 } from '../type'
 import { userActions } from '../constants/userConstants'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
+import Alert from '../components/Alert'
 
 interface HistoryParams {}
 
@@ -23,15 +25,16 @@ const ProfileScreen = () => {
   const [curPassword, setCurPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
+  const [passUpdatedSuccess, setPassUpdatedSuccess] = useState(false)
+  const [profileUpdatedSuccess, setProfileUpdatedSuccess] = useState(false)
 
   const dispatch = useDispatch()
   const userDetails = useSelector(
     (state: { userDetails: IUserInfoRdx }) => state.userDetails
   )
-  const { loading, userInfo, error } = userDetails
 
   const userLogin = useSelector(
-    (state: { userLogin: IUserInfoRdx }) => state.userLogin
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
   const userUpdateProfile = useSelector(
@@ -51,23 +54,46 @@ const ProfileScreen = () => {
       !userDetails.userInfo ||
       !userDetails.userInfo.name ||
       userUpdateProfile.success ||
+      userUpdatePassword.success ||
       (userLogin.userInfo &&
         userDetails.userInfo &&
-        userDetails.userInfo.id !== userLogin.userInfo.id)
+        userDetails.userInfo.id !== userLogin.userInfo.user.id)
     ) {
       dispatch({ type: userActions.USER_UPDATE_PROFILE_RESET })
+      dispatch({ type: userActions.USER_UPDATE_PASSWORD_RESET })
       dispatch(getUser())
     } else {
       setName(userDetails.userInfo.name)
       setEmail(userDetails.userInfo.email)
     }
-  }, [dispatch, history, userDetails, userLogin, userUpdateProfile.success])
+
+    if (userUpdateProfile.result && userUpdateProfile.result.ok) {
+      setProfileUpdatedSuccess(true)
+      setTimeout(() => {
+        setProfileUpdatedSuccess(false)
+      }, 2000)
+    }
+
+    if (userUpdatePassword.result && userUpdatePassword.result.ok) {
+      setPassUpdatedSuccess(true)
+      setTimeout(() => {
+        setPassUpdatedSuccess(false)
+      }, 2000)
+    }
+  }, [
+    dispatch,
+    history,
+    userDetails,
+    userLogin,
+    userUpdateProfile.success,
+    userUpdatePassword.result,
+  ])
 
   const updateUserDetails = (
     e: React.MouseEvent<HTMLFormElement, MouseEvent>
   ) => {
     e.preventDefault()
-    dispatch(updateUser({ id: userInfo.id, name, email }))
+    dispatch(updateUser({ id: userDetails.userInfo.id, name, email }))
   }
 
   const updateUserPassword = (
@@ -79,9 +105,9 @@ const ProfileScreen = () => {
 
   return (
     <div className='container'>
-      {error && (
+      {userDetails && userDetails.error && (
         <div className='u-txt-center u-py-ss'>
-          <Message error={error} />
+          <Message error={userDetails.error} />
         </div>
       )}
       {userUpdateProfile.error && (
@@ -94,23 +120,24 @@ const ProfileScreen = () => {
           <Message error={userUpdatePassword.error} />
         </div>
       )}
-      {userUpdatePassword.success && (
+      {profileUpdatedSuccess && (
         <div className='u-txt-center u-py-ss'>
-          <Message info={'User password updated successfully'} />
+          <Alert type='success' msg='User profile updated successfully' />
         </div>
       )}
-      {userUpdateProfile.success && (
+      {passUpdatedSuccess && (
         <div className='u-txt-center u-py-ss'>
-          <Message info={'User updated successfully'} />
+          <Alert type='success' msg='User password updated successfully' />
         </div>
       )}
 
-      {loading && <Loader />}
+      {userDetails && userDetails.loading && <Loader />}
 
       <div className='prof--sep u-my-s'>
         <SideNav
           isAdmin={
-            userLogin.userInfo && userLogin.userInfo.role !== UserRole.NORMAL
+            userLogin.userInfo &&
+            userLogin.userInfo.user.role !== UserRole.NORMAL
           }
         />
 

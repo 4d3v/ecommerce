@@ -413,7 +413,7 @@ func (repo *Repository) UpdateMe(w http.ResponseWriter, r *http.Request) {
 	sendJson("updatesuccess", w, &options{
 		user:   user,
 		ok:     true,
-		msg:    "User updated successfully ",
+		msg:    "User updated successfully",
 		stCode: http.StatusOK,
 	})
 }
@@ -462,7 +462,7 @@ func (repo *Repository) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	sendJson("updatesuccess", w, &options{
 		user:   user,
 		ok:     true,
-		msg:    "User updated successfully ",
+		msg:    "User password updated successfully",
 		stCode: http.StatusOK,
 	})
 }
