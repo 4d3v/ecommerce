@@ -167,9 +167,6 @@ func (repo *Repository) AdminUpdateUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Println(r.Form.Get("role"))
-	fmt.Println(user)
-
 	sendJson("msgjson", w, &options{ok: true, msg: "Success", stCode: http.StatusOK})
 }
 

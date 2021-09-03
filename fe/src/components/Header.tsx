@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { logout } from '../actions/userActions'
-import { IUserInfoRdx, IUserLoginRdx } from '../type'
+import { IUserLoginRdx } from '../type'
 
 interface HistoryParams {}
 

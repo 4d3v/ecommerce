@@ -39,8 +39,8 @@ const PlaceOrderScreen = () => {
 
   useEffect(() => {
     // If order is created with success
-    if (orderCreate && orderCreate.success) {
-      const orderCreatedId = orderCreate.order.data.order_id
+    if (orderCreate && orderCreate.result && orderCreate.result.ok) {
+      const orderCreatedId = orderCreate.result.data.order_id
 
       const createOrdProds = async () => {
         await Promise.all(

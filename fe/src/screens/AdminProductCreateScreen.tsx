@@ -7,16 +7,11 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import {
-  IAdminProductCreateRdx,
-  ICreateProduct,
-  IUserInfoRdx,
-  IUserLoginRdx,
-} from '../type'
+import { IAdminProductCreateRdx, ICreateProduct, IUserLoginRdx } from '../type'
 
 interface HistoryParams {}
 
-const ProductCreateScreen = () => {
+const AdminProductCreateScreen = () => {
   const history = useHistory<HistoryParams>()
   const dispatch = useDispatch()
 
@@ -167,4 +162,4 @@ const ProductCreateScreen = () => {
   )
 }
 
-export default ProductCreateScreen
+export default AdminProductCreateScreen

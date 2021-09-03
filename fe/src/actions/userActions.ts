@@ -317,7 +317,7 @@ export const adminUpdateUser =
 
       const { data } = await axios.patch(
         `${BASE_URL}/users/${user.id}`,
-        `name=${user.name}&email=${user.email}&role=${user.role}`,
+        `name=${user.name}&email=${user.email}&role=${user.role}&active=${user.active}`,
         {
           withCredentials: true,
         }

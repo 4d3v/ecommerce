@@ -1,3 +1,5 @@
+import { Action } from 'redux'
+
 export interface IUser {
   id: number
   name: string
@@ -164,9 +166,8 @@ export interface ICartItemsRdx {
 
 export interface IOrderCreateRdx {
   loading: boolean
-  success: boolean
   error: string
-  order: {
+  result: {
     ok: boolean
     message: string
     data: { order_id: number }
@@ -204,6 +205,12 @@ export interface IOrderedProdsRdx {
   loading: boolean
   error: string
   orderedProds: IOrderedProd[]
+}
+
+export interface IOrderedProdsCreateRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
 }
 
 export interface IOrderPayRdx {

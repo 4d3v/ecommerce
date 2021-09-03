@@ -24,11 +24,11 @@ import Footer from './components/Footer'
 import './styles/App.scss'
 import { BASE_URL } from './constants/endPoints'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
-import UserListScreen from './screens/UserListScreen'
-import UserEditScreen from './screens/UserEditScreen'
-import ProductListScreen from './screens/ProductListScreen'
-import ProductCreateScreen from './screens/ProductCreateScreen'
-import ProductEditScreen from './screens/ProductEditScreen'
+import AdminUserListScreen from './screens/AdminUserListScreen'
+import AdminUserEditScreen from './screens/AdminUserEditScreen'
+import AdminProductListScreen from './screens/AdminProductListScreen'
+import AdminProductCreateScreen from './screens/AdminProductCreateScreen'
+import AdminProductEditScreen from './screens/AdminProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 
 declare global {
@@ -76,26 +76,30 @@ const App = () => {
               <Route path='/product/:id' component={ProductScreen} exact />
               <Route path='/topics' component={Topics} exact />
               <Route path='/cart/:id?' component={CartScreen} exact />
-              <Route path='/admin/users' component={UserListScreen} exact />
+              <Route
+                path='/admin/users'
+                component={AdminUserListScreen}
+                exact
+              />
               <Route
                 path='/admin/products'
-                component={ProductListScreen}
+                component={AdminProductListScreen}
                 exact
               />
               <Route path='/admin/orders' component={OrderListScreen} exact />
               <Route
                 path='/admin/product/create'
-                component={ProductCreateScreen}
+                component={AdminProductCreateScreen}
                 exact
               />
               <Route
                 path='/admin/product/:productid'
-                component={ProductEditScreen}
+                component={AdminProductEditScreen}
                 exact
               />
               <Route
                 path='/admin/user/:userid'
-                component={UserEditScreen}
+                component={AdminUserEditScreen}
                 exact
               />
               <Route path='/' component={HomeScreen} exact />

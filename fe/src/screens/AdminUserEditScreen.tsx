@@ -20,7 +20,7 @@ interface RouteParams {
   userid: string
 }
 
-const UserEditScreen = () => {
+const AdminUserEditScreen = () => {
   const params = useParams<RouteParams>()
   const history = useHistory<HistoryParams>()
 
@@ -35,10 +35,9 @@ const UserEditScreen = () => {
   const userLogin = useSelector(
     (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
-  console.log(userLogin.userInfo.user)
 
   const userDetails = useSelector(
-    (state: { userDetails: IUserLoginRdx }) => state.userDetails
+    (state: { userDetails: IUserInfoRdx }) => state.userDetails
   )
 
   const adminUserUpdateProfile = useSelector(
@@ -55,14 +54,14 @@ const UserEditScreen = () => {
     } else if (
       !userDetails.userInfo ||
       (userDetails.userInfo &&
-        userDetails.userInfo.user.id !== Number(params.userid))
+        userDetails.userInfo.id !== Number(params.userid))
     ) {
       dispatch(getUserById(Number(params.userid)))
     } else {
-      setName(userDetails.userInfo.user.name)
-      setEmail(userDetails.userInfo.user.email)
-      setRole(userDetails.userInfo.user.role!)
-      setActive(userDetails.userInfo.user.active!)
+      setName(userDetails.userInfo.name)
+      setEmail(userDetails.userInfo.email)
+      setRole(userDetails.userInfo.role!)
+      setActive(userDetails.userInfo.active!)
     }
   }, [
     dispatch,
@@ -78,7 +77,7 @@ const UserEditScreen = () => {
     e.preventDefault()
     dispatch(
       adminUpdateUser({
-        id: userDetails.userInfo.user.id,
+        id: userDetails.userInfo.id,
         name: name,
         email: email,
         role: role,
@@ -214,4 +213,4 @@ const UserEditScreen = () => {
   )
 }
 
-export default UserEditScreen
+export default AdminUserEditScreen

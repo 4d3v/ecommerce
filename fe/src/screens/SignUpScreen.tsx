@@ -32,7 +32,7 @@ const SignUpScreen = () => {
     if (userSignUp && userSignUp.result && userSignUp.result.ok) {
       history.push(redirect)
     }
-  }, [history, userSignUp.result, redirect])
+  }, [history, userSignUp, redirect])
 
   const submitHandler = (e: React.MouseEvent<HTMLFormElement, MouseEvent>) => {
     e.preventDefault()

@@ -9,7 +9,6 @@ import { UserRole } from '../enums'
 import {
   IAdminProductUpdateRdx,
   IProductDetailsRdx,
-  IUserInfoRdx,
   IUserLoginRdx,
 } from '../type'
 import { listProductDetails, updateProduct } from '../actions/productActions'
@@ -29,7 +28,7 @@ interface ImageUploadedResult {
   error: string
 }
 
-const ProductEditScreen = () => {
+const AdminProductEditScreen = () => {
   const params = useParams<RouteParams>()
   const history = useHistory<HistoryParams>()
 
@@ -298,4 +297,4 @@ const ProductEditScreen = () => {
   )
 }
 
-export default ProductEditScreen
+export default AdminProductEditScreen

@@ -142,13 +142,8 @@ export const userDeleteReducer = (
   }
 }
 
-const adminUpdateUserInitState: {
-  result: { ok: boolean; message: string } | null
-} = {
-  result: null,
-}
 export const adminUserUpdateProfileReducer = (
-  state = adminUpdateUserInitState,
+  state: { ok: boolean; message: string } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {

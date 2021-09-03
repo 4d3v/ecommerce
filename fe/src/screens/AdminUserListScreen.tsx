@@ -6,17 +6,11 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import {
-  IUser,
-  IUserDeleteRdx,
-  IUserInfoRdx,
-  IUserListRdx,
-  IUserLoginRdx,
-} from '../type'
+import { IUser, IUserDeleteRdx, IUserListRdx, IUserLoginRdx } from '../type'
 
 interface HistoryParams {}
 
-const UserListScreen = () => {
+const AdminUserListScreen = () => {
   const history = useHistory<HistoryParams>()
   const dispatch = useDispatch()
 
@@ -117,4 +111,4 @@ const UserListScreen = () => {
   )
 }
 
-export default UserListScreen
+export default AdminUserListScreen

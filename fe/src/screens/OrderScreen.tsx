@@ -16,7 +16,6 @@ import {
   IOrderDetailsRdx,
   IOrderedProdsRdx,
   IOrderPayRdx,
-  IUserInfoRdx,
   IUserLoginRdx,
 } from '../type'
 import OrderSummary from '../components/OrderSummary'

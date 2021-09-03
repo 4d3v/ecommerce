@@ -14,9 +14,9 @@ export const orderCreateReducer = (
     case orderActions.ORDER_CREATE_REQUEST:
       return { loading: true }
     case orderActions.ORDER_CREATE_SUCCESS:
-      return { loading: false, success: true, order: action.payload }
+      return { loading: false, result: action.payload }
     case orderActions.ORDER_CREATE_FAIL:
-      return { loading: false, success: false, error: action.payload }
+      return { loading: false, error: action.payload }
     case orderActions.ORDER_CREATE_RESET:
       return null
     default:
@@ -32,9 +32,9 @@ export const orderedProdsCreateReducer = (
     case orderActions.ORDERED_PRODS_CREATE_REQUEST:
       return { loading: true }
     case orderActions.ORDERED_PRODS_CREATE_SUCCESS:
-      return { loading: false, success: true, orderedProd: action.payload }
+      return { loading: false, result: action.payload }
     case orderActions.ORDERED_PRODS_CREATE_FAIL:
-      return { loading: false, success: false, error: action.payload }
+      return { loading: false, error: action.payload }
     default:
       return state
   }

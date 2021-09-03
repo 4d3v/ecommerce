@@ -86,6 +86,8 @@ const ProfileScreen = () => {
     userDetails,
     userLogin,
     userUpdateProfile.success,
+    userUpdateProfile.result,
+    userUpdatePassword.success,
     userUpdatePassword.result,
   ])
 

@@ -6,12 +6,7 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import {
-  IOrderDetails,
-  IOrderListRdx,
-  IUserInfoRdx,
-  IUserLoginRdx,
-} from '../type'
+import { IOrderDetails, IOrderListRdx, IUserLoginRdx } from '../type'
 
 const MyOrdersScreen = () => {
   const dispatch = useDispatch()
