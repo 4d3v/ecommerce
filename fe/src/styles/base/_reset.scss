@@ -33,9 +33,9 @@ body {
 *:before,
 *:after {
   box-sizing: inherit;
-  user-select: none;
+  // user-select: none;
   outline: none;
-  -webkit-touch-callout: none;
+  // -webkit-touch-callout: none;
 }
 
 * {
@@ -51,15 +51,15 @@ body {
   border: 0;
 }
 
-// ::-webkit-scrollbar {
-//   display: none;
-//   opacity: 0;
-//   visibility: hidden;
-// }
+::-webkit-scrollbar {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}
 
-// ::-webkit-scrollbar-thumb {
-//   background: #fff;
-// }
+::-webkit-scrollbar-thumb {
+  background: #fff;
+}
 
 a {
   color: inherit;

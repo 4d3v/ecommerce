@@ -229,6 +229,61 @@ export const updateUserPass =
     }
   }
 
+export const forgotPassword =
+  (email: string) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: userActions.USER_FORGOT_PASSWORD_REQUEST,
+      })
+
+      const { data } = await axios.post(
+        `${BASE_URL}/forgotpassword`,
+        `email=${email}`,
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: userActions.USER_FORGOT_PASSWORD_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: userActions.USER_FORGOT_PASSWORD_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(customError)
+    }
+  }
+
+export const resetPassword =
+  (password: string, passwordConfirm: string, token: string) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: userActions.USER_RESET_PASSWORD_REQUEST,
+      })
+
+      const { data } = await axios.post(
+        `${BASE_URL}/resetpassword/${token}`,
+        `password=${password}&password_confirm=${passwordConfirm}&token=${token}`,
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: userActions.USER_RESET_PASSWORD_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: userActions.USER_RESET_PASSWORD_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(customError)
+    }
+  }
+
 export const listUsers = () => async (dispatch: AppDispatch) => {
   try {
     dispatch({

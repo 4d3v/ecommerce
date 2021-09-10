@@ -19,7 +19,7 @@ export const productListReducer = (
 }
 
 export const productDetailsReducer = (
-  state: { product: IProduct } | null = null,
+  state: { product: IProduct } | {} = {},
   action: AnyAction
 ) => {
   switch (action.type) {

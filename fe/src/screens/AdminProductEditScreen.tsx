@@ -152,11 +152,14 @@ const AdminProductEditScreen = () => {
       setUploadingImg(false)
       setImageUploaded(data)
     } catch (err) {
-      console.error(err.response)
+      console.log(err)
+
       setImageUploaded((st) => ({
         ok: false,
         message: '',
-        error: err.response.data,
+        error: err.response
+          ? err.response.data
+          : 'Something went wrong, try uploading an image with format jpg or png',
       }))
       setUploadingImg(false)
     }
@@ -186,16 +189,17 @@ const AdminProductEditScreen = () => {
           )}
 
           <h1 className='u-txt-center u-my-s'>Edit Product</h1>
-          {productDetails.loading ||
+          {(productDetails && productDetails.loading) ||
           userLogin.loading ||
           (adminProductUpdate && adminProductUpdate.loading) ||
           uploadingImg ? (
             <Loader />
-          ) : productDetails.error ? (
+          ) : productDetails && productDetails.error ? (
             <Message error={productDetails.error} />
           ) : userLogin.error ? (
             <Message error={userLogin.error} />
           ) : (
+            productDetails &&
             productDetails.product && (
               <>
                 <form className='form' onSubmit={updateProductDetails}>

@@ -25,7 +25,6 @@ const AdminUserListScreen = () => {
   const userDelete = useSelector(
     (state: { userDelete: IUserDeleteRdx }) => state.userDelete
   )
-  console.log(userDelete)
 
   useEffect(() => {
     if (

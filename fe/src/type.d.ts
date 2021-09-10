@@ -145,6 +145,18 @@ export interface IUserUpdatePasswordRdx {
   error: string
 }
 
+export interface IUserForgotPasswordRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
+}
+
+export interface IUserResetPasswordRdx {
+  loading: boolean
+  result: { ok: boolean; message: string }
+  error: string
+}
+
 export interface IUserListRdx {
   loading: boolean
   users: IUser[]

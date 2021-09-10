@@ -55,7 +55,7 @@ const MyOrdersScreen = () => {
 
                 <tbody>
                   {orderListUser.orders.map((order: IOrderDetails) => (
-                    <tr>
+                    <tr key={order.id}>
                       <td>{order.id}</td>
                       <td>{order.created_at}</td>
                       <td>{order.total_price}</td>

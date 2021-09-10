@@ -108,6 +108,42 @@ export const userUpdatePasswordReducer = (
   }
 }
 
+export const userForgotPasswordReducer = (
+  state: { ok: boolean; message: string } | {} = {},
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_FORGOT_PASSWORD_REQUEST:
+      return { loading: true }
+    case userActions.USER_FORGOT_PASSWORD_SUCCESS:
+      return { loading: false, result: action.payload }
+    case userActions.USER_FORGOT_PASSWORD_FAIL:
+      return { loading: false, error: action.payload }
+    case userActions.USER_FORGOT_PASSWORD_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const userResetPasswordReducer = (
+  state: { ok: boolean; message: string } | {} = {},
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case userActions.USER_RESET_PASSWORD_REQUEST:
+      return { loading: true }
+    case userActions.USER_RESET_PASSWORD_SUCCESS:
+      return { loading: false, result: action.payload }
+    case userActions.USER_RESET_PASSWORD_FAIL:
+      return { loading: false, error: action.payload }
+    case userActions.USER_RESET_PASSWORD_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
 export const userListReducer = (
   state: { users: IUser[] } = { users: [] },
   action: AnyAction

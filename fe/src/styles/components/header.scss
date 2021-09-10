@@ -19,17 +19,19 @@ header {
 
       .userinfo-dropdown {
         position: relative;
+        font-size: 1.2rem;
       }
 
       .dropdown {
         display: none;
         position: absolute;
-        top: 16px;
+        top: 20px;
         left: -30px;
         background-color: $base-secondary-color;
         padding: 0;
         overflow: hidden;
         height: 80px;
+        min-width: 100px;
 
         &__li {
           display: block;
@@ -45,6 +47,7 @@ header {
   padding: 4px;
   position: relative;
   font-size: 1.2rem;
+  cursor: pointer;
 
   &:after {
     content: '';

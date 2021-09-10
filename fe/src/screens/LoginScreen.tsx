@@ -71,9 +71,16 @@ const LoginScreen = () => {
 
         <div className='u-py-s'>
           New customer?{' '}
-          <Link to={redirect ? `/signup?redirect=${redirect}` : '/signup'}>
+          <Link
+            className='btn btn-purple'
+            to={redirect ? `/signup?redirect=${redirect}` : '/signup'}
+          >
             Sign Up
           </Link>
+        </div>
+
+        <div className='u-py-s'>
+          Forgot Password? <Link to='/forgotpassword'>Reset Password</Link>
         </div>
       </form>
     </div>

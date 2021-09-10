@@ -214,13 +214,14 @@ func (repo *Repository) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "PATCH" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		sendError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
 	if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
-		http.Error(w, "Please choose an file that's less than 1MB", http.StatusBadRequest)
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		fmt.Println(err)
 		return
 	}
 
@@ -228,7 +229,7 @@ func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request)
 	// of the file input on the frontend
 	file, fileHeader, err := r.FormFile("image")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		sendError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
@@ -236,19 +237,19 @@ func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request)
 	buff := make([]byte, 512)
 	_, err = file.Read(buff)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	filetype := http.DetectContentType(buff)
 	if filetype != "image/jpeg" && filetype != "image/png" {
-		http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG image", http.StatusBadRequest)
+		sendError(w, "The provided file format is not allowed. Please upload a JPEG or PNG image", http.StatusBadRequest)
 		return
 	}
 
 	_, err = file.Seek(0, io.SeekStart)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -264,7 +265,7 @@ func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request)
 	timeNow := time.Now().UnixNano()
 	dst, err := os.Create(fmt.Sprintf("./../fe/public/images/%d-%s", timeNow, fileHeader.Filename))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
@@ -272,7 +273,7 @@ func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request)
 	// Copy the uploaded file to the filesystem at the specified destination
 	_, err = io.Copy(dst, file)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

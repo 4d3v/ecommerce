@@ -85,9 +85,11 @@ const ProductScreen = () => {
                       productDetails.product.description}
                   </li>
 
-                  <Link to='/' className='btn u-my-s'>
-                    Go Back
-                  </Link>
+                  <li className='prod-info__item u-my-t u-txt-left'>
+                    <Link to='/' className='btn u-my-s u-txt-center'>
+                      Go Back
+                    </Link>
+                  </li>
                 </ul>
               </div>
 

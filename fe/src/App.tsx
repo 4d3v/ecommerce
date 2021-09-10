@@ -30,6 +30,8 @@ import AdminProductListScreen from './screens/AdminProductListScreen'
 import AdminProductCreateScreen from './screens/AdminProductCreateScreen'
 import AdminProductEditScreen from './screens/AdminProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
+import ResetPasswordScreen from './screens/ResetPasswordScreen'
 
 declare global {
   interface Window {
@@ -70,6 +72,16 @@ const App = () => {
               <Route path='/shipping' component={ShippingScreen} exact />
               <Route path='/signup' component={SignUpScreen} exact />
               <Route path='/login' component={LoginScreen} exact />
+              <Route
+                path='/forgotpassword'
+                component={ForgotPasswordScreen}
+                exact
+              />
+              <Route
+                path='/resetpassword/:resetpasstoken'
+                component={ResetPasswordScreen}
+                exact
+              />
               <Route path='/profile' component={ProfileScreen} exact />
               <Route path='/myorders' component={MyOrdersScreen} exact />
               <Route path='/order/:orderid' component={OrderScreen} exact />
