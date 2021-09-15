@@ -325,14 +325,17 @@ func (repo *Repository) CreateProductReview(w http.ResponseWriter, r *http.Reque
 	form.Required("name", "rating", "comment")
 	form.MinLength("name", 3)
 	form.MinLength("name", 7)
-	form.IsUint("rating")
+
+	rating, err := strconv.ParseFloat(r.Form.Get("rating"), 64) // Validated above
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
 
 	if !form.Valid() {
 		sendFormError(w, "Invalid form", http.StatusNotFound, form)
 		return
 	}
-
-	rating, _ := strconv.Atoi(r.Form.Get("rating")) // Validated above
 
 	review := models.Review{
 		Name:      r.Form.Get("name"),
@@ -348,7 +351,28 @@ func (repo *Repository) CreateProductReview(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	repo.UpdateProductReviewRating(w, r, productId, rating)
+
 	sendJson("msgjson", w, &options{ok: true, msg: "Review created with success", stCode: http.StatusOK})
+}
+
+// UpdateProduct updates a product
+func (repo *Repository) UpdateProductReviewRating(w http.ResponseWriter, r *http.Request, productId int, rating float64) {
+	prod, err := repo.DB.GetProductById(productId)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	prod.SumReviews = prod.SumReviews + rating
+	prod.NumReviews++
+	prod.Rating = prod.SumReviews / float64(prod.NumReviews)
+
+	err = repo.DB.UpdateProductReviewRating(prod)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
 }
 
 func (repo *Repository) GetProductReviews(w http.ResponseWriter, r *http.Request) {

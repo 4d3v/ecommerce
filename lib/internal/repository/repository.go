@@ -6,6 +6,7 @@ type DatabaseRepo interface {
 	InsertProduct(models.Product) error
 	GetProducts() ([]models.Product, error)
 	GetProductById(id int) (models.Product, error)
+	UpdateProductReviewRating(prod models.Product) error
 	UpdateProductById(prod models.Product) error
 	DeleteProductById(id int) error
 	GetProductReviews(productId int) ([]models.Review, error)

@@ -95,7 +95,7 @@ func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 
 	query := `
 		SELECT id, name, image, brand, category, description,
-		rating, num_reviews, price, count_in_stock, user_id,
+		rating, sum_reviews, num_reviews, price, count_in_stock, user_id,
 		created_at, updated_at FROM products
 		WHERE id = $1
 	`
@@ -111,6 +111,7 @@ func (dbrepo *postgresDbRepo) GetProductById(id int) (models.Product, error) {
 		&prod.Category,
 		&prod.Description,
 		&prod.Rating,
+		&prod.SumReviews,
 		&prod.NumReviews,
 		&prod.Price,
 		&prod.CountInStock,
@@ -147,6 +148,32 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 		&prod.Description,
 		&prod.Price,
 		&prod.CountInStock,
+		time.Now(),
+		&prod.Id,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dbrepo *postgresDbRepo) UpdateProductReviewRating(prod models.Product) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		UPDATE products SET rating = $1, sum_reviews = $2, num_reviews = $3, updated_at = $4
+		WHERE id = $5
+	`
+
+	_, err := dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		&prod.Rating,
+		&prod.SumReviews,
+		&prod.NumReviews,
 		time.Now(),
 		&prod.Id,
 	)

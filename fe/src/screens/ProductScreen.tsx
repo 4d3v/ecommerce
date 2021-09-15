@@ -209,7 +209,7 @@ const ProductScreen = () => {
               productReviewList.reviews.length > 0 ? (
                 <ul className='user-reviews'>
                   {productReviewList.reviews.map((review) => (
-                    <li>
+                    <li key={review.id}>
                       <div className='user-reviews__top'>
                         <div>{review.created_at}</div>
                         <Rating value={review.rating} color='yellow' />

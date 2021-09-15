@@ -41,17 +41,18 @@ type userJson struct {
 }
 
 type productJson struct {
-	Id           int    `json:"id"`
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	Brand        string `json:"brand"`
-	Category     string `json:"category"`
-	Description  string `json:"description"`
-	Rating       int    `json:"rating"`
-	NumReviews   int    `json:"num_reviews"`
-	Price        int    `json:"price"`
-	CountInStock int    `json:"count_in_stock"`
-	UserId       int    `json:"user_id"`
+	Id           int     `json:"id"`
+	Name         string  `json:"name"`
+	Image        string  `json:"image"`
+	Brand        string  `json:"brand"`
+	Category     string  `json:"category"`
+	Description  string  `json:"description"`
+	Rating       float64 `json:"rating"`
+	SumReviews   float64 `json:"sum_reviews"`
+	NumReviews   int     `json:"num_reviews"`
+	Price        int     `json:"price"`
+	CountInStock int     `json:"count_in_stock"`
+	UserId       int     `json:"user_id"`
 	// User models.User
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
@@ -95,15 +96,15 @@ type customOrderedProdJson struct {
 }
 
 type prodReviewsJson struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	Comment   string `json:"comment"`
-	Rating    int    `json:"rating"`
-	UserId    int    `json:"user_id"`
-	ProductId int    `json:"product_id"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	UserName  string `json:"username"`
+	Id        int     `json:"id"`
+	Name      string  `json:"name"`
+	Comment   string  `json:"comment"`
+	Rating    float64 `json:"rating"`
+	UserId    int     `json:"user_id"`
+	ProductId int     `json:"product_id"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
+	UserName  string  `json:"username"`
 }
 
 type logsignupdateSuccess struct {

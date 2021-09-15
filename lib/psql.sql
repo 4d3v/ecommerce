@@ -33,6 +33,7 @@ CREATE TABLE products(
   category VARCHAR(50),
   description VARCHAR(50),
   rating INTEGER DEFAULT 0,
+  sum_reviews INTEGER DEFAULT 0,
   num_reviews INTEGER DEFAULT 0,
   price INTEGER DEFAULT 0,
   count_in_stock INTEGER DEFAULT 0,

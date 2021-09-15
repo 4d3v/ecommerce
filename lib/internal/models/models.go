@@ -25,7 +25,8 @@ type Product struct {
 	Brand        string
 	Category     string
 	Description  string
-	Rating       int
+	Rating       float64
+	SumReviews   float64
 	NumReviews   int
 	Price        int
 	CountInStock int
@@ -92,7 +93,7 @@ type CustomOrderedProd struct {
 type Review struct {
 	Id        int
 	Name      string
-	Rating    int
+	Rating    float64
 	Comment   string
 	UserId    int
 	User      User
