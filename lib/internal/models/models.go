@@ -73,6 +73,7 @@ type OrderedProd struct {
 // CustomOrderedProd is used on the GET request for /orderedprods/{orderid}
 type CustomOrderedProd struct {
 	Id               int
+	ProdId           int
 	ProdName         string
 	ProdImage        string
 	ProdBrand        string
@@ -82,8 +83,22 @@ type CustomOrderedProd struct {
 	UserId           int
 	OrderId          int
 	OrderTotalPrice  int
+	OrderIsDelivered bool
 	OpCreated_At     time.Time
 	OpUpdatedAt      time.Time
+}
+
+// Review is the Review model
+type Review struct {
+	Id        int
+	Name      string
+	Rating    int
+	Comment   string
+	UserId    int
+	User      User
+	ProductId int
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // MailData holds an email message

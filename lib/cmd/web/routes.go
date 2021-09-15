@@ -44,6 +44,9 @@ func routes() http.Handler {
 		mux.Get("/", handlers.Repo.GetProducts)
 		mux.Get("/{id}", handlers.Repo.GetProductById)
 		mux.Patch("/uploadimage/{productid}", handlers.Repo.UploadProductImg)
+		mux.Get("/{productid}/reviews", handlers.Repo.GetProductReviews)
+		// mux.Use(Auth)
+		mux.Post("/{productid}/reviews", handlers.Repo.CreateProductReview)
 	})
 
 	mux.Route("/admproducts", func(mux chi.Router) {

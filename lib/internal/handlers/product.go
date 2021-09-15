@@ -299,3 +299,71 @@ func (repo *Repository) UploadProductImg(w http.ResponseWriter, r *http.Request)
 
 	sendJson("msgjson", w, &options{ok: true, msg: "Image uploaded with success", stCode: http.StatusOK})
 }
+
+// CreateProductReview creates a new product
+func (repo *Repository) CreateProductReview(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	productId, err := strconv.Atoi(chi.URLParam(r, "productid"))
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	user, err := repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("name", "rating", "comment")
+	form.MinLength("name", 3)
+	form.MinLength("name", 7)
+	form.IsUint("rating")
+
+	if !form.Valid() {
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		return
+	}
+
+	rating, _ := strconv.Atoi(r.Form.Get("rating")) // Validated above
+
+	review := models.Review{
+		Name:      r.Form.Get("name"),
+		Rating:    rating,
+		Comment:   r.Form.Get("comment"),
+		UserId:    user.Id,
+		ProductId: productId,
+	}
+
+	err = repo.DB.InsertProductReview(review)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	sendJson("msgjson", w, &options{ok: true, msg: "Review created with success", stCode: http.StatusOK})
+}
+
+func (repo *Repository) GetProductReviews(w http.ResponseWriter, r *http.Request) {
+	productId, err := strconv.Atoi(chi.URLParam(r, "productid"))
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	prodReviews, err := repo.DB.GetProductReviews(productId)
+
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	sendJson("prodreviewsjson", w, &options{prodReviews: prodReviews, stCode: http.StatusOK})
+}

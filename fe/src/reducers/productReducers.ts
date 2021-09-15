@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux'
 import { productActions } from '../constants/productConstants'
-import { IProduct } from '../type'
+import { IProduct, IReview } from '../type'
 
 export const productListReducer = (
   state: { products: IProduct[] } = { products: [] },
@@ -83,6 +83,40 @@ export const adminProductDeleteReducer = (
       return { loading: false, result: action.payload }
     case productActions.PRODUCT_DELETE_FAIL:
       return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export const productReviewListReducer = (
+  state: { reviews: IReview[] } = { reviews: [] },
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.PRODUCT_REVIEW_LIST_REQUEST:
+      return { loading: true, reviews: [] }
+    case productActions.PRODUCT_REVIEW_LIST_SUCCESS:
+      return { loading: false, reviews: action.payload }
+    case productActions.PRODUCT_REVIEW_LIST_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export const productReviewCreateReducer = (
+  state: { ok: boolean; message: string } | {} = {},
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.PRODUCT_CREATE_REVIEW_REQUEST:
+      return { loading: true }
+    case productActions.PRODUCT_CREATE_REVIEW_SUCCESS:
+      return { loading: false, result: action.payload }
+    case productActions.PRODUCT_CREATE_REVIEW_FAIL:
+      return { loading: false, error: action.payload }
+    case productActions.PRODUCT_CREATE_REVIEW_RESET:
+      return {}
     default:
       return state
   }

@@ -28,6 +28,18 @@ export interface IProduct {
   updated_at: Date
 }
 
+export interface IReview {
+  id: number
+  name: string
+  comment: string
+  rating: number
+  user_id: string
+  product_id: string
+  created_at: Date
+  updated_at: Date
+  username
+}
+
 export interface ICreateProduct {
   name: string
   brand: string
@@ -36,6 +48,14 @@ export interface ICreateProduct {
   price: number
   count_in_stock: number
   image?: string
+}
+
+export interface ICreateProductReview {
+  name: string
+  comment: string
+  rating: number
+  productId: number
+  userId: number
 }
 
 export interface IUpdateProduct {
@@ -109,6 +129,12 @@ export interface IProductListRdx {
 
 export interface IProductDetailsRdx {
   product: IProduct
+  loading: boolean
+  error: string
+}
+
+export interface IProductReviewListRdx {
+  reviews: IReview[]
   loading: boolean
   error: string
 }

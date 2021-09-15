@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory, useParams } from 'react-router-dom'
-import { listProductDetails } from '../actions/productActions'
-import { IProductDetailsRdx } from '../type'
+import {
+  createProductReview,
+  listProductDetails,
+  listProductReviews,
+} from '../actions/productActions'
+import {
+  IProductDetailsRdx,
+  IProductReviewListRdx,
+  IUserLoginRdx,
+} from '../type'
 import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import { productActions } from '../constants/productConstants'
 
 interface RouteParams {
   id: string
@@ -13,20 +22,66 @@ interface RouteParams {
 
 const ProductScreen = () => {
   const [qty, setQty] = useState(1)
+  const [rating, setRating] = useState(0)
+  const [name, setName] = useState('')
+  const [comment, setComment] = useState('')
 
   const dispatch = useDispatch()
   const params = useParams<RouteParams>()
   const history = useHistory()
+
   const productDetails = useSelector(
     (state: { productDetails: IProductDetailsRdx }) => state.productDetails
   )
 
+  const userLogin = useSelector(
+    (state: { userLogin: IUserLoginRdx }) => state.userLogin
+  )
+
+  const productReviewCreate = useSelector(
+    (state: { productReviewCreate: any }) => state.productReviewCreate
+  )
+
+  const productReviewList = useSelector(
+    (state: { productReviewList: IProductReviewListRdx }) =>
+      state.productReviewList
+  )
+
   useEffect(() => {
+    if (productReviewCreate && productReviewCreate.success) {
+      setRating(0)
+      setName('')
+      setComment('')
+      dispatch({ type: productActions.PRODUCT_CREATE_REVIEW_RESET })
+    }
+
+    if (productReviewCreate && productReviewCreate.error) {
+      setTimeout(() => {
+        dispatch({ type: productActions.PRODUCT_CREATE_REVIEW_RESET })
+      }, 2000)
+    }
+
     dispatch(listProductDetails(params.id))
-  }, [dispatch, params.id])
+    dispatch(listProductReviews(params.id))
+  }, [dispatch, params.id, productReviewCreate])
 
   const addToCartHandler = () => {
     history.push(`/cart/${params.id}?qty=${qty}`)
+  }
+
+  const createProductReviewHandler = (
+    e: React.MouseEvent<HTMLFormElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+    dispatch(
+      createProductReview({
+        name,
+        rating,
+        comment,
+        userId: userLogin.userInfo.user.id,
+        productId: Number(params.id),
+      })
+    )
   }
 
   return (
@@ -38,7 +93,7 @@ const ProductScreen = () => {
       ) : (
         productDetails &&
         productDetails.product && (
-          <div className='container u-txt-center'>
+          <div className='container u-txt-center prod-details'>
             <div className='prod-wrapper u-my-s'>
               <div className='prod-img-wrapper'>
                 <img
@@ -142,6 +197,87 @@ const ProductScreen = () => {
                   </li>
                 </ul>
               </div>
+            </div>
+
+            <div>
+              <h2>Reviews</h2>
+              {productReviewList && productReviewList.error && (
+                <Message error={productReviewList.error} />
+              )}
+              {productReviewList &&
+              productReviewList.reviews &&
+              productReviewList.reviews.length > 0 ? (
+                <ul className='user-reviews'>
+                  {productReviewList.reviews.map((review) => (
+                    <li>
+                      <div className='user-reviews__top'>
+                        <div>{review.created_at}</div>
+                        <Rating value={review.rating} color='yellow' />
+                      </div>
+                      <div>{review.username}</div>
+                      <div>
+                        <strong>Title:</strong> {review.name}
+                      </div>
+                      <div>
+                        <strong>Review:</strong>
+                        {review.comment}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className='u-my-s'>
+                  <Message info='No Reviews' />
+                </div>
+              )}
+            </div>
+
+            <div>
+              {userLogin && userLogin.userInfo ? (
+                <>
+                  {productReviewCreate && productReviewCreate.error && (
+                    <Message error={productReviewCreate.error} />
+                  )}
+                  <form className='form' onSubmit={createProductReviewHandler}>
+                    <h3>Write a customer review</h3>
+                    <label htmlFor='name'>Name</label>
+                    <input
+                      type='text'
+                      placeholder='Enter name'
+                      name='name'
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+
+                    <label htmlFor='comment'>Review</label>
+                    <textarea
+                      id='comment'
+                      name='comment'
+                      placeholder='Post your review'
+                      rows={4}
+                      cols={50}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    ></textarea>
+
+                    <select
+                      value={rating}
+                      onChange={(e) => setRating(Number(e.target.value))}
+                    >
+                      <option value={1}>1 - Poor</option>
+                      <option value={2}>2 - Fair</option>
+                      <option value={3}>3 - Good</option>
+                      <option value={4}>4 - Very Good</option>
+                      <option value={5}>5 - Excellent</option>
+                    </select>
+
+                    <button type='submit'>Submit</button>
+                  </form>
+                </>
+              ) : (
+                <Message info='Please login to post a review' />
+              )}
             </div>
           </div>
         )

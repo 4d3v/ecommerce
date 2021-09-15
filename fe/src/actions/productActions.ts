@@ -2,7 +2,7 @@ import axios from 'axios'
 import { BASE_URL } from '../constants/endPoints'
 import { productActions } from '../constants/productConstants'
 import { AppDispatch } from '../store'
-import { ICreateProduct, IUpdateProduct } from '../type'
+import { ICreateProduct, ICreateProductReview, IUpdateProduct } from '../type'
 import { getFormErrors } from './actionsUtils'
 
 export const listProducts = () => async (dispatch: AppDispatch) => {
@@ -76,6 +76,7 @@ export const createProduct =
       console.log(error.response)
     }
   }
+
 export const updateProduct =
   (product: IUpdateProduct) => async (dispatch: AppDispatch) => {
     try {
@@ -131,6 +132,62 @@ export const deleteProduct =
       const customError = getFormErrors(error)
       dispatch({
         type: productActions.PRODUCT_DELETE_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
+export const createProductReview =
+  (review: ICreateProductReview) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: productActions.PRODUCT_CREATE_REVIEW_REQUEST,
+      })
+      const { name, comment, rating, productId } = review
+
+      const { data } = await axios.post(
+        `${BASE_URL}/products/${productId}/reviews`,
+        `name=${name}&comment=${comment}&rating=${rating}`,
+        {
+          withCredentials: true,
+        }
+      )
+
+      dispatch({
+        type: productActions.PRODUCT_CREATE_REVIEW_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.PRODUCT_CREATE_REVIEW_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }
+
+export const listProductReviews =
+  (productId: string) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: productActions.PRODUCT_REVIEW_LIST_REQUEST,
+      })
+
+      const { data } = await axios.get(
+        `${BASE_URL}/products/${productId}/reviews`,
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: productActions.PRODUCT_REVIEW_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.PRODUCT_REVIEW_LIST_FAIL,
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(error.response)

@@ -94,6 +94,18 @@ type customOrderedProdJson struct {
 	OpUpdatedAt      string `json:"op_updated_at"`
 }
 
+type prodReviewsJson struct {
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Comment   string `json:"comment"`
+	Rating    int    `json:"rating"`
+	UserId    int    `json:"user_id"`
+	ProductId int    `json:"product_id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	UserName  string `json:"username"`
+}
+
 type logsignupdateSuccess struct {
 	User    userJson `json:"user"`
 	Ok      bool     `json:"ok"`
@@ -109,19 +121,20 @@ type msgJson struct {
 }
 
 type options struct {
-	users   []models.User
-	user    models.User
-	prods   []models.Product
-	prod    models.Product
-	order   models.Order
-	orders  []models.Order
-	cops    []models.CustomOrderedProd
-	ok      bool
-	msg     string
-	err     string
-	errs    map[string][]string
-	stCode  int
-	dataMap map[string]interface{}
+	users       []models.User
+	user        models.User
+	prods       []models.Product
+	prod        models.Product
+	prodReviews []models.Review
+	order       models.Order
+	orders      []models.Order
+	cops        []models.CustomOrderedProd
+	ok          bool
+	msg         string
+	err         string
+	errs        map[string][]string
+	stCode      int
+	dataMap     map[string]interface{}
 }
 
 func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
@@ -226,6 +239,32 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		}
 
 		w.Write(newJson)
+
+	case "prodreviewsjson":
+		var prodReviews []prodReviewsJson
+
+		for _, prop := range opts.prodReviews {
+			p := prodReviewsJson{
+				Id:        prop.Id,
+				Name:      prop.Name,
+				Comment:   prop.Comment,
+				Rating:    prop.Rating,
+				UserId:    prop.UserId,
+				ProductId: prop.ProductId,
+				CreatedAt: prop.CreatedAt.Format(timeFormatStr),
+				UpdatedAt: prop.UpdatedAt.Format(timeFormatStr),
+				UserName:  prop.User.Name,
+			}
+			prodReviews = append(prodReviews, p)
+		}
+
+		resp, err := json.Marshal(prodReviews)
+		if err != nil {
+			fmt.Println("Error marshaling json")
+			helpers.ServerError(w, err)
+		}
+
+		w.Write(resp)
 
 	case "orderjson":
 		usr := userJson{

@@ -87,6 +87,22 @@ BEFORE UPDATE ON orderedprods
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
+CREATE TABLE reviews(
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+  name VARCHAR(50) NOT NULL,
+  comment VARCHAR(150) NOT NULL,
+  rating INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON reviews
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
 -- E.G
 -- select p.name, u.username FROM orderedprods as op
 -- JOIN products as p ON p.id = op.product_id

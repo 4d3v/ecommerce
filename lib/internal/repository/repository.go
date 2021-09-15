@@ -8,6 +8,8 @@ type DatabaseRepo interface {
 	GetProductById(id int) (models.Product, error)
 	UpdateProductById(prod models.Product) error
 	DeleteProductById(id int) error
+	GetProductReviews(productId int) ([]models.Review, error)
+	InsertProductReview(review models.Review) error
 
 	AdminInsertUser(usr models.User) error
 	AdminGetUsers() ([]models.User, error)

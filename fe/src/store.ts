@@ -7,6 +7,8 @@ import {
   adminProductUpdateReducer,
   productDetailsReducer,
   productListReducer,
+  productReviewCreateReducer,
+  productReviewListReducer,
 } from './reducers/productReducers'
 import { cartReducer } from './reducers/cartReducers'
 import {
@@ -50,6 +52,8 @@ const userInfoJson = localStorage.getItem('userInfo'),
 const reducer = combineReducers({
     productList: productListReducer,
     productDetails: productDetailsReducer,
+    productReviewCreate: productReviewCreateReducer,
+    productReviewList: productReviewListReducer,
     userLogin: userLoginReducer,
     userLogout: userLogoutReducer,
     userSignUp: userSignUpReducer,
