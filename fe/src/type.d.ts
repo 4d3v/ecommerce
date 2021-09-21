@@ -231,6 +231,7 @@ interface IOrderedProd {
   prod_count_in_stock: number
   prod_qty: number
   prod_image: string
+  prod_id: number
   prod_name: string
   prod_price: number
   user_id: string

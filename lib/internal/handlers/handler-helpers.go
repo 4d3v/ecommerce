@@ -83,6 +83,7 @@ type orderJson struct {
 
 type customOrderedProdJson struct {
 	Id               int    `json:"id"`
+	ProdId           int    `json:"prod_id"`
 	ProdName         string `json:"prod_name"`
 	ProdImage        string `json:"prod_image"`
 	ProdBrand        string `json:"prod_brand"`
@@ -351,6 +352,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 		for _, cop := range opts.cops {
 			copJson := customOrderedProdJson{
 				Id:               cop.Id,
+				ProdId:           cop.ProdId,
 				ProdName:         cop.ProdName,
 				ProdImage:        cop.ProdImage,
 				ProdBrand:        cop.ProdBrand,

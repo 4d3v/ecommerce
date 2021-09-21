@@ -193,3 +193,31 @@ export const listProductReviews =
       console.log(error.response)
     }
   }
+
+export const updateProductCountInStock =
+  (productId: number, countInStock: number, qty: number) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_REQUEST,
+      })
+
+      const { data } = await axios.patch(
+        `${BASE_URL}/products/countinstock/${productId}`,
+        `count_in_stock=${countInStock}&qty=${qty}`,
+        { withCredentials: true }
+      )
+
+      dispatch({
+        type: productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
+  }

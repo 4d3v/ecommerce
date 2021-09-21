@@ -91,7 +91,7 @@ func (dbrepo *postgresDbRepo) GetOrderedProds(userId int, orderId int) ([]models
 	var customOrderedProds []models.CustomOrderedProd
 
 	query := `
-        SELECT op.id, p.name, p.image, p.brand, p.price, p.count_in_stock, 
+        SELECT op.id, op.product_id, p.name, p.image, p.brand, p.price, p.count_in_stock, 
 		u.id, o.id, op.qty, op.created_at, op.updated_at FROM orderedprods AS op
 		JOIN products AS p ON p.id = op.product_id
 		JOIN users AS u ON u.id = op.user_id
@@ -110,6 +110,7 @@ func (dbrepo *postgresDbRepo) GetOrderedProds(userId int, orderId int) ([]models
 
 		err := rows.Scan(
 			&customOrderedProd.Id,
+			&customOrderedProd.ProdId,
 			&customOrderedProd.ProdName,
 			&customOrderedProd.ProdImage,
 			&customOrderedProd.ProdBrand,

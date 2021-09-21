@@ -7,6 +7,7 @@ type DatabaseRepo interface {
 	GetProducts() ([]models.Product, error)
 	GetProductById(id int) (models.Product, error)
 	UpdateProductReviewRating(prod models.Product) error
+	UpdateProductCountInStock(productId, countInStock int) error
 	UpdateProductById(prod models.Product) error
 	DeleteProductById(id int) error
 	GetProductReviews(productId int) ([]models.Review, error)
@@ -38,7 +39,7 @@ type DatabaseRepo interface {
 	GetOrderById(id, userId int) (models.Order, error)
 	InsertOrder(order models.Order) (int, error)
 	UpdateOrder(order models.Order) error
-	SetOrderToPaid(order models.Order) error
+	PayOrder(order models.Order) error
 	DeleteOrder(id int) error
 
 	AdminGetOrderedProds(orderId int) ([]models.CustomOrderedProd, error)

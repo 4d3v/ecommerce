@@ -324,7 +324,7 @@ func (repo *Repository) CreateProductReview(w http.ResponseWriter, r *http.Reque
 	form := forms.New(r.PostForm)
 	form.Required("name", "rating", "comment")
 	form.MinLength("name", 3)
-	form.MinLength("name", 7)
+	form.MinLength("comment", 7)
 
 	rating, err := strconv.ParseFloat(r.Form.Get("rating"), 64) // Validated above
 	if err != nil {
@@ -373,6 +373,54 @@ func (repo *Repository) UpdateProductReviewRating(w http.ResponseWriter, r *http
 		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
 		return
 	}
+}
+
+func (repo *Repository) UpdateProductCountInStock(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	productId, err := strconv.Atoi(chi.URLParam(r, "productid"))
+	if err != nil {
+		sendError(w, "invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	_, err = repo.getUserByJwt(r)
+	if err != nil { // Should already be handled on pre middleware
+		fmt.Println("ERR GetUserByJwt", err)
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("count_in_stock", "qty")
+	form.IsUint("count_in_stock")
+	form.IsUint("qty")
+
+	countInStock, _ := strconv.Atoi(r.Form.Get("count_in_stock")) // Validated above
+	qty, _ := strconv.Atoi(r.Form.Get("qty"))                     // Validated above
+	countInStock = countInStock - qty
+
+	if !form.Valid() {
+		sendFormError(w, "Invalid form", http.StatusNotFound, form)
+		return
+	}
+
+	if countInStock < 0 {
+		sendError(w, "No products available", http.StatusBadRequest)
+		return
+	}
+
+	err = repo.DB.UpdateProductCountInStock(productId, countInStock)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)
+		return
+	}
+
+	sendJson("msgjson", w, &options{ok: true, msg: "Product count in stock updated with success", stCode: http.StatusOK})
 }
 
 func (repo *Repository) GetProductReviews(w http.ResponseWriter, r *http.Request) {

@@ -311,7 +311,7 @@ func (dbrepo *postgresDbRepo) UpdateOrder(order models.Order) error {
 	return nil
 }
 
-func (dbrepo *postgresDbRepo) SetOrderToPaid(order models.Order) error {
+func (dbrepo *postgresDbRepo) PayOrder(order models.Order) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -339,7 +339,6 @@ func (dbrepo *postgresDbRepo) SetOrderToPaid(order models.Order) error {
 	rows, err := sqlRes.RowsAffected() // Should affect a row
 	if err != nil || rows == 0 {
 		return errors.New("no orders found with specified id")
-
 	}
 
 	return nil

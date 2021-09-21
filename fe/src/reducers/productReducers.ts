@@ -121,3 +121,19 @@ export const productReviewCreateReducer = (
       return state
   }
 }
+
+export const productUpdateCountInStockReducer = (
+  state: { ok: boolean; message: string } | {} = {},
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_REQUEST:
+      return { loading: true }
+    case productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_SUCCESS:
+      return { loading: false, result: action.payload }
+    case productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}

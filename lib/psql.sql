@@ -32,9 +32,9 @@ CREATE TABLE products(
   brand VARCHAR(50),
   category VARCHAR(50),
   description VARCHAR(50),
-  rating INTEGER DEFAULT 0,
-  sum_reviews INTEGER DEFAULT 0,
-  num_reviews INTEGER DEFAULT 0,
+  rating FLOAT8 DEFAULT 0,
+  sum_reviews FLOAT8 DEFAULT 0,
+  num_reviews FLOAT8 DEFAULT 0,
   price INTEGER DEFAULT 0,
   count_in_stock INTEGER DEFAULT 0,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -94,7 +94,7 @@ CREATE TABLE reviews(
   product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
   name VARCHAR(50) NOT NULL,
   comment VARCHAR(150) NOT NULL,
-  rating INTEGER NOT NULL,
+  rating FLOAT8 NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

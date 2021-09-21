@@ -30,6 +30,7 @@ import {
 } from '@paypal/paypal-js/types/components/buttons'
 import Alert from '../components/Alert'
 import { UserRole } from '../enums'
+import { updateProductCountInStock } from '../actions/productActions'
 
 interface HistoryParams {}
 
@@ -157,8 +158,19 @@ const OrderScreen = () => {
 
       onApproval()
         .then((data) => {
-          console.log(data)
+          console.log('THE DATA ON APPROVAL', data)
           setPayerName(details.payer.name.given_name)
+
+          orderedProds.forEach(async (el) => {
+            dispatch(
+              updateProductCountInStock(
+                el.prod_id,
+                el.prod_count_in_stock,
+                el.prod_qty
+              )
+            )
+          })
+
           setTransactionCompleted(true)
           setTimeout(() => {
             setTransactionCompleted(false)

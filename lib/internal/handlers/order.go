@@ -340,7 +340,7 @@ func (repo *Repository) PayOrder(w http.ResponseWriter, r *http.Request) {
 		UserId:                    user.Id,
 	}
 
-	err = repo.DB.SetOrderToPaid(order)
+	err = repo.DB.PayOrder(order)
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusNotFound)

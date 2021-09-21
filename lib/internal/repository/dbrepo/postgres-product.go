@@ -159,6 +159,27 @@ func (dbrepo *postgresDbRepo) UpdateProductById(prod models.Product) error {
 	return nil
 }
 
+func (dbrepo *postgresDbRepo) UpdateProductCountInStock(productId, countInStock int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `UPDATE products SET count_in_stock = $1, updated_at = $2 WHERE id = $3`
+
+	_, err := dbrepo.DB.ExecContext(
+		ctx,
+		query,
+		countInStock,
+		time.Now(),
+		productId,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (dbrepo *postgresDbRepo) UpdateProductReviewRating(prod models.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

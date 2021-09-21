@@ -7,11 +7,9 @@ interface IMessage {
 
 const Message = ({ info, error }: IMessage) => {
   return info ? (
-    <h2 className='message-info'>{info}</h2>
-  ) : error ? (
-    <h2 className='message-error'>{error}</h2>
+    <h2 className='message-info u-my-s'>{info}</h2>
   ) : (
-    <h2>...</h2>
+    <h2 className='message-error u-my-s'>{error}</h2>
   )
 }
 
