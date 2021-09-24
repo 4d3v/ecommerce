@@ -41,11 +41,16 @@ declare global {
 
 const App = () => {
   const [paycId, setPaycId] = useState('NOT_SET')
+  const [leftNavToggled, setLeftNavToggled] = useState(false)
+
+  const toggleLeftNav = () => setLeftNavToggled((st: boolean) => !st)
+
   const initialPaypalOptions = {
     'client-id': paycId,
     currency: 'USD',
     intent: 'capture',
   }
+
   useEffect(() => {
     const getPaypalClientId = async () => {
       const {
@@ -64,7 +69,7 @@ const App = () => {
     <Router>
       {paycId !== 'NOT_SET' && (
         <PayPalScriptProvider options={initialPaypalOptions}>
-          <Header />
+          <Header toogleLeftNav={toggleLeftNav} />
           <main>
             <Switch>
               <Route path='/placeorder' component={PlaceOrderScreen} exact />
@@ -114,7 +119,10 @@ const App = () => {
                 component={AdminUserEditScreen}
                 exact
               />
-              <Route path='/' component={HomeScreen} exact />
+
+              <Route path='/'>
+                <HomeScreen leftNavToggled={leftNavToggled} />
+              </Route>
             </Switch>
           </main>
           <Footer />

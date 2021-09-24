@@ -16,26 +16,24 @@ const Product = ({ product }: IProps) => {
           alt={product.name}
           className='card-prod__img'
         />
-      </Link>
 
-      <div className='card-prod__body'>
-        <Link to={`/product/${product.id}`}>
+        <div className='card-prod__body'>
           <div>
             <strong>{product.name}</strong>
           </div>
-        </Link>
 
-        <div className='u-my-s'>
-          <Rating
-            value={product.rating}
-            text={`${product.num_reviews} reviews`}
-          />
-        </div>
+          <div className='u-my-s'>
+            <Rating
+              value={product.rating}
+              text={`${product.num_reviews} reviews`}
+            />
+          </div>
 
-        <div>
-          <h3 className='card-prod__price u-my-s'>${product.price}</h3>
+          <div>
+            <h3 className='card-prod__price u-my-s'>${product.price}</h3>
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }

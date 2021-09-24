@@ -4,15 +4,21 @@ import { Link, useHistory } from 'react-router-dom'
 import { logout } from '../actions/userActions'
 import { IUserLoginRdx } from '../type'
 
+interface IProps {
+  toogleLeftNav: () => void
+}
+
 interface HistoryParams {}
 
-const Header = () => {
+const Header = ({ toogleLeftNav }: IProps) => {
   const history = useHistory<HistoryParams>()
 
   const dispatch = useDispatch()
   const userLogin = useSelector(
     (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
+
+  const handleHambBtn = () => toogleLeftNav()
 
   const logoutHandler = () => {
     dispatch(logout())
@@ -21,8 +27,27 @@ const Header = () => {
 
   return (
     <header id='header'>
-      <nav className='container'>
-        <div>
+      <nav className='dki01'>
+        <button className='_3Cn68 _2Lj_X' onClick={handleHambBtn}>
+          <span>
+            <svg
+              width='0'
+              height='0'
+              viewBox='0 0 24 24'
+              version='1.1'
+              xmlns='http://www.w3.org/2000/svg'
+              xmlnsXlink='http://www.w3.org/1999/xlink'
+            >
+              <g>
+                <path d='M6 4h12v3H6zM6 18h12v3H6zM2 11h20v3H2z'></path>
+              </g>
+            </svg>
+          </span>
+        </button>
+
+        <div style={{ flex: '1' }}>
+          {' '}
+          {/* TEMP STYLING */}
           <Link to='/'>ECOMMERCE</Link>
         </div>
         <ul className='u-txt-center'>

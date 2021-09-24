@@ -1,140 +1,151 @@
 .prod-details {
-  .prod-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 175px;
+  --scrollbar-width: 0px;
+  width: 100%;
+  position: relative;
+  z-index: 0;
+  padding-top: 54px;
 
-    &__details,
-    &__stats {
-      height: 100%;
+  .content-wrapper {
+    margin: 2rem;
 
-      .prod-opts-wrapper {
+    .prod-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 175px;
+
+      &__details,
+      &__stats {
         height: 100%;
 
-        .prod-info {
-          &__item {
-            button {
-              display: block !important;
+        .prod-opts-wrapper {
+          height: 100%;
+
+          .prod-info {
+            &__item {
+              button {
+                display: block !important;
+              }
             }
           }
         }
       }
-    }
 
-    &__details {
-      display: flex;
-      align-items: center;
-      margin-right: 0.5rem;
-
-      .prod-img-wrapper {
-        height: 300px;
-        margin-right: 0.5rem;
-
-        .prod-img {
-          height: 100%;
-        }
-      }
-    }
-
-    &__stats {
-      margin-left: 0.5rem;
-
-      .prod-opts-wrapper {
-        ul {
-          border: 1px solid #424242;
-        }
-      }
-
-      .prod-info {
-        &__item {
-          display: flex;
-          background-color: #2f2f2f;
-
-          div,
-          select {
-            border: 1px solid #424242;
-          }
-
-          div {
-            width: 50%;
-            padding: 0.5rem !important;
-          }
-
-          select {
-            background: #2f2f2f;
-            color: $base-font-light;
-            width: 50%;
-          }
-
-          button,
-          a {
-            margin: auto !important;
-          }
-        }
-      }
-    }
-
-    &__info {
-      background-color: #2b2b2b;
-      padding: 1rem;
-    }
-  }
-
-  .reviews-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-
-    .section-reviews {
-      &__wrapper {
-        display: flex;
-        background-color: #2b2b2b;
-        padding: 2rem 1rem;
-        max-width: 80rem;
-        flex-direction: column;
-        cursor: pointer;
-      }
-
-      &__title {
+      &__details {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
+        margin-right: 0.5rem;
 
-        i {
-          font-size: 1.8rem;
-          color: yellow;
+        .prod-img-wrapper {
+          height: 300px;
+          margin-right: 0.5rem;
+
+          .prod-img {
+            height: 100%;
+          }
         }
       }
 
-      &__userreviews {
-        .user-reviews {
-          max-width: 80%;
-          margin: 1rem auto;
-          text-align: left;
+      &__stats {
+        margin-left: 0.5rem;
 
-          li {
-            padding: 5px;
-            border-top: 1px solid;
-            border-bottom: 1px solid;
+        .prod-opts-wrapper {
+          ul {
+            background-color: $base-secondary-color;
+            border: 1px solid #424242;
           }
+        }
 
-          &__top {
+        .prod-info {
+          &__item {
             display: flex;
-            justify-content: space-between;
+
+            div,
+            select {
+              border: 1px solid #424242;
+            }
+
+            div {
+              width: 50%;
+              padding: 0.5rem !important;
+            }
+
+            select {
+              // background: #2f2f2f;
+              background-color: inherit;
+              color: $base-font-light;
+              width: 50%;
+            }
+
+            button,
+            a {
+              margin: auto !important;
+            }
           }
         }
       }
 
-      &__usrrevhid {
-        overflow: hidden;
-        height: 0px;
-        margin: 0;
+      &__info {
+        background-color: $base-primary-color;
+        padding: 1rem;
       }
+    }
 
-      &__usrrevvis {
-        overflow: visible;
-        height: auto;
-        margin: 0;
+    .reviews-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .section-reviews {
+        &__wrapper {
+          display: flex;
+          background-color: $base-secondary-color;
+          padding: 2rem 1rem;
+          // max-width: 80rem;
+          flex-direction: column;
+          cursor: pointer;
+        }
+
+        &__title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1rem 0;
+
+          i {
+            font-size: 1.8rem;
+            color: yellow;
+          }
+        }
+
+        &__userreviews {
+          .user-reviews {
+            max-width: 80%;
+            margin: 1rem auto;
+            text-align: left;
+
+            li {
+              padding: 5px;
+              border-top: 1px solid;
+              border-bottom: 1px solid;
+            }
+
+            &__top {
+              display: flex;
+              justify-content: space-between;
+            }
+          }
+        }
+
+        &__usrrevhid {
+          overflow: hidden;
+          height: 0px;
+          margin: 0;
+        }
+
+        &__usrrevvis {
+          overflow: visible;
+          height: auto;
+          margin: 0;
+        }
       }
     }
   }

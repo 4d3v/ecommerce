@@ -103,9 +103,72 @@
 
 .container {
   width: 1140px;
-  padding: 0 15px 0 15px;
+  padding: 54px 15px 0 15px;
   margin-right: auto;
   margin-left: auto;
+}
+
+.content-title {
+  background: $base-secondary-color;
+  padding: 1rem;
+}
+
+.dki01 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  height: 54px;
+  z-index: 99;
+  background: #06070d;
+}
+
+.dki02 {
+  position: sticky;
+  top: 54px;
+  z-index: 99;
+}
+
+._3Cn68 {
+  margin-left: 8px !important;
+  padding: 0 16px !important;
+}
+
+._2Lj_X {
+  box-sizing: border-box;
+  margin: 0;
+  margin-left: 0px;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  height: 100%;
+
+  span {
+    color: $base-font-light;
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+
+      &:hover {
+        color: #00d491;
+      }
+    }
+  }
 }
 
 .btn {

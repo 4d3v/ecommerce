@@ -10,6 +10,7 @@
 @import './components/product';
 @import './components/header';
 @import './components/footer';
+@import './components/mainsidenav';
 @import './components/loader';
 @import './components/sidenav';
 @import './components/alert';
@@ -27,7 +28,7 @@
 @import './pages/orderscreen';
 
 body {
-  background-color: $base-primary-color;
+  background-color: $base-main-dark-bg;
 }
 
 main {

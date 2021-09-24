@@ -1,4 +1,21 @@
-.prods-card-wrapper {
+.home {
+  --scrollbar-width: 0px;
+  min-height: calc(100vh - 54px - 433px);
+  width: 100%;
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 72px auto;
+  grid-template-areas: 'networkbar body';
+  z-index: 0;
+
+  padding-top: 54px;
+
+  &__content {
+  }
+
+  .prods-card-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 2rem;
+  }
 }

@@ -84,7 +84,7 @@ const ProductScreen = () => {
   }
 
   return (
-    <>
+    <div className='prod-details'>
       {productDetails && productDetails.loading ? (
         <Loader />
       ) : productDetails && productDetails.error ? (
@@ -92,224 +92,234 @@ const ProductScreen = () => {
       ) : (
         productDetails &&
         productDetails.product && (
-          <div className='container u-txt-center prod-details'>
-            <div className='prod-wrapper u-my-s'>
-              <div className='prod-wrapper__details'>
-                <div className='prod-img-wrapper'>
-                  <img
-                    src={`/images/${productDetails.product.image}`}
-                    alt={productDetails.product.name}
-                    className='prod-img'
-                  />
-                </div>
-
-                <div className='prod-opts-wrapper'>
-                  <ul className='prod-info'>
-                    <li className='prod-info__item u-my-t u-txt-left'>
-                      <h2>
-                        {productDetails.product
-                          ? productDetails.product.name
-                          : 'null'}
-                      </h2>
-                    </li>
-                    <li className='prod-info__item u-my-t u-txt-left'>
-                      <Rating
-                        value={productDetails.product.rating}
-                        text={`
-                ${productDetails.product.num_reviews}  reviews`}
-                      />
-                    </li>
-                    <li className='prod-info__item u-my-t u-txt-left'>
-                      <strong>Brand: </strong>
-                      {productDetails.product.brand}
-                    </li>
-
-                    <li className='prod-info__item u-my-t u-txt-left'>
-                      <strong>Category: </strong>
-                      {productDetails.product.category}
-                    </li>
-
-                    <li className='prod-info__item u-my-t u-txt-left'>
-                      <strong>Description: </strong>
-                      {productDetails.product?.description &&
-                        productDetails.product.description}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className='prod-wrapper__stats'>
-                <div className='prod-opts-wrapper'>
-                  <ul>
-                    <li className='prod-wrapper__info'>INFO</li>
-                    <li className='prod-info__item u-txt-left'>
-                      <div>Price</div> <div>{productDetails.product.price}</div>
-                    </li>
-                    <li className='prod-info__item u-txt-left'>
-                      <div> Status</div>
-                      <div>
-                        {productDetails.product?.count_in_stock !== undefined &&
-                        productDetails.product.count_in_stock > 0
-                          ? 'In Stock'
-                          : 'Out Of Stock'}
-                      </div>
-                    </li>
-                    {productDetails.product.count_in_stock !== undefined &&
-                      productDetails.product.count_in_stock > 0 && (
-                        <li className='prod-info__item u-txt-left'>
-                          <div>
-                            Quantity: {productDetails.product.count_in_stock}{' '}
-                            available
-                          </div>
-                          <select
-                            value={qty}
-                            onChange={(e) => setQty(Number(e.target.value))}
-                          >
-                            {[
-                              ...Array(productDetails.product.count_in_stock),
-                            ].map((el, i) => (
-                              <option key={i + 1} value={i + 1}>
-                                {i + 1 === 1
-                                  ? i + 1 + ' unit'
-                                  : i + 1 + ' units'}
-                              </option>
-                            ))}
-                          </select>
-                        </li>
-                      )}
-                    <li className='prod-info__item u-my-t'>
-                      <button
-                        className='btn'
-                        onClick={addToCartHandler}
-                        disabled={
-                          productDetails.product?.count_in_stock !==
-                            undefined &&
-                          productDetails.product.count_in_stock > 0
-                            ? false
-                            : true
-                        }
-                      >
-                        Add To Cart
-                      </button>
-                    </li>
-
-                    <li className='prod-info__item u-my-t'>
-                      <Link to='/' className='btn u-my-s u-txt-center'>
-                        Go Back
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <div>
+            <div className='content-title dki02'>
+              <h2 className='u-txt-center'>PRODUCT DETAILS</h2>
             </div>
 
-            <div className='reviews-wrapper u-my-s'>
-              <section className='section-reviews'>
-                <div
-                  className='section-reviews__wrapper'
-                  onClick={() => setUserReviewsHidden((st) => !st)}
-                >
-                  <div className='section-reviews__title'>
-                    <i className='fas fa-star'></i>
-                    <h2>Reviews</h2>
-                    <i
-                      className={`fas fa-arrow-${
-                        userReviewsHidden ? 'down' : 'up'
-                      }`}
-                    ></i>
+            <div className='content-wrapper'>
+              <div className='prod-wrapper u-my-s'>
+                <div className='prod-wrapper__details'>
+                  <div className='prod-img-wrapper'>
+                    <img
+                      src={`/images/${productDetails.product.image}`}
+                      alt={productDetails.product.name}
+                      className='prod-img'
+                    />
                   </div>
-                  {productReviewList && productReviewList.error && (
-                    <Message error={productReviewList.error} />
-                  )}
-                  {productReviewList &&
-                  productReviewList.reviews &&
-                  productReviewList.reviews.length > 0 ? (
-                    <div
-                      className={`section-reviews__userreviews ${
-                        userReviewsHidden
-                          ? 'section-reviews__usrrevhid'
-                          : 'section-reviews__usrrevvis'
-                      }`}
-                    >
-                      <ul className='user-reviews'>
-                        {productReviewList.reviews.map((review) => (
-                          <li key={review.id}>
-                            <div className='user-reviews__top'>
-                              <div>{review.created_at}</div>
-                              <Rating value={review.rating} color='yellow' />
-                            </div>
-                            <div>{review.username}</div>
+
+                  <div className='prod-opts-wrapper'>
+                    <ul className='prod-info'>
+                      <li className='prod-info__item u-my-t u-txt-left'>
+                        <h2>
+                          {productDetails.product
+                            ? productDetails.product.name
+                            : 'null'}
+                        </h2>
+                      </li>
+                      <li className='prod-info__item u-my-t u-txt-left'>
+                        <Rating
+                          value={productDetails.product.rating}
+                          text={`
+                ${productDetails.product.num_reviews}  reviews`}
+                        />
+                      </li>
+                      <li className='prod-info__item u-my-t u-txt-left'>
+                        <strong>Brand: </strong>
+                        {productDetails.product.brand}
+                      </li>
+
+                      <li className='prod-info__item u-my-t u-txt-left'>
+                        <strong>Category: </strong>
+                        {productDetails.product.category}
+                      </li>
+
+                      <li className='prod-info__item u-my-t u-txt-left'>
+                        <strong>Description: </strong>
+                        {productDetails.product?.description &&
+                          productDetails.product.description}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className='prod-wrapper__stats'>
+                  <div className='prod-opts-wrapper'>
+                    <ul>
+                      <li className='prod-wrapper__info'>INFO</li>
+                      <li className='prod-info__item u-txt-left'>
+                        <div>Price</div>{' '}
+                        <div>{productDetails.product.price}</div>
+                      </li>
+                      <li className='prod-info__item u-txt-left'>
+                        <div> Status</div>
+                        <div>
+                          {productDetails.product?.count_in_stock !==
+                            undefined &&
+                          productDetails.product.count_in_stock > 0
+                            ? 'In Stock'
+                            : 'Out Of Stock'}
+                        </div>
+                      </li>
+                      {productDetails.product.count_in_stock !== undefined &&
+                        productDetails.product.count_in_stock > 0 && (
+                          <li className='prod-info__item u-txt-left'>
                             <div>
-                              <strong>Title:</strong> {review.name}
+                              Quantity: {productDetails.product.count_in_stock}{' '}
+                              available
                             </div>
-                            <div>
-                              <strong>Review:</strong>
-                              {review.comment}
-                            </div>
+                            <select
+                              value={qty}
+                              onChange={(e) => setQty(Number(e.target.value))}
+                            >
+                              {[
+                                ...Array(productDetails.product.count_in_stock),
+                              ].map((el, i) => (
+                                <option key={i + 1} value={i + 1}>
+                                  {i + 1 === 1
+                                    ? i + 1 + ' unit'
+                                    : i + 1 + ' units'}
+                                </option>
+                              ))}
+                            </select>
                           </li>
-                        ))}
-                      </ul>
+                        )}
+                      <li className='prod-info__item u-my-t'>
+                        <button
+                          className='btn'
+                          onClick={addToCartHandler}
+                          disabled={
+                            productDetails.product?.count_in_stock !==
+                              undefined &&
+                            productDetails.product.count_in_stock > 0
+                              ? false
+                              : true
+                          }
+                        >
+                          Add To Cart
+                        </button>
+                      </li>
+
+                      <li className='prod-info__item u-my-t'>
+                        <Link to='/' className='btn u-my-s u-txt-center'>
+                          Go Back
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className='reviews-wrapper u-my-s'>
+                <section className='section-reviews'>
+                  {productReviewList && productReviewList.error ? (
+                    <Message error={productReviewList.error} />
+                  ) : productReviewList &&
+                    productReviewList.reviews &&
+                    productReviewList.reviews.length > 0 ? (
+                    <div
+                      className='section-reviews__wrapper'
+                      onClick={() => setUserReviewsHidden((st) => !st)}
+                    >
+                      <div className='section-reviews__title'>
+                        <i className='fas fa-star'></i>
+                        <h2>Reviews</h2>
+                        <i
+                          className={`fas fa-arrow-${
+                            userReviewsHidden ? 'down' : 'up'
+                          }`}
+                        ></i>
+                      </div>
+                      <div
+                        className={`section-reviews__userreviews ${
+                          userReviewsHidden
+                            ? 'section-reviews__usrrevhid'
+                            : 'section-reviews__usrrevvis'
+                        }`}
+                      >
+                        <ul className='user-reviews'>
+                          {productReviewList.reviews.map((review) => (
+                            <li key={review.id}>
+                              <div className='user-reviews__top'>
+                                <div>{review.created_at}</div>
+                                <Rating value={review.rating} color='yellow' />
+                              </div>
+                              <div>{review.username}</div>
+                              <div>
+                                <strong>Title:</strong> {review.name}
+                              </div>
+                              <div>
+                                <strong>Review:</strong>
+                                {review.comment}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   ) : (
                     <div className='u-my-s'>
-                      <Message info='No Reviews' />
+                      <Message error='No Reviews' />
                     </div>
                   )}
-                </div>
-              </section>
-            </div>
+                </section>
+              </div>
 
-            <div>
-              {userLogin && userLogin.userInfo ? (
-                <>
-                  {productReviewCreate && productReviewCreate.error && (
-                    <Message error={productReviewCreate.error} />
-                  )}
-                  <form className='form' onSubmit={createProductReviewHandler}>
-                    <h3>Write a customer review</h3>
-                    <label htmlFor='name'>Name</label>
-                    <input
-                      type='text'
-                      placeholder='Enter name'
-                      name='name'
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-
-                    <label htmlFor='comment'>Review</label>
-                    <textarea
-                      id='comment'
-                      name='comment'
-                      placeholder='Post your review'
-                      rows={4}
-                      cols={50}
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                    ></textarea>
-
-                    <select
-                      value={rating}
-                      onChange={(e) => setRating(Number(e.target.value))}
+              <div>
+                {userLogin && userLogin.userInfo ? (
+                  <>
+                    {productReviewCreate && productReviewCreate.error && (
+                      <Message error={productReviewCreate.error} />
+                    )}
+                    <form
+                      className='form'
+                      onSubmit={createProductReviewHandler}
                     >
-                      <option value={1}>1 - Poor</option>
-                      <option value={2}>2 - Fair</option>
-                      <option value={3}>3 - Good</option>
-                      <option value={4}>4 - Very Good</option>
-                      <option value={5}>5 - Excellent</option>
-                    </select>
+                      <h3>Write a customer review</h3>
+                      <label htmlFor='name'>Name</label>
+                      <input
+                        type='text'
+                        placeholder='Enter name'
+                        name='name'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
 
-                    <button type='submit'>Submit</button>
-                  </form>
-                </>
-              ) : (
-                <Message info='Please login to post a review' />
-              )}
+                      <label htmlFor='comment'>Review</label>
+                      <textarea
+                        id='comment'
+                        name='comment'
+                        placeholder='Post your review'
+                        rows={4}
+                        cols={50}
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                      ></textarea>
+
+                      <select
+                        value={rating}
+                        onChange={(e) => setRating(Number(e.target.value))}
+                      >
+                        <option value={1}>1 - Poor</option>
+                        <option value={2}>2 - Fair</option>
+                        <option value={3}>3 - Good</option>
+                        <option value={4}>4 - Very Good</option>
+                        <option value={5}>5 - Excellent</option>
+                      </select>
+
+                      <button type='submit'>Submit</button>
+                    </form>
+                  </>
+                ) : (
+                  <Message error='Please login to post a review' />
+                )}
+              </div>
             </div>
           </div>
         )
       )}
-    </>
+    </div>
   )
 }
 

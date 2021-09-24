@@ -48,9 +48,12 @@ func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
 		SELECT id, name, image, brand, category, description,
 		rating, num_reviews, price, count_in_stock, user_id,
 		created_at, updated_at FROM products
-	` // ORDER BY id ASC
+		WHERE created_at < $1
+		ORDER BY id DESC
+		FETCH FIRST 10 ROWS ONLY
+	`
 
-	rows, err := dbrepo.DB.QueryContext(ctx, query)
+	rows, err := dbrepo.DB.QueryContext(ctx, query, time.Now())
 	if err != nil {
 		return products, err
 	}

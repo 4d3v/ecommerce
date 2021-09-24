@@ -4,9 +4,14 @@ import { listProducts } from '../actions/productActions'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import MainSideNav from '../components/MainSideNav'
 import { IProductListRdx } from '../type'
 
-const HomeScreen = () => {
+interface IProps {
+  leftNavToggled: boolean
+}
+
+const HomeScreen = ({ leftNavToggled }: IProps) => {
   const dispatch = useDispatch()
 
   const productList: IProductListRdx = useSelector(
@@ -20,19 +25,25 @@ const HomeScreen = () => {
   }, [dispatch])
 
   return (
-    <div className='container u-py-s'>
-      <h1>PRODUCTS</h1>
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <Message error={error} />
-      ) : (
-        <div className='prods-card-wrapper u-py-s'>
-          {products.map((prod) => (
-            <Product key={prod.id} product={prod} />
-          ))}
+    <div className='home'>
+      <MainSideNav leftNavToggled={leftNavToggled} />
+
+      <div className='home__content'>
+        <div className='content-title dki02'>
+          <h2 className='u-txt-center'>NEWEST PRODUCTS</h2>
         </div>
-      )}
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <Message error={error} />
+        ) : (
+          <div className='prods-card-wrapper'>
+            {products.map((prod) => (
+              <Product key={prod.id} product={prod} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
