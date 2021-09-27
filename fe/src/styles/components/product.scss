@@ -1,6 +1,4 @@
 .card-prod {
-  //   margin-top: 2rem;
-  //   margin-bottom: 2rem;
   background-color: $base-secondary-color;
   width: 300px;
   display: inline-block;
@@ -24,7 +22,6 @@
   &__img {
     position: relative;
     height: 230px;
-    margin-top: 5px;
     margin-bottom: 25px;
     border-top-left-radius: $border-radius-size;
     border-top-right-radius: $border-radius-size;

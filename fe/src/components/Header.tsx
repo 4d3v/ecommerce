@@ -5,12 +5,12 @@ import { logout } from '../actions/userActions'
 import { IUserLoginRdx } from '../type'
 
 interface IProps {
-  toogleLeftNav: () => void
+  toggleLeftNav: () => void
 }
 
 interface HistoryParams {}
 
-const Header = ({ toogleLeftNav }: IProps) => {
+const Header = ({ toggleLeftNav }: IProps) => {
   const history = useHistory<HistoryParams>()
 
   const dispatch = useDispatch()
@@ -18,7 +18,7 @@ const Header = ({ toogleLeftNav }: IProps) => {
     (state: { userLogin: IUserLoginRdx }) => state.userLogin
   )
 
-  const handleHambBtn = () => toogleLeftNav()
+  const handleHambBtn = () => toggleLeftNav()
 
   const logoutHandler = () => {
     dispatch(logout())

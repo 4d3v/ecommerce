@@ -15,12 +15,18 @@ import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { productActions } from '../constants/productConstants'
+import MainSideNav from '../components/MainSideNav'
 
 interface RouteParams {
   id: string
 }
 
-const ProductScreen = () => {
+interface IProps {
+  leftNavToggled: boolean
+  leftNavDefVis: boolean
+}
+
+const ProductScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
   const [qty, setQty] = useState(1)
   const [rating, setRating] = useState(1)
   const [name, setName] = useState('')
@@ -84,7 +90,12 @@ const ProductScreen = () => {
   }
 
   return (
-    <div className='prod-details'>
+    <div className='prod-details _mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
+
       {productDetails && productDetails.loading ? (
         <Loader />
       ) : productDetails && productDetails.error ? (

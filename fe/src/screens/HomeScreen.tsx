@@ -9,9 +9,10 @@ import { IProductListRdx } from '../type'
 
 interface IProps {
   leftNavToggled: boolean
+  leftNavDefVis: boolean
 }
 
-const HomeScreen = ({ leftNavToggled }: IProps) => {
+const HomeScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
   const dispatch = useDispatch()
 
   const productList: IProductListRdx = useSelector(
@@ -26,7 +27,10 @@ const HomeScreen = ({ leftNavToggled }: IProps) => {
 
   return (
     <div className='home'>
-      <MainSideNav leftNavToggled={leftNavToggled} />
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
 
       <div className='home__content'>
         <div className='content-title dki02'>

@@ -69,7 +69,7 @@ const App = () => {
     <Router>
       {paycId !== 'NOT_SET' && (
         <PayPalScriptProvider options={initialPaypalOptions}>
-          <Header toogleLeftNav={toggleLeftNav} />
+          <Header toggleLeftNav={toggleLeftNav} />
           <main>
             <Switch>
               <Route path='/placeorder' component={PlaceOrderScreen} exact />
@@ -90,9 +90,19 @@ const App = () => {
               <Route path='/profile' component={ProfileScreen} exact />
               <Route path='/myorders' component={MyOrdersScreen} exact />
               <Route path='/order/:orderid' component={OrderScreen} exact />
-              <Route path='/product/:id' component={ProductScreen} exact />
+              <Route path='/product/:id' exact>
+                <ProductScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
               <Route path='/topics' component={Topics} exact />
-              <Route path='/cart/:id?' component={CartScreen} exact />
+              <Route path='/cart/:id?' exact>
+                <CartScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
               <Route
                 path='/admin/users'
                 component={AdminUserListScreen}
@@ -121,7 +131,10 @@ const App = () => {
               />
 
               <Route path='/'>
-                <HomeScreen leftNavToggled={leftNavToggled} />
+                <HomeScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={true}
+                />
               </Route>
             </Switch>
           </main>
