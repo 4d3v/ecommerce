@@ -75,11 +75,11 @@
 }
 
 .u-my-ss {
-  padding: 1rem 0 !important;
+  margin: 1rem 0 !important;
 }
 
 .u-my-t {
-  padding: 0.5rem 0 !important;
+  margin: 0.5rem 0 !important;
 }
 
 .u-m-all-m {
@@ -240,6 +240,12 @@
   display: flex;
   border: 1px solid #555;
   min-height: 86vh;
+
+  width: 1140px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 
   &--r {
     width: 100%;

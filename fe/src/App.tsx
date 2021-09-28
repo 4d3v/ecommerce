@@ -72,9 +72,24 @@ const App = () => {
           <Header toggleLeftNav={toggleLeftNav} />
           <main>
             <Switch>
-              <Route path='/placeorder' component={PlaceOrderScreen} exact />
-              <Route path='/payment' component={PaymentScreen} exact />
-              <Route path='/shipping' component={ShippingScreen} exact />
+              <Route path='/placeorder' exact>
+                <PlaceOrderScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
+              <Route path='/payment' exact>
+                <PaymentScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
+              <Route path='/shipping' exact>
+                <ShippingScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
               <Route path='/signup' component={SignUpScreen} exact />
               <Route path='/login' component={LoginScreen} exact />
               <Route
@@ -87,8 +102,18 @@ const App = () => {
                 component={ResetPasswordScreen}
                 exact
               />
-              <Route path='/profile' component={ProfileScreen} exact />
-              <Route path='/myorders' component={MyOrdersScreen} exact />
+              <Route path='/profile' exact>
+                <ProfileScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
+              <Route path='/myorders' exact>
+                <MyOrdersScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
               <Route path='/order/:orderid' component={OrderScreen} exact />
               <Route path='/product/:id' exact>
                 <ProductScreen

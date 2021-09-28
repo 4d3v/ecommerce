@@ -4,17 +4,18 @@ import { useHistory } from 'react-router-dom'
 import { removeAllFromCart } from '../actions/cartActions'
 import { createOrder, createOrderedProds } from '../actions/orderActions'
 import CheckoutSteps from '../components/CheckoutSteps'
+import MainSideNav from '../components/MainSideNav'
 import Message from '../components/Message'
 import OrderItemsInfo from '../components/OrderItemsInfo'
 import OrderSummary from '../components/OrderSummary'
 import { orderActions } from '../constants/orderConstants'
-import { ICart, ICartItemsRdx, IOrderCreateRdx } from '../type'
+import { ICart, ICartItemsRdx, IMainNavProps, IOrderCreateRdx } from '../type'
 
 interface HistoryParams {}
 
 let orderedProdsCreated = 0
 
-const PlaceOrderScreen = () => {
+const PlaceOrderScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const dispatch = useDispatch()
   const history = useHistory<HistoryParams>()
 
@@ -85,44 +86,71 @@ const PlaceOrderScreen = () => {
   return orderCreate && orderCreate.error ? (
     <Message error={orderCreate.error} />
   ) : (
-    <div className='container'>
-      <CheckoutSteps step1 step2 step3 step4 />
-      {/*LEFT COL*/}
-      <div className='placeorder-wrapper u-my-s'>
-        <ul className='placeorder-info'>
-          <li>
-            <h2>Shipping</h2>
-            <p>
-              <strong>Address: </strong>
-              {cart.shippingAddress.postal_code},{cart.shippingAddress.address},
-              {cart.shippingAddress.country},{cart.shippingAddress.city}
-            </p>
-          </li>
+    <div className='_mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
 
-          <li>
-            <h2>Payment Method</h2>
-            <strong>Method: </strong>
-            {cart.paymentMethod}
-          </li>
+      <div>
+        <div className='content-title dki02'>
+          <h2 className='u-txt-center'>Place Order</h2>
+        </div>
 
-          <li>
-            <h2>Order Items</h2>
-            <OrderItemsInfo cartProds={cart.cartItems} />
-          </li>
+        <CheckoutSteps step1 step2 step3 step4 />
 
-          <li>
-            <button
-              className='btn'
-              disabled={cart.cartItems.length === 0}
-              onClick={placeOrderHandler}
-            >
-              Place Order
-            </button>
-          </li>
-        </ul>
+        {/*LEFT COL*/}
+        <div className='placeorder-wrapper'>
+          <ul className='placeorder-info'>
+            <li>
+              <h2>Shipping</h2>
+              <div>
+                <p>
+                  <strong>Address: </strong>
+                  {cart.shippingAddress.address}
+                </p>
+                <p>
+                  <strong>PostalCode: </strong>
+                  {cart.shippingAddress.postal_code}
+                </p>
+                <p>
+                  <strong>Country: </strong>
+                  {cart.shippingAddress.country}
+                </p>
+                <p>
+                  <strong>City: </strong>
+                  {cart.shippingAddress.city}
+                </p>
+              </div>
+            </li>
 
-        {/* RIGHT COL */}
-        <OrderSummary cartItemsPrice={itemsPrice} />
+            <li className='u-my-ss'>
+              <h2>Payment Method</h2>
+              <p>
+                <strong>Method: </strong>
+                {cart.paymentMethod}
+              </p>
+            </li>
+
+            <li className='u-my-ss'>
+              <h2>Order Items</h2>
+              <OrderItemsInfo cartProds={cart.cartItems} />
+            </li>
+
+            <li className='u-my-ss'>
+              <button
+                className='btn'
+                disabled={cart.cartItems.length === 0}
+                onClick={placeOrderHandler}
+              >
+                Place Order
+              </button>
+            </li>
+          </ul>
+
+          {/* RIGHT COL */}
+          <OrderSummary cartItemsPrice={itemsPrice} />
+        </div>
       </div>
     </div>
   )

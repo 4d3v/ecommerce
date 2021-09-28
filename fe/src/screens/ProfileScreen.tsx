@@ -5,6 +5,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getUser, updateUser, updateUserPass } from '../actions/userActions'
 import {
+  IMainNavProps,
   IUserInfoRdx,
   IUserLoginRdx,
   IUserUpdatePasswordRdx,
@@ -14,10 +15,11 @@ import { userActions } from '../constants/userConstants'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
 import Alert from '../components/Alert'
+import MainSideNav from '../components/MainSideNav'
 
 interface HistoryParams {}
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const history = useHistory<HistoryParams>()
 
   const [name, setName] = useState('')
@@ -106,7 +108,12 @@ const ProfileScreen = () => {
   }
 
   return (
-    <div className='container'>
+    <div className='_mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
+
       {userDetails && userDetails.error && (
         <div className='u-txt-center u-py-ss'>
           <Message error={userDetails.error} />
@@ -135,7 +142,7 @@ const ProfileScreen = () => {
 
       {userDetails && userDetails.loading && <Loader />}
 
-      <div className='prof--sep u-my-s'>
+      <div className='prof--sep'>
         <SideNav
           isAdmin={
             userLogin.userInfo &&
@@ -144,7 +151,7 @@ const ProfileScreen = () => {
         />
 
         <div className='prof--sep--r'>
-          <h1 className='u-txt-center u-my-s'>My Profile</h1>
+          <h2 className='u-txt-center u-my-s'>MY PROFILE</h2>
           <form className='form' onSubmit={updateUserDetails}>
             <label htmlFor='name'>Name</label>
             <input

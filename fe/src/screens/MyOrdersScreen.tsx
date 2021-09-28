@@ -3,12 +3,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { listMyOrders } from '../actions/orderActions'
 import Loader from '../components/Loader'
+import MainSideNav from '../components/MainSideNav'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import { IOrderDetails, IOrderListRdx, IUserLoginRdx } from '../type'
+import {
+  IMainNavProps,
+  IOrderDetails,
+  IOrderListRdx,
+  IUserLoginRdx,
+} from '../type'
 
-const MyOrdersScreen = () => {
+const MyOrdersScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector(
@@ -24,8 +30,13 @@ const MyOrdersScreen = () => {
   }, [dispatch])
 
   return (
-    <div className='container'>
-      <div className='prof--sep u-my-s'>
+    <div className='_mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
+
+      <div className='prof--sep'>
         <SideNav
           isAdmin={
             userLogin.userInfo &&
@@ -34,7 +45,7 @@ const MyOrdersScreen = () => {
         />
 
         <div className='prof--sep--r'>
-          <h1 className='u-txt-center u-my-s'>My Orders</h1>
+          <h2 className='u-txt-center u-my-s'>MY ORDERS</h2>
           {orderListUser.loading ? (
             <Loader />
           ) : orderListUser.error ? (

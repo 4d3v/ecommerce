@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { addPaymentMethod } from '../actions/cartActions'
 import CheckoutSteps from '../components/CheckoutSteps'
-import { ICartItemsRdx } from '../type'
+import MainSideNav from '../components/MainSideNav'
+import { ICartItemsRdx, IMainNavProps } from '../type'
 
 interface HistoryParams {}
 
-const PaymentScreen = () => {
+const PaymentScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const history = useHistory<HistoryParams>()
 
   const dispatch = useDispatch()
@@ -25,37 +26,47 @@ const PaymentScreen = () => {
   }
 
   return (
-    <div className='container'>
-      <CheckoutSteps step1 step2 step3 />
-      <h1 className='u-txt-center u-my-s'>Shipping</h1>
-      <form className='form' onSubmit={submitHandler}>
-        <div>Select Payment Method</div>
-        <div className='radio-input'>
-          <input
-            className='form__radio'
-            id='Paypal'
-            type='radio'
-            name='methodPaypal'
-            value='Paypal'
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            checked
-          />
-          Paypal
+    <div className='_mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
+
+      <div>
+        <div className='content-title dki02'>
+          <h2 className='u-txt-center'>PAYMENT</h2>
         </div>
 
-        <div className='radio-input'>
-          <input
-            className='form__radio'
-            id='Stripe'
-            type='radio'
-            name='methodStripe'
-            value='Stripe'
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          />
-          Stripe
-        </div>
-        <button type='submit'>Continue</button>
-      </form>
+        <CheckoutSteps step1 step2 step3 />
+        <form className='form' onSubmit={submitHandler}>
+          <div>Select Payment Method</div>
+          <div className='radio-input'>
+            <input
+              className='form__radio'
+              id='Paypal'
+              type='radio'
+              name='methodPaypal'
+              value='Paypal'
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              checked
+            />
+            Paypal
+          </div>
+
+          <div className='radio-input'>
+            <input
+              className='form__radio'
+              id='Stripe'
+              type='radio'
+              name='methodStripe'
+              value='Stripe'
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            />
+            Stripe
+          </div>
+          <button type='submit'>Continue</button>
+        </form>
+      </div>
     </div>
   )
 }

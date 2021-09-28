@@ -3,7 +3,7 @@ import { Link, useHistory, useLocation, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import { addToCart, removeFromCart } from '../actions/cartActions'
-import { ICart, ICartItemsRdx } from '../type'
+import { ICart, ICartItemsRdx, IMainNavProps } from '../type'
 import MainSideNav from '../components/MainSideNav'
 
 interface RouteParams {
@@ -17,12 +17,7 @@ interface LocationParams {
 
 interface HistoryParams {}
 
-interface IProps {
-  leftNavToggled: boolean
-  leftNavDefVis: boolean
-}
-
-export const CartScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
+const CartScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const params = useParams<RouteParams>()
   const location = useLocation<LocationParams>()
   const history = useHistory<HistoryParams>()
@@ -59,7 +54,7 @@ export const CartScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
 
       <div>
         <div className='content-title dki02'>
-          <h2 className='u-txt-center'>PRODUCT DETAILS</h2>
+          <h2 className='u-txt-center'>MY CART</h2>
         </div>
 
         <div className='cart-items-wrapper u-m-all-m'>

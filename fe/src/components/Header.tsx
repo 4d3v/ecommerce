@@ -45,11 +45,13 @@ const Header = ({ toggleLeftNav }: IProps) => {
           </span>
         </button>
 
-        <div style={{ flex: '1' }}>
-          {' '}
-          {/* TEMP STYLING */}
-          <Link to='/'>ECOMMERCE</Link>
-        </div>
+        <Link className='ecommerce-logo' to='/'>
+          <div className='ecommerce-logo__wrapper'>
+            <img src='ecommerce.png' alt='Ecommerce Logo' />
+            <span>E-COMMERCE</span>
+          </div>
+        </Link>
+
         <ul className='u-txt-center'>
           <li>
             <Link to='/cart' className='nav-link'>

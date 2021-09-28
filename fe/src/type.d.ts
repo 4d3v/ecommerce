@@ -1,5 +1,10 @@
 import { Action } from 'redux'
 
+export interface IMainNavProps {
+  leftNavToggled: boolean
+  leftNavDefVis: boolean
+}
+
 export interface IUser {
   id: number
   name: string

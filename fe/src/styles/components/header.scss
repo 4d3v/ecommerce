@@ -7,11 +7,30 @@ header {
     align-items: center;
     justify-content: space-between;
 
+    .ecommerce-logo {
+      flex: 1;
+
+      &__wrapper {
+        display: flex;
+        align-items: center;
+      }
+
+      img {
+        height: 40px;
+      }
+
+      span {
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+    }
+
     ul {
       display: flex;
       align-items: center;
       justify-content: right;
       height: 4rem;
+      margin-right: 8px;
 
       li:hover .dropdown {
         display: inherit;
@@ -20,6 +39,7 @@ header {
       .userinfo-dropdown {
         position: relative;
         font-size: 1.2rem;
+        cursor: default;
       }
 
       .dropdown {
