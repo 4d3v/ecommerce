@@ -15,7 +15,7 @@ const OrderItemsInfo = ({ products, cartProds }: IProps) => {
     <ul className='orderinfo-items'>
       {prods &&
         prods.map((prod: any, idx: number) => (
-          <li key={idx} className='orderinfo-item'>
+          <li key={idx} className='orderinfo-item u-my-ss'>
             <div className='orderinfo-item__imgwrapper'>
               <img
                 src={`/images/${type ? prod.prod_image : prod.image}`}

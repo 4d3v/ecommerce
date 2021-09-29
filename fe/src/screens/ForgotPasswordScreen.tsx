@@ -72,7 +72,7 @@ const ForgotPasswordScreen = () => {
         <button type='submit'>Send</button>
 
         <div className='u-py-s'>
-          <Link className='btn btn-purple' to='/login'>
+          <Link className='btn' to='/login'>
             Go Back
           </Link>
         </div>

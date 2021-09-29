@@ -218,21 +218,13 @@
   line-height: 32px;
   border-radius: 2px;
   font-size: 0.9em;
-  background-color: $btn-color;
+  background-color: $btn-color-1;
   color: $base-font-light;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: $btn-color-1;
-  }
-}
-
-.btn-purple {
-  background-color: $btn-color-1;
-
-  &:hover {
-    background-color: #085e4d;
+    background-color: $btn-color-1-hover;
   }
 }
 

@@ -88,7 +88,7 @@ const ResetPasswordScreen = () => {
         <button type='submit'>Update My Password</button>
 
         <div className='u-py-s'>
-          <Link className='btn btn-purple' to='/login'>
+          <Link className='btn' to='/login'>
             Go Back
           </Link>
         </div>

@@ -114,7 +114,12 @@ const App = () => {
                   leftNavDefVis={false}
                 />
               </Route>
-              <Route path='/order/:orderid' component={OrderScreen} exact />
+              <Route path='/order/:orderid' exact>
+                <OrderScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
               <Route path='/product/:id' exact>
                 <ProductScreen
                   leftNavToggled={leftNavToggled}

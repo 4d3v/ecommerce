@@ -13,6 +13,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import {
   IAdminOrderDeliverRdx,
+  IMainNavProps,
   IOrderDetailsRdx,
   IOrderedProdsRdx,
   IOrderPayRdx,
@@ -31,6 +32,7 @@ import {
 import Alert from '../components/Alert'
 import { UserRole } from '../enums'
 import { updateProductCountInStock } from '../actions/productActions'
+import MainSideNav from '../components/MainSideNav'
 
 interface HistoryParams {}
 
@@ -43,7 +45,7 @@ const strconvPayMethod = new Map<number, string>([
   [2, 'stripe'],
 ])
 
-const OrderScreen = () => {
+const OrderScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const dispatch = useDispatch()
   const params = useParams<RouteParams>()
   const history = useHistory<HistoryParams>()
@@ -194,94 +196,125 @@ const OrderScreen = () => {
   ) : (
     orderDetails &&
     orderDetails.orderItem && (
-      <div className='container'>
-        <div className='order-wrapper u-my-s'>
-          <ul className='order-info'>
-            <h1>Order {orderDetails.orderItem.id}</h1>
-            <li>
-              <h2>Shipping</h2>
-              <div>
-                <strong>Name: {orderDetails.orderItem.user!.name}</strong>
-              </div>
-              <div>
-                <strong>
-                  <a href={`mailto:${orderDetails.orderItem.user!.email}`}>
-                    Email: {orderDetails.orderItem.user!.email}
-                  </a>
-                </strong>
-              </div>
-              <div>
-                <strong>Address: </strong>
-                {orderDetails.orderItem.postal_code},{' '}
-                {orderDetails.orderItem.address},{' '}
-                {orderDetails.orderItem.country}, {orderDetails.orderItem.city}
-              </div>
-              <div>
-                {orderDetails.orderItem.is_delivered ? (
-                  <Message
-                    info={`delivered on ${orderDetails.orderItem.delivered_at}`}
-                  />
-                ) : (
-                  <Message info={`Not delivered`} />
-                )}
-              </div>
-            </li>
+      <div className='_mctt02'>
+        <MainSideNav
+          leftNavToggled={leftNavToggled}
+          leftNavDefVis={leftNavDefVis}
+        />
 
-            <li>
-              <h2>Payment Method</h2>
-              <div>
-                <strong>Method: </strong>
-                {strconvPayMethod.get(orderDetails.orderItem.payment_method)}
-              </div>
-              <div>
-                {orderDetails.orderItem.is_paid ? (
-                  <Message info={`paid on ${orderDetails.orderItem.paid_at}`} />
-                ) : (
-                  <Message info={`Not paid`} />
-                )}
-              </div>
-            </li>
+        <div>
+          <div className='content-title dki02'>
+            <h2 className='u-txt-center'>ORDER {orderDetails.orderItem.id}</h2>
+          </div>
 
-            <li>
-              <h2>Order Items</h2>
-              <OrderItemsInfo products={orderedProds} />
-            </li>
-          </ul>
-
-          <div className='order-summary'>
-            <OrderSummary orderedProds={orderedProds} />
-            {!orderDetails.orderItem.is_paid && (
-              <div className='u-my-ss'>
-                {orderPay && orderPay.loading && <Loader />}
-                {true && (
-                  <PayPalButtons
-                    createOrder={(
-                      data: UnknownObject,
-                      actions: CreateOrderActions
-                    ) => paypalCreateOrder(data, actions)}
-                    onApprove={(
-                      data: OnApproveData,
-                      actions: OnApproveActions
-                    ) => paypalOnApproveOrder(data, actions)}
-                  />
-                )}
-              </div>
-            )}
-
-            {userLogin.userInfo &&
-              userLogin.userInfo.user.role !== UserRole.NORMAL &&
-              orderDetails.orderItem.is_paid &&
-              !orderDetails.orderItem.is_delivered && (
+          <div className='order-wrapper'>
+            <ul className='order-info'>
+              <li>
+                <h2>Shipping</h2>
                 <div>
-                  {adminOrderDeliver.loading && <Loader />}
-                  <button
-                    className='btn u-txt-center btn-set-delivered'
-                    onClick={setOrderAsDelivered}
-                  >
-                    Mark As Delivered
-                  </button>
+                  <p>
+                    <strong>Address: </strong>
+                    {orderDetails.orderItem.address}
+                  </p>
+                  <p>
+                    <strong>PostalCode: </strong>
+                    {orderDetails.orderItem.postal_code}
+                  </p>
+                  <p>
+                    <strong>Country: </strong>
+                    {orderDetails.orderItem.country}
+                  </p>
+                  <p>
+                    <strong>City: </strong>
+                    {orderDetails.orderItem.city}
+                  </p>
+                </div>
+
+                <div>
+                  <strong>Name: {orderDetails.orderItem.user!.name}</strong>
+                </div>
+                <div>
+                  <strong>
+                    <a href={`mailto:${orderDetails.orderItem.user!.email}`}>
+                      Email: {orderDetails.orderItem.user!.email}
+                    </a>
+                  </strong>
+                </div>
+              </li>
+
+              <li className='u-my-ss'>
+                <h2>Payment Method</h2>
+                <div>
+                  <strong>Method: </strong>
+                  {strconvPayMethod.get(orderDetails.orderItem.payment_method)}
+                </div>
+              </li>
+
+              <li className='u-my-ss'>
+                <div>
+                  {orderDetails.orderItem.is_paid ? (
+                    <Message
+                      info={`paid on ${orderDetails.orderItem.paid_at}`}
+                    />
+                  ) : (
+                    <Message info={`Not paid`} />
+                  )}
+                </div>
+              </li>
+
+              <li className='u-my-ss'>
+                <div>
+                  {orderDetails.orderItem.is_delivered ? (
+                    <Message
+                      info={`delivered on ${orderDetails.orderItem.delivered_at}`}
+                    />
+                  ) : (
+                    <Message info={`Not delivered`} />
+                  )}
+                </div>
+              </li>
+
+              <li className='u-my-ss'>
+                <h2>Order Items</h2>
+                <OrderItemsInfo products={orderedProds} />
+              </li>
+            </ul>
+
+            <div className='order-summary'>
+              <OrderSummary orderedProds={orderedProds} />
+              {!orderDetails.orderItem.is_paid && (
+                <div className='u-my-ss'>
+                  {orderPay && orderPay.loading && <Loader />}
+                  {true && (
+                    <PayPalButtons
+                      createOrder={(
+                        data: UnknownObject,
+                        actions: CreateOrderActions
+                      ) => paypalCreateOrder(data, actions)}
+                      onApprove={(
+                        data: OnApproveData,
+                        actions: OnApproveActions
+                      ) => paypalOnApproveOrder(data, actions)}
+                    />
+                  )}
                 </div>
               )}
+
+              {userLogin.userInfo &&
+                userLogin.userInfo.user.role !== UserRole.NORMAL &&
+                orderDetails.orderItem.is_paid &&
+                !orderDetails.orderItem.is_delivered && (
+                  <div className='u-my-ss'>
+                    {adminOrderDeliver.loading && <Loader />}
+                    <button
+                      className='btn u-txt-center btn-set-delivered'
+                      onClick={setOrderAsDelivered}
+                    >
+                      Mark As Delivered
+                    </button>
+                  </div>
+                )}
+            </div>
           </div>
         </div>
 
