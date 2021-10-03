@@ -29,8 +29,8 @@ export interface IProduct {
   count_in_stock: number
   user_id: number
   user: IUser
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
 }
 
 export interface IReview {
@@ -127,8 +127,9 @@ export type IPaymentMethod = string
 
 // SCREENS
 export interface IProductListRdx {
-  products: IProduct[]
+  result: { products: IProduct[]; data: { total_prods: number } }
   loading: boolean
+  success: boolean
   error: string
 }
 

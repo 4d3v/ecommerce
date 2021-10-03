@@ -16,13 +16,27 @@ import (
 
 // GetProducts get all products
 func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := repo.DB.GetProducts()
+	var lt time.Time
+	if r.URL.Query().Get("lt") != "" {
+		t, err := time.Parse(timeFormatStr, r.URL.Query().Get("lt"))
+		if err != nil {
+			sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+			return
+		}
+		lt = t
+	}
+
+	products, err := repo.DB.GetProducts(lt)
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("prodsjson", w, &options{prods: products, stCode: http.StatusOK})
+	fmt.Println(lt)
+	dtMap := make(map[string]interface{})
+	dtMap["total_prods"] = repo.App.GlobalCounts["totalProds"]
+
+	sendJson("prodsjson", w, &options{prods: products, dataMap: dtMap, stCode: http.StatusOK})
 }
 
 // CreateProduct creates a new product

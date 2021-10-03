@@ -14,4 +14,5 @@ type AppConfig struct {
 	InfoLog      *log.Logger
 	ErrorLog     *log.Logger
 	MailChan     chan models.MailData
+	GlobalCounts map[string]int
 }

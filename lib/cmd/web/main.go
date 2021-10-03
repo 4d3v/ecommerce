@@ -52,6 +52,9 @@ func run() (*driver.DB, error) {
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
 
+	app.GlobalCounts = make(map[string]int)
+	app.GlobalCounts["totalProds"] = 0
+
 	app.InProduction = false
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime)

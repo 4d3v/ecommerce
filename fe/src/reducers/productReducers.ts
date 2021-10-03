@@ -3,14 +3,29 @@ import { productActions } from '../constants/productConstants'
 import { IProduct, IReview } from '../type'
 
 export const productListReducer = (
-  state: { products: IProduct[] } = { products: [] },
+  state: { result: { products: IProduct[]; data: { total_prods: number } } } = {
+    result: { products: [], data: { total_prods: 0 } },
+  },
   action: AnyAction
 ) => {
   switch (action.type) {
     case productActions.PRODUCT_LIST_REQUEST:
-      return { loading: true, products: [] }
+      return {
+        loading: true,
+        result: {
+          products: [...state.result.products],
+          data: { total_prods: state.result.data.total_prods },
+        },
+      }
     case productActions.PRODUCT_LIST_SUCCESS:
-      return { loading: false, products: action.payload }
+      return {
+        loading: false,
+        result: {
+          products: [...state.result.products, ...action.payload.products],
+          data: action.payload.data,
+        },
+        success: true,
+      }
     case productActions.PRODUCT_LIST_FAIL:
       return { loading: false, error: action.payload }
     default:

@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/4d3v/ecommerce/internal/models"
@@ -38,56 +39,110 @@ func (dbrepo *postgresDbRepo) InsertProduct(prod models.Product) error {
 }
 
 // GetProducts retrieves all the products from the db
-func (dbrepo *postgresDbRepo) GetProducts() ([]models.Product, error) {
+func (dbrepo *postgresDbRepo) GetProducts(lt time.Time) ([]models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	var products []models.Product
+	var query string
+	var fullCount int = 0
 
-	query := `
+	// That means we did not pass query param for year
+	if lt.Year() == 1 {
+		lt = time.Now()
+	}
+
+	// If global variable is unset, run the heavier query. (Should be run only on the first time)
+	if dbrepo.App.GlobalCounts["totalProds"] == 0 {
+		query = `
 		SELECT id, name, image, brand, category, description,
 		rating, num_reviews, price, count_in_stock, user_id,
-		created_at, updated_at FROM products
+		created_at, updated_at, count(*) OVER()
+		FROM products
 		WHERE created_at < $1
 		ORDER BY id DESC
-		FETCH FIRST 10 ROWS ONLY
-	`
+		FETCH FIRST 6 ROWS ONLY
+		`
+	} else {
+		query = `
+		SELECT id, name, image, brand, category, description,
+		rating, num_reviews, price, count_in_stock, user_id,
+		created_at, updated_at
+		FROM products
+		WHERE created_at < $1
+		ORDER BY id DESC
+		FETCH FIRST 6 ROWS ONLY
+		`
+	}
 
-	rows, err := dbrepo.DB.QueryContext(ctx, query, time.Now())
+	rows, err := dbrepo.DB.QueryContext(ctx, query, lt)
 	if err != nil {
 		return products, err
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var prod models.Product
-		err := rows.Scan(
-			&prod.Id,
-			&prod.Name,
-			&prod.Image,
-			&prod.Brand,
-			&prod.Category,
-			&prod.Description,
-			&prod.Rating,
-			&prod.NumReviews,
-			&prod.Price,
-			&prod.CountInStock,
-			&prod.UserId,
-			&prod.CreatedAt,
-			&prod.UpdatedAt,
-		)
+	if dbrepo.App.GlobalCounts["totalProds"] == 0 {
+		for rows.Next() {
+			var prod models.Product
+			err := rows.Scan(
+				&prod.Id,
+				&prod.Name,
+				&prod.Image,
+				&prod.Brand,
+				&prod.Category,
+				&prod.Description,
+				&prod.Rating,
+				&prod.NumReviews,
+				&prod.Price,
+				&prod.CountInStock,
+				&prod.UserId,
+				&prod.CreatedAt,
+				&prod.UpdatedAt,
+				&fullCount,
+			)
 
-		if err != nil {
-			return products, err
+			if err != nil {
+				return products, err
+			}
+
+			products = append(products, prod)
 		}
+	} else {
+		for rows.Next() {
+			var prod models.Product
+			err := rows.Scan(
+				&prod.Id,
+				&prod.Name,
+				&prod.Image,
+				&prod.Brand,
+				&prod.Category,
+				&prod.Description,
+				&prod.Rating,
+				&prod.NumReviews,
+				&prod.Price,
+				&prod.CountInStock,
+				&prod.UserId,
+				&prod.CreatedAt,
+				&prod.UpdatedAt,
+			)
 
-		products = append(products, prod)
+			if err != nil {
+				return products, err
+			}
+
+			products = append(products, prod)
+		}
 	}
 
 	if err = rows.Err(); err != nil {
 		return products, err
 	}
 
+	if fullCount > dbrepo.App.GlobalCounts["totalProds"] {
+		dbrepo.App.GlobalCounts["totalProds"] = fullCount
+	}
+
+	fmt.Println("gvc", dbrepo.App.GlobalCounts["totalProds"])
 	return products, nil
 }
 

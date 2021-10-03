@@ -24,9 +24,12 @@ const (
 )
 
 const (
-	timeFormatStr   = "2006-01-02 15:04:05"
+	timeFormatStr   = "2006-01-02 15:04:05.999999999 -0700 MST"
 	MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
 )
+
+// timeFormatStr   = "2006-01-02 15:04:05"
+// timeFormatStr   = "2006-01-02 15:04:05.999999999 -0700 MST"
 
 type userJson struct {
 	Id              int    `json:"id"`
@@ -56,6 +59,11 @@ type productJson struct {
 	// User models.User
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
+}
+
+type testtt struct {
+	Products []productJson          `json:"products"`
+	Data     map[string]interface{} `json:"data"`
 }
 
 type orderJson struct {
@@ -234,7 +242,13 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			resp = append(resp, p)
 		}
 
-		newJson, err := json.Marshal(resp)
+		t := testtt{
+			Products: resp,
+			Data:     opts.dataMap,
+		}
+
+		newJson, err := json.Marshal(t)
+		// newJson, err := json.Marshal(resp)
 		if err != nil {
 			fmt.Println("Error marshaling json")
 			helpers.ServerError(w, err)

@@ -1,10 +1,14 @@
 package repository
 
-import "github.com/4d3v/ecommerce/internal/models"
+import (
+	"time"
+
+	"github.com/4d3v/ecommerce/internal/models"
+)
 
 type DatabaseRepo interface {
 	InsertProduct(models.Product) error
-	GetProducts() ([]models.Product, error)
+	GetProducts(lt time.Time) ([]models.Product, error)
 	GetProductById(id int) (models.Product, error)
 	UpdateProductReviewRating(prod models.Product) error
 	UpdateProductCountInStock(productId, countInStock int) error

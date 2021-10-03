@@ -82,7 +82,8 @@ const AdminProductListScreen = () => {
           ) : productList.error ? (
             <Message error={productList.error} />
           ) : (
-            productList.products && (
+            productList.result &&
+            productList.result.products && (
               <table className='orderstable'>
                 <thead>
                   <tr>
@@ -96,7 +97,7 @@ const AdminProductListScreen = () => {
                 </thead>
 
                 <tbody>
-                  {productList.products.map((product: IProduct) => (
+                  {productList.result.products.map((product: IProduct) => (
                     <tr key={product.id}>
                       <td>{product.id}</td>
                       <td>{product.name}</td>

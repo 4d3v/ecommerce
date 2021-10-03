@@ -5,24 +5,29 @@ import { AppDispatch } from '../store'
 import { ICreateProduct, ICreateProductReview, IUpdateProduct } from '../type'
 import { getFormErrors } from './actionsUtils'
 
-export const listProducts = () => async (dispatch: AppDispatch) => {
-  try {
-    dispatch({ type: productActions.PRODUCT_LIST_REQUEST })
+export const listProducts =
+  (query?: { lt: string }) => async (dispatch: AppDispatch, getState: any) => {
+    try {
+      dispatch({ type: productActions.PRODUCT_LIST_REQUEST })
 
-    const { data } = await axios.get(`${BASE_URL}/products`)
+      const { data } = await axios.get(`${BASE_URL}/products`, {
+        params: {
+          lt: query && query.lt.trim() ? query.lt : '',
+        },
+      })
 
-    dispatch({
-      type: productActions.PRODUCT_LIST_SUCCESS,
-      payload: data,
-    })
-  } catch (error) {
-    const customError = getFormErrors(error)
-    dispatch({
-      type: productActions.PRODUCT_LIST_FAIL,
-      payload: customError.length > 0 ? customError : error.message,
-    })
+      dispatch({
+        type: productActions.PRODUCT_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.PRODUCT_LIST_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+    }
   }
-}
 
 export const listProductDetails =
   (id: string) => async (dispatch: AppDispatch) => {
