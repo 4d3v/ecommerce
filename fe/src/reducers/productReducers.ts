@@ -17,6 +17,7 @@ export const productListReducer = (
           data: { total_prods: state.result.data.total_prods },
         },
       }
+
     case productActions.PRODUCT_LIST_SUCCESS:
       return {
         loading: false,
@@ -26,8 +27,13 @@ export const productListReducer = (
         },
         success: true,
       }
+
     case productActions.PRODUCT_LIST_FAIL:
       return { loading: false, error: action.payload }
+
+    case productActions.PRODUCT_LIST_RESET:
+      return { result: { products: [], data: { total_prods: 0 } } }
+
     default:
       return state
   }
@@ -147,6 +153,34 @@ export const productUpdateCountInStockReducer = (
     case productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_SUCCESS:
       return { loading: false, result: action.payload }
     case productActions.PRODUCT_UPDATE_COUNT_IN_STOCK_FAIL:
+      return { loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export const admProductListReducer = (
+  state: { result: { products: IProduct[]; data: { total_prods: number } } } = {
+    result: { products: [], data: { total_prods: 0 } },
+  },
+  action: AnyAction
+) => {
+  switch (action.type) {
+    case productActions.ADM_PRODUCT_LIST_REQUEST:
+      return {
+        loading: true,
+        result: {
+          products: [],
+          data: { total_prods: 0 },
+        },
+      }
+    case productActions.ADM_PRODUCT_LIST_SUCCESS:
+      return {
+        loading: false,
+        result: action.payload,
+        success: true,
+      }
+    case productActions.ADM_PRODUCT_LIST_FAIL:
       return { loading: false, error: action.payload }
     default:
       return state

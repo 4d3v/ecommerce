@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
-import { deleteProduct, listProducts } from '../actions/productActions'
+import { adminListProducts, deleteProduct } from '../actions/productActions'
 import Alert from '../components/Alert'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
@@ -17,8 +17,8 @@ const AdminProductListScreen = () => {
 
   const [productDeleted, setProductDeleted] = useState(false)
 
-  const productList = useSelector(
-    (state: { productList: IProductListRdx }) => state.productList
+  const admProductList = useSelector(
+    (state: { admProductList: IProductListRdx }) => state.admProductList
   )
 
   const adminProductDelete = useSelector(
@@ -36,7 +36,7 @@ const AdminProductListScreen = () => {
       !userLogin.userInfo
     )
       history.push('/')
-    else dispatch(listProducts())
+    else dispatch(adminListProducts())
   }, [dispatch, history, userLogin.userInfo, adminProductDelete])
 
   const deleteProductHandler = (productId: number) => {
@@ -60,11 +60,7 @@ const AdminProductListScreen = () => {
         />
 
         <div className='prof--sep--r'>
-          <h1 className='u-txt-center u-my-s'>Users</h1>
-
-          <Link to='/admin/product/create' className='btn u-txt-center'>
-            Create Product
-          </Link>
+          <h2 className='u-txt-center u-my-s'>PRODUCTS</h2>
 
           {adminProductDelete && adminProductDelete.loading && <Loader />}
           {adminProductDelete &&
@@ -77,13 +73,13 @@ const AdminProductListScreen = () => {
             <Message error={adminProductDelete.error} />
           )}
 
-          {productList.loading ? (
+          {admProductList.loading ? (
             <Loader />
-          ) : productList.error ? (
-            <Message error={productList.error} />
+          ) : admProductList.error ? (
+            <Message error={admProductList.error} />
           ) : (
-            productList.result &&
-            productList.result.products && (
+            admProductList.result &&
+            admProductList.result.products && (
               <table className='orderstable'>
                 <thead>
                   <tr>
@@ -97,7 +93,7 @@ const AdminProductListScreen = () => {
                 </thead>
 
                 <tbody>
-                  {productList.result.products.map((product: IProduct) => (
+                  {admProductList.result.products.map((product: IProduct) => (
                     <tr key={product.id}>
                       <td>{product.id}</td>
                       <td>{product.name}</td>
@@ -124,6 +120,12 @@ const AdminProductListScreen = () => {
               </table>
             )
           )}
+
+          <div className='u-txt-center'>
+            <Link to='/admin/product/create' className='btn'>
+              Create Product
+            </Link>
+          </div>
         </div>
       </div>
     </div>

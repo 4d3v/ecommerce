@@ -1,5 +1,12 @@
 import { Action } from 'redux'
 
+export interface IMainHomeProps {
+  leftNavToggled: boolean
+  leftNavDefVis: boolean
+  prodsFetched: boolean
+  toggleProdsFetched: () => void
+}
+
 export interface IMainNavProps {
   leftNavToggled: boolean
   leftNavDefVis: boolean

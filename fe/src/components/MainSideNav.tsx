@@ -1,5 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+
+interface LocationParams {}
 
 interface IProps {
   leftNavToggled: boolean
@@ -7,6 +9,8 @@ interface IProps {
 }
 
 const MainSideNav = ({ leftNavToggled, leftNavDefVis }: IProps) => {
+  const location = useLocation<LocationParams>()
+
   return (
     <div className='main__lmenu'>
       <div
@@ -18,7 +22,11 @@ const MainSideNav = ({ leftNavToggled, leftNavDefVis }: IProps) => {
           <ul>
             <li>
               <div className='main__lmenu--nav--item'>
-                <div className='navitem navitemselected'>
+                <div
+                  className={`navitem ${
+                    location.pathname === '/' && 'navitemselected'
+                  }`}
+                >
                   <Link className='_wd2ds u-crsptr' to='/'>
                     <div className='_1wd2ds'>
                       <span className='item'>
@@ -33,8 +41,12 @@ const MainSideNav = ({ leftNavToggled, leftNavDefVis }: IProps) => {
 
             <li>
               <div className='main__lmenu--nav--item'>
-                <div className='navitem'>
-                  <Link className='_wd2ds u-crsptr' to='/'>
+                <div
+                  className={`navitem ${
+                    location.pathname === '/category' && 'navitemselected'
+                  }`}
+                >
+                  <Link className='_wd2ds u-crsptr' to='/category'>
                     <div className='_1wd2ds'>
                       <span className='item'>
                         <i className='fas fa-tag'></i>

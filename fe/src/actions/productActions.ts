@@ -6,7 +6,7 @@ import { ICreateProduct, ICreateProductReview, IUpdateProduct } from '../type'
 import { getFormErrors } from './actionsUtils'
 
 export const listProducts =
-  (query?: { lt: string }) => async (dispatch: AppDispatch, getState: any) => {
+  (query?: { lt: string }) => async (dispatch: AppDispatch) => {
     try {
       dispatch({ type: productActions.PRODUCT_LIST_REQUEST })
 
@@ -224,5 +224,29 @@ export const updateProductCountInStock =
         payload: customError.length > 0 ? customError : error.message,
       })
       console.log(error.response)
+    }
+  }
+
+export const adminListProducts =
+  (query?: { lt: string }) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch({ type: productActions.ADM_PRODUCT_LIST_REQUEST })
+
+      const { data } = await axios.get(`${BASE_URL}/products`, {
+        params: {
+          lt: query && query.lt.trim() ? query.lt : '',
+        },
+      })
+
+      dispatch({
+        type: productActions.ADM_PRODUCT_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: productActions.ADM_PRODUCT_LIST_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
     }
   }

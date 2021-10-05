@@ -5,14 +5,10 @@ import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import MainSideNav from '../components/MainSideNav'
-import { IProductListRdx } from '../type'
+import { IMainNavProps, IProductListRdx } from '../type'
+import { productActions } from '../constants/productConstants'
 
-interface IProps {
-  leftNavToggled: boolean
-  leftNavDefVis: boolean
-}
-
-const HomeScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
+const HomeScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const dispatch = useDispatch()
 
   const productList: IProductListRdx = useSelector(
@@ -56,6 +52,7 @@ const HomeScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
   )
 
   useEffect(() => {
+    dispatch({ type: productActions.PRODUCT_LIST_RESET })
     dispatch(listProducts())
   }, [dispatch])
 
@@ -80,7 +77,7 @@ const HomeScreen = ({ leftNavToggled, leftNavDefVis }: IProps) => {
             <div className='prods-card-wrapper'>
               {productList.result.products.map((prod, idx) =>
                 productList.result.products.length === idx + 1 ? (
-                  <div key={prod.id} ref={lastProdEl}>
+                  <div key={prod.id} ref={lastProdEl} data-id={prod.id}>
                     <Product product={prod} />
                   </div>
                 ) : (

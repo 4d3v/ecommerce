@@ -32,6 +32,7 @@ import AdminProductEditScreen from './screens/AdminProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
 import ResetPasswordScreen from './screens/ResetPasswordScreen'
+import CategoryScreen from './screens/CategoryScreen'
 
 declare global {
   interface Window {
@@ -78,87 +79,112 @@ const App = () => {
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/payment' exact>
                 <PaymentScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/shipping' exact>
                 <ShippingScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/signup' component={SignUpScreen} exact />
+
               <Route path='/login' component={LoginScreen} exact />
+
               <Route
                 path='/forgotpassword'
                 component={ForgotPasswordScreen}
                 exact
               />
+
               <Route
                 path='/resetpassword/:resetpasstoken'
                 component={ResetPasswordScreen}
                 exact
               />
+
               <Route path='/profile' exact>
                 <ProfileScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/myorders' exact>
                 <MyOrdersScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/order/:orderid' exact>
                 <OrderScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/product/:id' exact>
                 <ProductScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route path='/topics' component={Topics} exact />
+
               <Route path='/cart/:id?' exact>
                 <CartScreen
                   leftNavToggled={leftNavToggled}
                   leftNavDefVis={false}
                 />
               </Route>
+
               <Route
                 path='/admin/users'
                 component={AdminUserListScreen}
                 exact
               />
+
               <Route
                 path='/admin/products'
                 component={AdminProductListScreen}
                 exact
               />
+
               <Route path='/admin/orders' component={OrderListScreen} exact />
+
               <Route
                 path='/admin/product/create'
                 component={AdminProductCreateScreen}
                 exact
               />
+
               <Route
                 path='/admin/product/:productid'
                 component={AdminProductEditScreen}
                 exact
               />
+
               <Route
                 path='/admin/user/:userid'
                 component={AdminUserEditScreen}
                 exact
               />
+
+              <Route path='/category'>
+                <CategoryScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={true}
+                />
+              </Route>
 
               <Route path='/'>
                 <HomeScreen
