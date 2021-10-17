@@ -228,14 +228,17 @@ export const updateProductCountInStock =
   }
 
 export const adminListProducts =
-  (query?: { lt: string }) => async (dispatch: AppDispatch) => {
+  (query?: { limit: number; offset: number }) =>
+  async (dispatch: AppDispatch) => {
     try {
       dispatch({ type: productActions.ADM_PRODUCT_LIST_REQUEST })
 
-      const { data } = await axios.get(`${BASE_URL}/products`, {
+      const { data } = await axios.get(`${BASE_URL}/admproducts`, {
         params: {
-          lt: query && query.lt.trim() ? query.lt : '',
+          limit: query && query.limit ? query.limit : 10,
+          offset: query && query.offset ? query?.offset : 0,
         },
+        withCredentials: true,
       })
 
       dispatch({

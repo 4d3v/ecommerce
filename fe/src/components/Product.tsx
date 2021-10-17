@@ -9,7 +9,7 @@ interface IProps {
 
 const Product = ({ product }: IProps) => {
   return (
-    <div className='card-prod u-my-s'>
+    <div className='card-prod u-m-all-m'>
       <Link to={`/product/${product.id}`}>
         <img
           src={`/images/${product.image}`}

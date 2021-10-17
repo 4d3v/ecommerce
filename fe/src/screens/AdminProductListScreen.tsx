@@ -5,6 +5,7 @@ import { adminListProducts, deleteProduct } from '../actions/productActions'
 import Alert from '../components/Alert'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import Pagination from '../components/Pagination'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
 import { IProduct, IProductListRdx, IUserLoginRdx } from '../type'
@@ -14,7 +15,9 @@ interface HistoryParams {}
 const AdminProductListScreen = () => {
   const history = useHistory<HistoryParams>()
   const dispatch = useDispatch()
+  const limit = 10
 
+  const [page, setPage] = useState(0)
   const [productDeleted, setProductDeleted] = useState(false)
 
   const admProductList = useSelector(
@@ -36,8 +39,8 @@ const AdminProductListScreen = () => {
       !userLogin.userInfo
     )
       history.push('/')
-    else dispatch(adminListProducts())
-  }, [dispatch, history, userLogin.userInfo, adminProductDelete])
+    else dispatch(adminListProducts({ limit: limit, offset: page * limit }))
+  }, [dispatch, history, userLogin.userInfo, adminProductDelete, page])
 
   const deleteProductHandler = (productId: number) => {
     // TEMP temporarily using window.confirm
@@ -47,6 +50,10 @@ const AdminProductListScreen = () => {
     setTimeout(() => {
       setProductDeleted(false)
     }, 2000)
+  }
+
+  const handlePageClick = (pg: number) => {
+    setPage(Number(pg))
   }
 
   return (
@@ -120,6 +127,17 @@ const AdminProductListScreen = () => {
               </table>
             )
           )}
+
+          <div className='pagination-bar'>
+            {admProductList.result.data.total_prods > 0 && (
+              <Pagination
+                page={page}
+                limit={limit}
+                total_prods={admProductList.result.data.total_prods}
+                handlePageClick={handlePageClick}
+              />
+            )}
+          </div>
 
           <div className='u-txt-center'>
             <Link to='/admin/product/create' className='btn'>

@@ -16,6 +16,7 @@ type DatabaseRepo interface {
 	DeleteProductById(id int) error
 	GetProductReviews(productId int) ([]models.Review, error)
 	InsertProductReview(review models.Review) error
+	AdminGetProducts(lt time.Time, limit int, offset int) ([]models.Product, error)
 
 	AdminInsertUser(usr models.User) error
 	AdminGetUsers() ([]models.User, error)

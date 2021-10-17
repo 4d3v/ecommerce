@@ -54,6 +54,7 @@ func run() (*driver.DB, error) {
 
 	app.GlobalCounts = make(map[string]int)
 	app.GlobalCounts["totalProds"] = 0
+	app.GlobalCounts["totalProdPages"] = 0
 
 	app.InProduction = false
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)

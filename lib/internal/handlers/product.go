@@ -35,6 +35,7 @@ func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(lt)
 	dtMap := make(map[string]interface{})
 	dtMap["total_prods"] = repo.App.GlobalCounts["totalProds"]
+	dtMap["total_prod_pages"] = repo.App.GlobalCounts["totalProdPages"]
 
 	sendJson("prodsjson", w, &options{prods: products, dataMap: dtMap, stCode: http.StatusOK})
 }
@@ -452,4 +453,32 @@ func (repo *Repository) GetProductReviews(w http.ResponseWriter, r *http.Request
 	}
 
 	sendJson("prodreviewsjson", w, &options{prodReviews: prodReviews, stCode: http.StatusOK})
+}
+
+// AdmGetProducts gets all products (for admins)
+func (repo *Repository) AdmGetProducts(w http.ResponseWriter, r *http.Request) {
+	var lt time.Time
+	if r.URL.Query().Get("lt") != "" {
+		t, err := time.Parse(timeFormatStr, r.URL.Query().Get("lt"))
+		if err != nil {
+			sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+			return
+		}
+		lt = t
+	}
+	limit := r.URL.Query().Get("limit")
+	offset := r.URL.Query().Get("offset")
+	lmt, _ := strconv.Atoi(limit)
+	offs, _ := strconv.Atoi(offset)
+
+	products, err := repo.DB.AdminGetProducts(lt, lmt, offs)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	dtMap := make(map[string]interface{})
+	dtMap["total_prods"] = repo.App.GlobalCounts["totalProds"]
+
+	sendJson("prodsjson", w, &options{prods: products, dataMap: dtMap, stCode: http.StatusOK})
 }

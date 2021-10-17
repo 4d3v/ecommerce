@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/4d3v/ecommerce/internal/models"
@@ -142,7 +143,14 @@ func (dbrepo *postgresDbRepo) GetProducts(lt time.Time) ([]models.Product, error
 		dbrepo.App.GlobalCounts["totalProds"] = fullCount
 	}
 
+	if dbrepo.App.GlobalCounts["totalProdPages"] == 0 {
+		p := float64(fullCount) / 6.0
+		dbrepo.App.GlobalCounts["totalProdPages"] = int(math.Ceil(p))
+	}
+
 	fmt.Println("gvc", dbrepo.App.GlobalCounts["totalProds"])
+	fmt.Println("gpages", dbrepo.App.GlobalCounts["totalProdPages"])
+
 	return products, nil
 }
 
@@ -406,4 +414,117 @@ func (dbrepo *postgresDbRepo) GetProductReviews(productId int) ([]models.Review,
 	}
 
 	return prodReviews, nil
+}
+
+// AdminGetProducts retrieves all the products from the db
+func (dbrepo *postgresDbRepo) AdminGetProducts(lt time.Time, limit int, offset int) ([]models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var products []models.Product
+	var fullCount int = 0
+	var query string
+
+	// That means we did not pass query param for year
+	if lt.Year() == 1 {
+		lt = time.Now()
+	}
+
+	// If global variable is unset, run the heavier query. (Should be run only on the first time)
+	if dbrepo.App.GlobalCounts["totalProds"] == 0 {
+		query = `
+		SELECT id, name, image, brand, category, description,
+		rating, num_reviews, price, count_in_stock, user_id,
+		created_at, updated_at, count(*) OVER()
+		FROM products
+		WHERE created_at < $1
+		LIMIT $2
+		OFFSET $3
+		`
+	} else {
+		query = `
+		SELECT id, name, image, brand, category, description,
+		rating, num_reviews, price, count_in_stock, user_id,
+		created_at, updated_at
+		FROM products
+		WHERE created_at < $1
+		LIMIT $2
+		OFFSET $3
+		`
+	}
+
+	rows, err := dbrepo.DB.QueryContext(ctx, query, lt, limit, offset)
+	if err != nil {
+		return products, err
+	}
+	defer rows.Close()
+
+	if dbrepo.App.GlobalCounts["totalProds"] == 0 {
+		for rows.Next() {
+			var prod models.Product
+			err := rows.Scan(
+				&prod.Id,
+				&prod.Name,
+				&prod.Image,
+				&prod.Brand,
+				&prod.Category,
+				&prod.Description,
+				&prod.Rating,
+				&prod.NumReviews,
+				&prod.Price,
+				&prod.CountInStock,
+				&prod.UserId,
+				&prod.CreatedAt,
+				&prod.UpdatedAt,
+				&fullCount,
+			)
+
+			if err != nil {
+				return products, err
+			}
+
+			products = append(products, prod)
+		}
+	} else {
+		for rows.Next() {
+			var prod models.Product
+			err := rows.Scan(
+				&prod.Id,
+				&prod.Name,
+				&prod.Image,
+				&prod.Brand,
+				&prod.Category,
+				&prod.Description,
+				&prod.Rating,
+				&prod.NumReviews,
+				&prod.Price,
+				&prod.CountInStock,
+				&prod.UserId,
+				&prod.CreatedAt,
+				&prod.UpdatedAt,
+			)
+
+			if err != nil {
+				return products, err
+			}
+
+			products = append(products, prod)
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		return products, err
+	}
+
+	if fullCount > dbrepo.App.GlobalCounts["totalProds"] {
+		dbrepo.App.GlobalCounts["totalProds"] = fullCount
+	}
+
+	if dbrepo.App.GlobalCounts["totalProdPages"] == 0 {
+		p := float64(fullCount) / 6.0
+		dbrepo.App.GlobalCounts["totalProdPages"] = int(math.Ceil(p))
+	}
+	fmt.Println("totalProds: ", dbrepo.App.GlobalCounts["totalProds"])
+
+	return products, nil
 }

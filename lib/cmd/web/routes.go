@@ -52,6 +52,7 @@ func routes() http.Handler {
 
 	mux.Route("/admproducts", func(mux chi.Router) {
 		mux.Use(Auth)
+		mux.Get("/", handlers.Repo.AdmGetProducts)
 		mux.Post("/", handlers.Repo.CreateProduct)
 		mux.Patch("/{id}", handlers.Repo.UpdateProduct)
 		mux.Delete("/{id}", handlers.Repo.DeleteProduct)
