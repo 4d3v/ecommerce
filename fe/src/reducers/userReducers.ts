@@ -145,18 +145,30 @@ export const userResetPasswordReducer = (
 }
 
 export const userListReducer = (
-  state: { users: IUser[] } = { users: [] },
+  state: { result: { users: IUser[]; data: { total_users: number } } } = {
+    result: { users: [], data: { total_users: 0 } },
+  },
   action: AnyAction
 ) => {
   switch (action.type) {
     case userActions.USER_LIST_REQUEST:
-      return { loading: true }
+      return {
+        loading: true,
+        result: {
+          users: [...state.result.users],
+          data: { total_prods: state.result.data.total_users },
+        },
+      }
+
     case userActions.USER_LIST_SUCCESS:
-      return { loading: false, users: action.payload }
+      return { loading: false, result: action.payload }
+
     case userActions.USER_LIST_FAIL:
       return { loading: false, error: action.payload }
+
     case userActions.USER_LIST_RESET:
       return { users: null }
+
     default:
       return state
   }

@@ -8,24 +8,24 @@ import (
 	"github.com/4d3v/ecommerce/internal/models"
 )
 
-func (dbrepo *postgresDbRepo) AdminGetOrders() ([]models.Order, error) {
+func (dbrepo *postgresDbRepo) AdminGetOrders(limit, offset int) ([]models.Order, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	var orders []models.Order
+	var fullCount int
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_status, total_price, is_paid, is_delivered, 
-		user_id FROM orders 
-	` // ORDER BY id ASC
+		user_id, count(*) OVER() 
+		FROM orders 
+		ORDER BY id DESC
+		LIMIT $1
+		OFFSET $2
+	`
 
-	// JOIN products AS p ON p.id = op.product_id
-	// 	JOIN users AS u ON u.id = op.user_id
-	// 	JOIN orders AS o ON o.id = op.order_id
-	// 	WHERE op.user_id = $1 AND op.order_id = $2
-
-	rows, err := dbrepo.DB.QueryContext(ctx, query)
+	rows, err := dbrepo.DB.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return orders, err
 	}
@@ -48,6 +48,7 @@ func (dbrepo *postgresDbRepo) AdminGetOrders() ([]models.Order, error) {
 			&order.IsDelivered,
 			// &order.DeliveredAt,
 			&order.UserId,
+			&fullCount,
 		)
 
 		if err != nil {
@@ -59,6 +60,10 @@ func (dbrepo *postgresDbRepo) AdminGetOrders() ([]models.Order, error) {
 
 	if err = rows.Err(); err != nil {
 		return orders, err
+	}
+
+	if fullCount > dbrepo.App.GlobalCounts["adminTotalOrders"] {
+		dbrepo.App.GlobalCounts["adminTotalOrders"] = fullCount
 	}
 
 	return orders, nil

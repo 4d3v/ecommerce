@@ -198,7 +198,7 @@ export interface IUserResetPasswordRdx {
 
 export interface IUserListRdx {
   loading: boolean
-  users: IUser[]
+  result: { users: IUser[]; data: { total_users: number } }
   error?: { ok: boolean; errorMsg: string }
 }
 
@@ -236,7 +236,7 @@ export interface IOrderDetailsRdx {
 export interface IOrderListRdx {
   loading: boolean
   error: string
-  orders: IOrderDetails[]
+  result: { orders: IOrderDetails[]; data: { admin_total_orders: number } }
 }
 
 interface IOrderedProd {

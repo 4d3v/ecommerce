@@ -90,34 +90,61 @@ export const orderPayReducer = (state = {}, action: AnyAction) => {
 }
 
 export const orderListUserReducer = (
-  state: { orders: IOrderDetails[] } = { orders: [] },
+  state: {
+    result: { orders: IOrderDetails[]; data: {} }
+  } = {
+    result: { orders: [], data: {} },
+  },
   action: AnyAction
 ) => {
   switch (action.type) {
     case orderActions.ORDER_LIST_USER_REQUEST:
-      return { loading: true }
+      return {
+        loading: true,
+        result: {
+          orders: [...state.result.orders],
+          data: {},
+        },
+      }
+
     case orderActions.ORDER_LIST_USER_SUCCESS:
-      return { loading: false, orders: action.payload }
+      return { loading: false, result: action.payload }
+
     case orderActions.ORDER_LIST_USER_FAIL:
       return { loading: false, error: action.payload }
+
     case orderActions.ORDER_LIST_USER_RESET:
-      return { orders: [] }
+      return {}
+
     default:
       return state
   }
 }
 
 export const adminOrderListReducer = (
-  state: { orders: IOrderDetails[] } = { orders: [] },
+  state: {
+    result: { orders: IOrderDetails[]; data: { admin_total_orders: number } }
+  } = {
+    result: { orders: [], data: { admin_total_orders: 0 } },
+  },
   action: AnyAction
 ) => {
   switch (action.type) {
     case orderActions.ORDER_LIST_REQUEST:
-      return { loading: true }
+      return {
+        loading: true,
+        result: {
+          orders: [...state.result.orders],
+          data: { total_prods: state.result.data.admin_total_orders },
+        },
+      }
+
     case orderActions.ORDER_LIST_SUCCESS:
-      return { loading: false, orders: action.payload }
+      return { loading: false, result: action.payload }
+
     case orderActions.ORDER_LIST_FAIL:
       return { loading: false, error: action.payload }
+
     default:
       return state
   }

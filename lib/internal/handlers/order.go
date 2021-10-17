@@ -20,18 +20,27 @@ func (repo *Repository) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orders, err := repo.DB.AdminGetOrders()
+	limit := r.URL.Query().Get("limit")
+	offset := r.URL.Query().Get("offset")
+	lmt, _ := strconv.Atoi(limit)
+	offs, _ := strconv.Atoi(offset)
+
+	orders, err := repo.DB.AdminGetOrders(lmt, offs)
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
+	dtMap := make(map[string]interface{})
+	dtMap["admin_total_orders"] = repo.App.GlobalCounts["adminTotalOrders"]
+
 	sendJson("ordersjson", w, &options{
-		ok:     true,
-		msg:    "Success",
-		orders: orders,
-		stCode: http.StatusOK,
+		ok:      true,
+		msg:     "Success",
+		dataMap: dtMap,
+		orders:  orders,
+		stCode:  http.StatusOK,
 	})
 }
 

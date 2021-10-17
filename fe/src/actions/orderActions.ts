@@ -208,29 +208,35 @@ export const listMyOrders = () => async (dispatch: AppDispatch) => {
   }
 }
 
-export const adminListOrders = () => async (dispatch: AppDispatch) => {
-  try {
-    dispatch({
-      type: orderActions.ORDER_LIST_REQUEST,
-    })
+export const adminListOrders =
+  (query?: { limit: number; offset: number }) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: orderActions.ORDER_LIST_REQUEST,
+      })
 
-    const { data } = await axios.get(`${BASE_URL}/adminorders`, {
-      withCredentials: true,
-    })
+      const { data } = await axios.get(`${BASE_URL}/adminorders`, {
+        params: {
+          limit: query && query.limit ? query.limit : 10,
+          offset: query && query.offset ? query.offset : 0,
+        },
+        withCredentials: true,
+      })
 
-    dispatch({
-      type: orderActions.ORDER_LIST_SUCCESS,
-      payload: data,
-    })
-  } catch (error) {
-    const customError = getFormErrors(error)
-    dispatch({
-      type: orderActions.ORDER_LIST_FAIL,
-      payload: customError.length > 0 ? customError : error.message,
-    })
-    console.log(error.response)
+      dispatch({
+        type: orderActions.ORDER_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: orderActions.ORDER_LIST_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
   }
-}
 
 export const adminGetOrderDetails =
   (orderId: number) => async (dispatch: AppDispatch) => {

@@ -19,7 +19,7 @@ type DatabaseRepo interface {
 	AdminGetProducts(lt time.Time, limit int, offset int) ([]models.Product, error)
 
 	AdminInsertUser(usr models.User) error
-	AdminGetUsers() ([]models.User, error)
+	AdminGetUsers(limit, offset int) ([]models.User, error)
 	AdminUpdateUser(user models.User) error
 	AdminDeleteUser(id int) error
 
@@ -35,7 +35,7 @@ type DatabaseRepo interface {
 	ResetPassword(id int, password string) error
 	ActivateDisableUser(id int, active bool) error
 
-	AdminGetOrders() ([]models.Order, error)
+	AdminGetOrders(limit, offset int) ([]models.Order, error)
 	AdminGetOrderById(orderId int) (models.Order, error)
 	AdminUpdateOrderToPaid(id int) error
 	AdminUpdateIsDelivered(id int) error

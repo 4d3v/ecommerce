@@ -29,7 +29,7 @@ import AdminUserEditScreen from './screens/AdminUserEditScreen'
 import AdminProductListScreen from './screens/AdminProductListScreen'
 import AdminProductCreateScreen from './screens/AdminProductCreateScreen'
 import AdminProductEditScreen from './screens/AdminProductEditScreen'
-import OrderListScreen from './screens/OrderListScreen'
+import AdminOrderListScreen from './screens/AdminOrderListScreen'
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
 import ResetPasswordScreen from './screens/ResetPasswordScreen'
 import CategoryScreen from './screens/CategoryScreen'
@@ -159,7 +159,11 @@ const App = () => {
                 exact
               />
 
-              <Route path='/admin/orders' component={OrderListScreen} exact />
+              <Route
+                path='/admin/orders'
+                component={AdminOrderListScreen}
+                exact
+              />
 
               <Route
                 path='/admin/product/create'

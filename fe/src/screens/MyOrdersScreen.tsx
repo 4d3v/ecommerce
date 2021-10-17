@@ -7,12 +7,7 @@ import MainSideNav from '../components/MainSideNav'
 import Message from '../components/Message'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import {
-  IMainNavProps,
-  IOrderDetails,
-  IOrderListRdx,
-  IUserLoginRdx,
-} from '../type'
+import { IMainNavProps, IOrderDetails, IUserLoginRdx } from '../type'
 
 const MyOrdersScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   const dispatch = useDispatch()
@@ -22,7 +17,7 @@ const MyOrdersScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
   )
 
   const orderListUser = useSelector(
-    (state: { orderListUser: IOrderListRdx }) => state.orderListUser
+    (state: { orderListUser: any }) => state.orderListUser
   )
 
   useEffect(() => {
@@ -51,7 +46,8 @@ const MyOrdersScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
           ) : orderListUser.error ? (
             <Message error={orderListUser.error} />
           ) : (
-            orderListUser.orders && (
+            orderListUser.result &&
+            orderListUser.result.orders.length && (
               <table className='orderstable'>
                 <thead>
                   <tr>
@@ -65,7 +61,7 @@ const MyOrdersScreen = ({ leftNavToggled, leftNavDefVis }: IMainNavProps) => {
                 </thead>
 
                 <tbody>
-                  {orderListUser.orders.map((order: IOrderDetails) => (
+                  {orderListUser.result.orders.map((order: IOrderDetails) => (
                     <tr key={order.id}>
                       <td>{order.id}</td>
                       <td>{order.created_at}</td>

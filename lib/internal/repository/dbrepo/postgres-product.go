@@ -524,7 +524,6 @@ func (dbrepo *postgresDbRepo) AdminGetProducts(lt time.Time, limit int, offset i
 		p := float64(fullCount) / 6.0
 		dbrepo.App.GlobalCounts["totalProdPages"] = int(math.Ceil(p))
 	}
-	fmt.Println("totalProds: ", dbrepo.App.GlobalCounts["totalProds"])
 
 	return products, nil
 }

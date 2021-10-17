@@ -128,7 +128,7 @@ const AdminProductListScreen = () => {
             )
           )}
 
-          <div className='pagination-bar'>
+          <div className='u-pagination-bar'>
             {admProductList.result.data.total_prods > 0 && (
               <Pagination
                 page={page}

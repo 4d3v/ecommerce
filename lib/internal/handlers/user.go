@@ -25,13 +25,21 @@ func (repo *Repository) AdminGetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := repo.DB.AdminGetUsers()
+	limit := r.URL.Query().Get("limit")
+	offset := r.URL.Query().Get("offset")
+	lmt, _ := strconv.Atoi(limit)
+	offs, _ := strconv.Atoi(offset)
+
+	users, err := repo.DB.AdminGetUsers(lmt, offs)
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
-	sendJson("usersjson", w, &options{users: users, stCode: http.StatusOK})
+	dtMap := make(map[string]interface{})
+	dtMap["total_users"] = repo.App.GlobalCounts["totalUsers"]
+
+	sendJson("usersjson", w, &options{users: users, dataMap: dtMap, stCode: http.StatusOK})
 }
 
 // AdminCreateUser creates a new user (PS normal users should use Signup instead)

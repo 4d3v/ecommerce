@@ -53,8 +53,10 @@ func run() (*driver.DB, error) {
 	app.MailChan = mailChan
 
 	app.GlobalCounts = make(map[string]int)
+	app.GlobalCounts["totalUsers"] = 0
 	app.GlobalCounts["totalProds"] = 0
 	app.GlobalCounts["totalProdPages"] = 0
+	app.GlobalCounts["adminTotalOrders"] = 0
 
 	app.InProduction = false
 	app.InfoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)

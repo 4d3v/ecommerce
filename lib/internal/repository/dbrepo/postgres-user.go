@@ -51,15 +51,22 @@ func (dbrepo *postgresDbRepo) AdminInsertUser(usr models.User) error {
 }
 
 // AdminGetUsers retrieves all users and info
-func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
+func (dbrepo *postgresDbRepo) AdminGetUsers(limit, offset int) ([]models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	var users []models.User
+	var fullCount int = 0
 
-	query := `SELECT id, name, email, role, active, created_at, updated_at FROM users`
+	query := `
+		SELECT id, name, email, role, active, created_at, updated_at, count(*) OVER()
+		FROM users
+		WHERE created_at < $1
+		LIMIT $2
+		OFFSET $3
+	`
 
-	rows, err := dbrepo.DB.QueryContext(ctx, query)
+	rows, err := dbrepo.DB.QueryContext(ctx, query, time.Now(), limit, offset)
 	if err != nil {
 		return users, err
 	}
@@ -75,6 +82,7 @@ func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
 			&user.Active,
 			&user.CreatedAt,
 			&user.UpdatedAt,
+			&fullCount,
 		)
 
 		if err != nil {
@@ -86,6 +94,10 @@ func (dbrepo *postgresDbRepo) AdminGetUsers() ([]models.User, error) {
 
 	if err = rows.Err(); err != nil {
 		return users, err
+	}
+
+	if fullCount > dbrepo.App.GlobalCounts["totalUsers"] {
+		dbrepo.App.GlobalCounts["totalUsers"] = fullCount
 	}
 
 	return users, nil

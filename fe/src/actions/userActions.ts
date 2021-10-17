@@ -284,31 +284,37 @@ export const resetPassword =
     }
   }
 
-export const listUsers = () => async (dispatch: AppDispatch) => {
-  try {
-    dispatch({
-      type: userActions.USER_LIST_REQUEST,
-    })
+export const listUsers =
+  (query?: { limit: number; offset: number }) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: userActions.USER_LIST_REQUEST,
+      })
 
-    const { data } = await axios.get(`${BASE_URL}/users`, {
-      withCredentials: true,
-    })
+      const { data } = await axios.get(`${BASE_URL}/users`, {
+        params: {
+          limit: query && query.limit ? query.limit : 10,
+          offset: query && query.offset ? query?.offset : 0,
+        },
+        withCredentials: true,
+      })
 
-    dispatch({
-      type: userActions.USER_LIST_SUCCESS,
-      payload: data,
-    })
-  } catch (error) {
-    // TEMP maybe change getAuthError name or make another function in that case
-    const customError = getAuthError(error)
-    dispatch({
-      type: userActions.USER_LIST_FAIL,
-      payload: customError ? customError : error.message,
-    })
+      dispatch({
+        type: userActions.USER_LIST_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      // TEMP maybe change getAuthError name or make another function in that case
+      const customError = getAuthError(error)
+      dispatch({
+        type: userActions.USER_LIST_FAIL,
+        payload: customError ? customError : error.message,
+      })
 
-    console.log(customError)
+      console.log(customError)
+    }
   }
-}
 
 export const deleteUser = (userId: number) => async (dispatch: AppDispatch) => {
   try {

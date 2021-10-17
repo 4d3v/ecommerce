@@ -1,18 +1,22 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { adminListOrders } from '../actions/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import Pagination from '../components/Pagination'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
 import { IOrderDetails, IOrderListRdx, IUserLoginRdx } from '../type'
 
 interface HistoryParams {}
 
-const OrderListScreen = () => {
+const AdminOrderListScreen = () => {
   const history = useHistory<HistoryParams>()
   const dispatch = useDispatch()
+  const limit = 10
+
+  const [page, setPage] = useState(0)
 
   const adminOrderList = useSelector(
     (state: { adminOrderList: IOrderListRdx }) => state.adminOrderList
@@ -29,8 +33,14 @@ const OrderListScreen = () => {
       !userLogin.userInfo
     )
       history.push('/')
-    else dispatch(adminListOrders())
-  }, [dispatch, history, userLogin.userInfo])
+    else dispatch(adminListOrders({ limit: limit, offset: page * limit }))
+  }, [dispatch, history, userLogin.userInfo, page])
+
+  const handlePageClick = (pg: number) => {
+    console.log(pg)
+
+    setPage(Number(pg))
+  }
 
   return (
     <div className='container'>
@@ -49,7 +59,8 @@ const OrderListScreen = () => {
           ) : adminOrderList.error ? (
             <Message error={adminOrderList.error} />
           ) : (
-            adminOrderList.orders && (
+            adminOrderList.result &&
+            adminOrderList.result.orders.length && (
               <table className='orderstable'>
                 <thead>
                   <tr>
@@ -64,7 +75,7 @@ const OrderListScreen = () => {
                 </thead>
 
                 <tbody>
-                  {adminOrderList.orders.map((order: IOrderDetails) => (
+                  {adminOrderList.result.orders.map((order: IOrderDetails) => (
                     <tr key={order.id}>
                       <td>{order.id}</td>
                       <td>{order.user_id}</td>
@@ -94,10 +105,23 @@ const OrderListScreen = () => {
               </table>
             )
           )}
+
+          <div className='u-pagination-bar'>
+            {adminOrderList.result &&
+              adminOrderList.result.data &&
+              adminOrderList.result.data.admin_total_orders > 0 && (
+                <Pagination
+                  page={page}
+                  limit={limit}
+                  total_prods={adminOrderList.result.data.admin_total_orders}
+                  handlePageClick={handlePageClick}
+                />
+              )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default OrderListScreen
+export default AdminOrderListScreen

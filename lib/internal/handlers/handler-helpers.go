@@ -61,11 +61,6 @@ type productJson struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-type testtt struct {
-	Products []productJson          `json:"products"`
-	Data     map[string]interface{} `json:"data"`
-}
-
 type orderJson struct {
 	Id                        int      `json:"id"`
 	PostalCode                string   `json:"postal_code"`
@@ -130,6 +125,21 @@ type msgJson struct {
 	Errors  map[string][]string    `json:"errors"`
 }
 
+type productsJsonOutput struct {
+	Products []productJson          `json:"products"`
+	Data     map[string]interface{} `json:"data"`
+}
+
+type ordersJsonOutput struct {
+	Orders []orderJson            `json:"orders"`
+	Data   map[string]interface{} `json:"data"`
+}
+
+type usersJsonOutput struct {
+	Users []userJson             `json:"users"`
+	Data  map[string]interface{} `json:"data"`
+}
+
 type options struct {
 	users       []models.User
 	user        models.User
@@ -167,7 +177,12 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			users = append(users, p)
 		}
 
-		resp, err := json.Marshal(users)
+		t := usersJsonOutput{
+			Users: users,
+			Data:  opts.dataMap,
+		}
+
+		resp, err := json.Marshal(t)
 		if err != nil {
 			fmt.Println("Error marshaling json")
 			helpers.ServerError(w, err)
@@ -242,7 +257,7 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			resp = append(resp, p)
 		}
 
-		t := testtt{
+		t := productsJsonOutput{
 			Products: resp,
 			Data:     opts.dataMap,
 		}
@@ -353,7 +368,12 @@ func sendJson(jsonType string, w http.ResponseWriter, opts *options) error {
 			resp = append(resp, p)
 		}
 
-		newJson, err := json.Marshal(resp)
+		t := ordersJsonOutput{
+			Orders: resp,
+			Data:   opts.dataMap,
+		}
+
+		newJson, err := json.Marshal(t)
 		if err != nil {
 			fmt.Println("Error marshaling json")
 			helpers.ServerError(w, err)
