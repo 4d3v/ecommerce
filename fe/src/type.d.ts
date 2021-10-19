@@ -236,7 +236,10 @@ export interface IOrderDetailsRdx {
 export interface IOrderListRdx {
   loading: boolean
   error: string
-  result: { orders: IOrderDetails[]; data: { admin_total_orders: number } }
+  result: {
+    orders: IOrderDetails[]
+    data: { admin_total_orders?: number; my_total_orders?: number }
+  }
 }
 
 interface IOrderedProd {

@@ -145,17 +145,27 @@ func (repo *Repository) AdminUpdateIsDelivered(w http.ResponseWriter, r *http.Re
 func (repo *Repository) GetOrders(w http.ResponseWriter, r *http.Request) {
 	user, _ := repo.getUserByJwt(r)
 
-	orders, err := repo.DB.GetOrders(user.Id)
+	limit, offset, err := getLimitOffset(r)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	orders, err := repo.DB.GetOrders(user.Id, limit, offset)
 	if err != nil {
 		fmt.Println(err)
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
 	}
 
+	dtMap := make(map[string]interface{})
+	dtMap["my_total_orders"] = repo.App.GlobalCounts["myTotalOrders"]
+
 	sendJson("ordersjson", w, &options{
-		ok:     true,
-		orders: orders,
-		stCode: http.StatusOK,
+		ok:      true,
+		orders:  orders,
+		dataMap: dtMap,
+		stCode:  http.StatusOK,
 	})
 }
 

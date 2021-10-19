@@ -40,7 +40,7 @@ type DatabaseRepo interface {
 	AdminUpdateOrderToPaid(id int) error
 	AdminUpdateIsDelivered(id int) error
 
-	GetOrders(userId int) ([]models.Order, error)
+	GetOrders(userId, limit, offset int) ([]models.Order, error)
 	GetOrderById(id, userId int) (models.Order, error)
 	InsertOrder(order models.Order) (int, error)
 	UpdateOrder(order models.Order) error

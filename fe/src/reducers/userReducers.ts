@@ -167,7 +167,13 @@ export const userListReducer = (
       return { loading: false, error: action.payload }
 
     case userActions.USER_LIST_RESET:
-      return { users: null }
+      return {
+        loading: true,
+        result: {
+          users: [],
+          data: { total_users: 0 },
+        },
+      }
 
     default:
       return state

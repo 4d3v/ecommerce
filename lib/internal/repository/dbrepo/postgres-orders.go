@@ -158,21 +158,28 @@ func (dbrepo *postgresDbRepo) AdminGetOrderById(orderId int) (models.Order, erro
 	return order, nil
 }
 
-func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
+func (dbrepo *postgresDbRepo) GetOrders(userId, limit, offset int) ([]models.Order, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	var orders []models.Order
+	var (
+		orders    []models.Order
+		fullCount int = 0
+	)
 
 	query := `
 		SELECT id, postal_code, address, country, city, payment_method, 
 		payment_result_id, payment_result_status, payment_result_update_time, 
 		payment_result_email_address, total_price, is_paid, paid_at, 
-		is_delivered, delivered_at, user_id, created_at, updated_at 
-		FROM orders WHERE user_id = $1
-	` // ORDER BY id ASC
+		is_delivered, delivered_at, user_id, created_at, updated_at,
+		count(*) OVER() FROM orders
+		WHERE user_id = $1
+		ORDER BY id DESC
+		LIMIT $2
+		OFFSET $3
+	`
 
-	rows, err := dbrepo.DB.QueryContext(ctx, query, userId)
+	rows, err := dbrepo.DB.QueryContext(ctx, query, userId, limit, offset)
 	if err != nil {
 		return orders, err
 	}
@@ -200,6 +207,7 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 			&order.UserId,
 			&order.CreatedAt,
 			&order.UpdatedAt,
+			&fullCount,
 		)
 
 		if err != nil {
@@ -211,6 +219,10 @@ func (dbrepo *postgresDbRepo) GetOrders(userId int) ([]models.Order, error) {
 
 	if err = rows.Err(); err != nil {
 		return orders, err
+	}
+
+	if fullCount > dbrepo.App.GlobalCounts["myTotalOrders"] {
+		dbrepo.App.GlobalCounts["myTotalOrders"] = fullCount
 	}
 
 	return orders, nil

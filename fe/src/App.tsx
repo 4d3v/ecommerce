@@ -147,23 +147,26 @@ const App = () => {
                 />
               </Route>
 
-              <Route
-                path='/admin/users'
-                component={AdminUserListScreen}
-                exact
-              />
+              <Route path='/admin/users' exact>
+                <AdminUserListScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
 
-              <Route
-                path='/admin/products'
-                component={AdminProductListScreen}
-                exact
-              />
+              <Route path='/admin/products' exact>
+                <AdminProductListScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
 
-              <Route
-                path='/admin/orders'
-                component={AdminOrderListScreen}
-                exact
-              />
+              <Route path='/admin/orders' exact>
+                <AdminOrderListScreen
+                  leftNavToggled={leftNavToggled}
+                  leftNavDefVis={false}
+                />
+              </Route>
 
               <Route
                 path='/admin/product/create'

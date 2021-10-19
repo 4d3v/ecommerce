@@ -3,15 +3,25 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { deleteUser, listUsers } from '../actions/userActions'
 import Loader from '../components/Loader'
+import MainSideNav from '../components/MainSideNav'
 import Message from '../components/Message'
 import Pagination from '../components/Pagination'
 import SideNav from '../components/SideNav'
 import { UserRole } from '../enums'
-import { IUser, IUserDeleteRdx, IUserListRdx, IUserLoginRdx } from '../type'
+import {
+  IMainNavProps,
+  IUser,
+  IUserDeleteRdx,
+  IUserListRdx,
+  IUserLoginRdx,
+} from '../type'
 
 interface HistoryParams {}
 
-const AdminUserListScreen = () => {
+const AdminUserListScreen = ({
+  leftNavToggled,
+  leftNavDefVis,
+}: IMainNavProps) => {
   const history = useHistory<HistoryParams>()
   const dispatch = useDispatch()
   const limit = 10
@@ -21,7 +31,6 @@ const AdminUserListScreen = () => {
   const userList = useSelector(
     (state: { userList: IUserListRdx }) => state.userList
   )
-  console.log(userList)
 
   const userLogin = useSelector(
     (state: { userLogin: IUserLoginRdx }) => state.userLogin
@@ -51,8 +60,13 @@ const AdminUserListScreen = () => {
   }
 
   return (
-    <div className='container'>
-      <div className='prof--sep u-my-s'>
+    <div className='_mctt02'>
+      <MainSideNav
+        leftNavToggled={leftNavToggled}
+        leftNavDefVis={leftNavDefVis}
+      />
+
+      <div className='prof--sep'>
         <SideNav
           isAdmin={
             userLogin.userInfo &&

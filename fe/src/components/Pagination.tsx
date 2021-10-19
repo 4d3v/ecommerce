@@ -8,8 +8,6 @@ interface IProps {
 }
 
 const Pagination = ({ page, limit, total_prods, handlePageClick }: IProps) => {
-  console.log('total_prods', total_prods)
-
   const fillProductItems = (): JSX.Element[] => {
     const productItems = []
     // PS first page === 0, reason is because we start using 0 as offset on the db query

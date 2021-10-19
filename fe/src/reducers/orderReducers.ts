@@ -91,9 +91,9 @@ export const orderPayReducer = (state = {}, action: AnyAction) => {
 
 export const orderListUserReducer = (
   state: {
-    result: { orders: IOrderDetails[]; data: {} }
+    result: { orders: IOrderDetails[]; data: { my_total_orders: number } }
   } = {
-    result: { orders: [], data: {} },
+    result: { orders: [], data: { my_total_orders: 0 } },
   },
   action: AnyAction
 ) => {
@@ -103,7 +103,7 @@ export const orderListUserReducer = (
         loading: true,
         result: {
           orders: [...state.result.orders],
-          data: {},
+          data: { my_total_orders: state.result.data.my_total_orders },
         },
       }
 
@@ -114,7 +114,13 @@ export const orderListUserReducer = (
       return { loading: false, error: action.payload }
 
     case orderActions.ORDER_LIST_USER_RESET:
-      return {}
+      return {
+        loading: true,
+        result: {
+          orders: [],
+          data: { my_total_orders: 0 },
+        },
+      }
 
     default:
       return state

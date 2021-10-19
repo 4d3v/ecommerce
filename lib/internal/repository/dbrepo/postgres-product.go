@@ -3,7 +3,6 @@ package dbrepo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"time"
 
@@ -147,9 +146,6 @@ func (dbrepo *postgresDbRepo) GetProducts(lt time.Time) ([]models.Product, error
 		p := float64(fullCount) / 6.0
 		dbrepo.App.GlobalCounts["totalProdPages"] = int(math.Ceil(p))
 	}
-
-	fmt.Println("gvc", dbrepo.App.GlobalCounts["totalProds"])
-	fmt.Println("gpages", dbrepo.App.GlobalCounts["totalProdPages"])
 
 	return products, nil
 }

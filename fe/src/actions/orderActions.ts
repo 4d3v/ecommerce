@@ -184,29 +184,35 @@ export const adminSetOrderAsDelivered =
     }
   }
 
-export const listMyOrders = () => async (dispatch: AppDispatch) => {
-  try {
-    dispatch({
-      type: orderActions.ORDER_LIST_USER_REQUEST,
-    })
+export const listMyOrders =
+  (query?: { limit: number; offset: number }) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch({
+        type: orderActions.ORDER_LIST_USER_REQUEST,
+      })
 
-    const { data } = await axios.get(`${BASE_URL}/orders`, {
-      withCredentials: true,
-    })
+      const { data } = await axios.get(`${BASE_URL}/orders`, {
+        params: {
+          limit: query && query.limit ? query.limit : 10,
+          offset: query && query.offset ? query.offset : 0,
+        },
+        withCredentials: true,
+      })
 
-    dispatch({
-      type: orderActions.ORDER_LIST_USER_SUCCESS,
-      payload: data,
-    })
-  } catch (error) {
-    const customError = getFormErrors(error)
-    dispatch({
-      type: orderActions.ORDER_LIST_USER_FAIL,
-      payload: customError.length > 0 ? customError : error.message,
-    })
-    console.log(error.response)
+      dispatch({
+        type: orderActions.ORDER_LIST_USER_SUCCESS,
+        payload: data,
+      })
+    } catch (error) {
+      const customError = getFormErrors(error)
+      dispatch({
+        type: orderActions.ORDER_LIST_USER_FAIL,
+        payload: customError.length > 0 ? customError : error.message,
+      })
+      console.log(error.response)
+    }
   }
-}
 
 export const adminListOrders =
   (query?: { limit: number; offset: number }) =>

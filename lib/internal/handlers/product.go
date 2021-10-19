@@ -32,7 +32,6 @@ func (repo *Repository) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(lt)
 	dtMap := make(map[string]interface{})
 	dtMap["total_prods"] = repo.App.GlobalCounts["totalProds"]
 	dtMap["total_prod_pages"] = repo.App.GlobalCounts["totalProdPages"]
@@ -466,12 +465,14 @@ func (repo *Repository) AdmGetProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		lt = t
 	}
-	limit := r.URL.Query().Get("limit")
-	offset := r.URL.Query().Get("offset")
-	lmt, _ := strconv.Atoi(limit)
-	offs, _ := strconv.Atoi(offset)
 
-	products, err := repo.DB.AdminGetProducts(lt, lmt, offs)
+	limit, offset, err := getLimitOffset(r)
+	if err != nil {
+		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
+		return
+	}
+
+	products, err := repo.DB.AdminGetProducts(lt, limit, offset)
 	if err != nil {
 		sendError(w, fmt.Sprintf("%s", err), http.StatusBadRequest)
 		return
